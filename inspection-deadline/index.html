@@ -55,7 +55,22 @@
 <li>이행 완료 기간은 소방본부장·소방서장이 통보한 기간이 우선이며, 규모·절차가 복잡하면 기간을 달리 정할 수 있습니다(시행규칙 제23조제5항 단서).</li>
 </ul>
 </section>
-</main>
+<section class="no-print" id="exc" aria-labelledby="exc-t">
+<h2 id="exc-t">예외 상황: 면제·연기·업체 교체·진단</h2>
+<div class="g3">
+<div><label class="f" for="x-case">상황</label><select id="x-case">
+<option value="delay">점검을 기간 안에 못 함(질병·출장·경매·부도 등) → 연기</option>
+<option value="exempt">재난이 발생함 → 면제 또는 연기</option>
+<option value="fixdelay">지적사항 수리가 기간 안에 안 끝남 → 이행 완료 연기</option>
+<option value="vendor">점검 업체가 바뀌었거나 결과보고서를 못 받음</option>
+<option value="partial">24시간 운영 구역 등 일부를 점검 못 함</option>
+<option value="good">소방안전관리 우수 대상물(종합점검 면제)</option>
+<option value="diag">화재예방안전진단 대상</option>
+</select></div>
+<div><label class="f" for="x-end">기준 날짜</label><input id="x-end" type="date"><div class="hint" id="x-end-h">점검 실시 만료일(점검 기간의 마지막 날)</div></div>
+</div>
+<div id="x-out" aria-live="polite" style="margin-top:10px"></div>
+</section></main>
 <footer>
 <p class="maker">제작: 김재환 (소방안전관리자 1급, 소방설비기사 전기)</p>
 <p>근거 법령(국가법령정보센터 law.go.kr에서 원문 확인)</p>
@@ -67,6 +82,7 @@
 <li>「관공서의 공휴일에 관한 규정」 제2조, 제3조 / 공휴일 목록: 2026·2027년 월력요항 기준(노동절·제헌절 포함)</li>
 </ul>
 <p>참고용입니다. 최종 판단은 관할 소방서와 법령 원문으로 확인하세요.</p>
+<p>예외 상황 근거(2026-11-25 원문 확인): 소방시설법 [시행 2024. 12. 1.] 제22조제6항·제23조·제58조·제61조, 같은 법 시행령 [시행 2026. 10. 2.] 제33조, 같은 법 시행규칙 [시행 2026. 10. 19.] 제22조~제24조·별표 3(2025. 12. 1. 개정) 제3호다목·제5호의2.</p>
 </footer>
 <script>
 // 2026~2027 관공서 공휴일(일요일은 별도 처리). 대체공휴일 포함.
@@ -136,6 +152,28 @@ document.getElementById('calc').onclick=calc;
 document.getElementById('print').onclick=function(){if(document.getElementById('out').style.display==='none')calc();window.print();};
 document.querySelectorAll('input[name=defect]').forEach(function(e){e.onchange=function(){document.getElementById('fix').disabled=radio('defect')==='n';document.getElementById('fin').disabled=radio('defect')==='n';};});
 </script>
-<script src="../assets/ui.js" defer></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+function P(s){if(!s)return null;var a=s.split('-');return new Date(+a[0],+a[1]-1,+a[2]);}
+var W=['일','월','화','수','목','금','토'];function F(d){return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.('+W[d.getDay()]+')';}
+function A(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+var H={
+delay:['자체점검 실시 만료일','<b>연기 신청 마감: {d3}</b> (만료일 3일 전까지, 별지 제7호서식 + 곤란함을 증명하는 서류)<br>연기 사유: 재난 발생, 경매 등으로 소유권 변동 중·변동, 관계인의 질병·사고·장기출장, 부도·도산 등 중대한 위기. 소방서는 받은 날부터 3일 이내 결정·통보(별지 제8호서식).<br>사유 없이 점검하지 않으면 1년 이하 징역 또는 1천만원 이하 벌금(소방시설법 제58조제1호).','소방시설법 제22조제6항 · 시행령 제33조제1항 · 시행규칙 제22조'],
+exempt:['자체점검 실시 만료일','<b>면제·연기 신청 마감: {d3}</b> (만료일 3일 전까지)<br><b>면제</b>는 「재난 및 안전관리 기본법」 제3조제1호의 재난이 발생한 경우에만 신청할 수 있습니다. 그 밖의 사유는 연기만 가능.','시행령 제33조제2항 후단 · 시행규칙 제22조제1항'],
+fixdelay:['이행계획 완료기간 만료일','<b>완료 연기 신청 마감: {d3}</b> (완료기간 만료일 3일 전까지, 별지 제12호서식 + 증명 서류). 소방서는 3일 이내 결정(별지 제13호서식).<br>원래 완료기간: 수리·정비는 보고일부터 10일, 철거·교체는 20일 이내. 완료 후 10일 이내 이행완료 보고(전·후 사진, 공사 계약서).<br>기간 내 미완료·미보고는 과태료 300만원 이하(소방시설법 제61조제1항제9호).','소방시설법 제23조제4항·제5항 · 시행규칙 제23조제5항·제6항, 제24조'],
+vendor:['점검이 끝난 날','관리업자는 점검이 끝난 날부터 10일 이내에 결과 보고서를 관계인에게 내야 합니다(마감 {d10}). 관계인의 소방서 보고 기한은 <b>점검이 끝난 날부터 15일(토·공휴일 제외)</b>로, 업체에서 받은 날이 아닙니다.<br>업체가 바뀌어 받지 못하면 점검한 업체에 서면으로 요구하고 그 기록을 남기세요(업체 미제출은 관리업자 과태료 300만원 이하, 소방시설법 제61조제1항제6호). 위의 계산기에 점검 완료일을 넣으면 정확한 보고 마감이 나옵니다.','시행규칙 제23조제1항~제3항 · 소방시설법 제22조제1항 후단'],
+partial:['점검이 끝난 날','관리업자는 점검하지 못한 소방시설과 점검 방법을 결과 보고서(별지 제9호서식 제4호 기타란)에 적어 관계인에게 알리고, 관계인은 그 시설을 점검한 뒤 결과를 실시결과 보고서에 포함해 보고합니다.','시행규칙 별표 3 제5호의2'],
+good:['-','소방청장이 소방안전관리가 우수하다고 인정한 대상물은 소방서장이 3년 범위에서 <b>종합점검</b>을 면제할 수 있습니다. 면제기간 중 화재가 나면 제외. 작동점검까지 면제하는 조항은 아닙니다.','시행규칙 별표 3 제3호다목2)'],
+diag:['-','화재예방안전진단은 화재예방법 제41조의 별도 의무이며, 진단 결과를 제출하지 않으면 과태료 300만원 이하(제52조제1항제8호). <b>진단을 받았다고 소방시설 자체점검이 면제된다는 조항은 이번 확인 범위(소방시설법 제22조, 시행령 제33조, 시행규칙 제22조·별표 3)에서 찾지 못했습니다.</b> 관할 소방서에 확인하세요.','화재예방법 제41조, 제52조제1항제8호']
+};
+function run(){var k=$('x-case').value,h=H[k],d=P($('x-end').value);$('x-end-h').textContent=h[0]==='-'?'날짜 필요 없음':h[0];
+ var t=h[1];if(d){t=t.replace('{d3}',F(A(d,-3))).replace('{d10}',F(A(d,10)));}else{t=t.replace('{d3}','기준 날짜를 넣으면 계산').replace('{d10}','점검 끝난 날 + 10일');}
+ $('x-out').innerHTML='<div class="'+(k==='diag'?'warn':'ok')+'">'+t+'<br><span class="law">근거: '+h[2]+'</span></div>'+(d&&/\{d3\}/.test(h[1])?'<p class="hint">마감일이 토·공휴일이면 그 전 근무일에 내는 것이 안전합니다(조문은 “만료일 3일 전까지”).</p>':'');}
+$('x-case').onchange=run;$('x-end').onchange=run;
+if(location.hash==='#exc'){var u=new URLSearchParams(location.search).get('x');if(u&&H[u])$('x-case').value=u;}
+run();
+})();
+</script><script src="../assets/ui.js" defer></script>
 </body>
 </html>
