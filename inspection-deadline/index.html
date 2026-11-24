@@ -36,6 +36,7 @@ footer ul{padding-left:18px;margin:6px 0}
 @media (max-width:640px){.grid{grid-template-columns:1fr}td.d{white-space:normal}th,td{padding:6px;font-size:13px}}
 @media print{header{background:#fff;color:#000;border-bottom:2px solid #000}header p{color:#333}.no-print{display:none}body{background:#fff}section{border:none;padding:0}}
 </style>
+<script src="../gc.js"></script>
 </head>
 <body>
 <header>
@@ -63,7 +64,7 @@ footer ul{padding-left:18px;margin:6px 0}
 <div><label class="f" for="fin">실제 이행 완료일(선택)</label>
 <input type="date" id="fin"><div class="hint">비우면 이행 완료 기한 마지막 날로 계산</div></div>
 </div>
-<div class="btns"><button id="calc">계산</button><button class="sub" id="print">인쇄</button></div>
+<div class="btns"><button id="calc" data-gc="calc-inspection-deadline">계산</button><button class="sub" id="print">인쇄</button></div>
 </section>
 
 <section id="out" style="display:none">
