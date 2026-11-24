@@ -33,6 +33,7 @@ footer ul{padding-left:18px;margin:6px 0}
 @media (max-width:640px){.grid{grid-template-columns:1fr}th{width:40%}th,td{padding:6px;font-size:13px}}
 @media print{header{background:#fff;color:#000;border-bottom:2px solid #000}header p{color:#333}button{display:none}body{background:#fff}}
 </style>
+<script src="../gc.js"></script>
 </head>
 <body>
 <header>
@@ -54,7 +55,7 @@ footer ul{padding-left:18px;margin:6px 0}
 <div style="grid-column:1/-1"><label class="chk"><input type="checkbox" id="fr1"> 주요구조부가 내화구조이고, 벽 및 반자의 실내에 면하는 부분이 불연재료·준불연재료 또는 난연재료임</label>
 <div class="hint">해당하면 표의 바닥면적 2배를 기준면적으로 합니다(표 2.1.1.2 비고).</div></div>
 </div>
-<button id="b1">소화기 계산</button>
+<button id="b1" data-gc="calc-extinguisher">소화기 계산</button>
 <div id="r1"></div>
 </section>
 
@@ -75,7 +76,7 @@ footer ul{padding-left:18px;margin:6px 0}
 <div><label class="chk"><input type="checkbox" id="fr2" checked> 주요구조부가 내화구조로 된 특정소방대상물 또는 그 부분</label>
 <div class="hint">열감지기만 구분(연기감지기는 구분 없음)</div></div>
 </div>
-<button id="b2">감지기 계산</button> <button class="sub" onclick="window.print()">인쇄</button>
+<button id="b2" data-gc="calc-detector">감지기 계산</button> <button class="sub" onclick="window.print()">인쇄</button>
 <div id="r2"></div>
 </section>
 </main>
