@@ -55,13 +55,53 @@
 <button id="b2" data-gc="calc-detector">감지기 계산</button> <button class="sub" onclick="window.print()">인쇄</button>
 <div id="r2"></div>
 </section>
-</main>
+<section id="sub">
+<h2>부속용도 추가 소화기 (NFTC 101 표 2.1.1.3)</h2>
+<div class="grid">
+<div><label class="f" for="su">부속용도</label>
+<select id="su">
+<option value="k">음식점·다중이용업소·호텔·기숙사·노유자·의료·업무·공장·장례식장·교육연구·교정·군사시설의 주방</option>
+<option value="b">보일러실·건조실·세탁소·대량화기취급소</option>
+<option value="e">관리자 출입이 곤란한 변전실·송전실·변압기실·배전반실</option>
+<option value="p">발전실·변전실·송전실·변압기실·배전반실·통신기기실·전산기기실 등</option>
+<option value="m">마그네슘 합금 칩 저장·취급 장소</option>
+</select></div>
+<div><label class="f" for="sa">해당 부분 바닥면적(㎡)</label><input type="number" id="sa" min="0" step="0.01" value="40"></div>
+<div style="grid-column:1/-1"><label class="chk"><input type="checkbox" id="ssp"> 스프링클러·간이스프링클러·물분무등소화설비 또는 상업용 주방자동소화장치가 설치됨</label><div class="hint">표 2.1.1.3 제1호 단서: 이 경우 자동확산소화기는 설치하지 않을 수 있음</div></div>
+</div>
+<button id="b3" data-gc="calc-sub-extinguisher">부속용도 계산</button>
+<div id="r3"></div>
+</section>
+
+<section id="water">
+<h2>옥내소화전 수원·옥상수원 (NFTC 102)</h2>
+<div class="grid">
+<div><label class="f" for="wn">옥내소화전이 가장 많은 층의 설치 개수</label><input type="number" id="wn" min="0" step="1" value="3"></div>
+<div><label class="f" for="wx">옥상수원 예외</label>
+<select id="wx">
+<option value="">해당 없음(옥상수원 필요)</option>
+<option value="1">지하층만 있는 건축물</option>
+<option value="2">고가수조를 가압송수장치로 설치</option>
+<option value="3">수원이 최상층 방수구보다 높은 위치</option>
+<option value="4">건축물 높이가 지표면에서 10m 이하</option>
+<option value="5">주펌프와 동등 이상 별도 펌프(내연기관 연동 또는 비상전원)</option>
+<option value="6">2.2.1.9 단서에 해당</option>
+<option value="7">가압수조를 가압송수장치로 설치</option>
+</select></div>
+<div><label class="f" for="wp">측정 방수압력(MPa, 선택)</label><input type="number" id="wp" min="0" step="0.01" placeholder="예: 0.25"></div>
+<div><label class="f" for="wq">측정 방수량(L/min, 선택)</label><input type="number" id="wq" min="0" step="1" placeholder="예: 140"></div>
+</div>
+<button id="b4" data-gc="calc-water">수원 계산</button>
+<div id="r4"></div>
+<p class="hint">30층 이상 고층건축물 등 다른 기준이 함께 적용되는 건물은 해당 기준(예: 고층건축물 기준)을 따로 확인하세요. 이 계산은 NFTC 102 2.1.1·2.1.2만 씁니다.</p>
+</section></main>
 <footer>
 <p class="maker">제작: 김재환 (소방안전관리자 1급, 소방설비기사 전기)</p>
 <p>근거 기준(국가법령정보센터 law.go.kr 행정규칙 원문 확인)</p>
 <ul>
 <li>소화기구 및 자동소화장치의 화재안전기술기준(NFTC 101) [시행 2024. 7. 25., 국립소방연구원공고 제2024-48호] 1.7.1.2, 2.1.1.2(표 2.1.1.2·비고), 2.1.1.3, 2.1.1.4.1, 2.1.1.4.2, 2.1.1.5</li>
 <li>자동화재탐지설비 및 시각경보장치의 화재안전기술기준(NFTC 203) [시행 2026. 3. 1., 국립소방연구원공고 제2026-10호] 2.4.1(표 2.4.1), 2.4.3.5(표 2.4.3.5), 2.4.3.10.1(표 2.4.3.10.1), 2.4.3.10.2</li>
+<li>옥내소화전설비의 화재안전기술기준(NFTC 102) [시행 2026. 7. 1., 국립소방연구원공고 제2026-34호] 2.1.1, 2.1.2, 2.2.1.3, 2.2.1.4 · NFTC 101 표 2.1.1.3(부속용도별 추가 소화기구, 2024. 7. 25. 개정) — 2026-11-25 원문 확인</li>
 </ul>
 <p>참고용입니다. 최종 판단은 관할 소방서와 기준 원문으로 확인하세요.</p>
 </footer>
@@ -78,7 +118,7 @@ document.getElementById('b1').onclick=function(){
  '<tr><th>3단위 소화기 기준 최소 개수</th><td>'+u+'단위 ÷ 3단위 = '+n2(u/3)+' → <b>'+c+'개</b> 이상</td></tr>'+
  '<tr><th>배치 조건(개수를 늘려야 할 수 있음)</th><td>각 층마다 설치, 2 이상의 거실로 구획된 층은 바닥면적 33㎡ 이상 거실마다 추가 배치(2.1.1.4.1)<br>각 부분에서 소화기까지 보행거리: 소형 20m 이내, 대형 30m 이내(2.1.1.4.2)</td></tr>'+
  '</table><ul class="note"><li>소형소화기: 능력단위 1단위 이상이고 대형 미만. 대형소화기: A급 10단위·B급 20단위 이상(1.7.1.2).</li>'+
- '<li>보일러실·주방 등 부속용도는 표 2.1.1.3에 따라 따로 추가합니다(이 계산에 미포함).</li>'+
+ '<li>보일러실·주방 등 부속용도는 표 2.1.1.3에 따라 따로 추가합니다(<a href=\"#sub\">아래 부속용도 계산</a>).</li>'+
  '<li>2단위 이상 설치 대상은 간이소화용구 능력단위가 전체의 1/2을 넘으면 안 됩니다(노유자시설 제외, 2.1.1.5).</li></ul>';
 };
 // NFTC 203 표 2.4.3.5 (단위 ㎡) [내화, 기타]
@@ -110,6 +150,33 @@ document.getElementById('b2').onclick=function(){
 };
 document.getElementById('b1').click();document.getElementById('b2').click();
 </script>
-<script src="../assets/ui.js" defer></script>
+<script>
+(function(){
+function n2(x){return Math.round(x*100)/100;}
+var $=function(i){return document.getElementById(i);};
+$('b3').onclick=function(){var t=$('su').value,a=+$('sa').value,sp=$('ssp').checked,o=$('r3');
+ if(!(a>0)&&t!=='m'){o.innerHTML='<div class="err">바닥면적을 0보다 크게 넣어 주세요.</div>';return;}
+ var h='<table>';
+ if(t==='k'||t==='b'||t==='e'){var u=Math.ceil(n2(a/25));
+  h+='<tr><th>추가 능력단위</th><td>'+a+'㎡ ÷ 25㎡ = '+n2(a/25)+' → <b>'+u+'단위</b> 이상(바닥면적 25㎡마다 능력단위 1단위 이상의 소화기)</td></tr>';
+  if(t==='k')h+='<tr><th>주방 K급</th><td>주방에 설치하는 소화기 중 <b>1개 이상은 주방화재용(K급)</b></td></tr>';
+  var ad=a<=10?1:2;h+='<tr><th>자동확산소화기</th><td>'+(sp?'스프링클러 등 또는 상업용 주방자동소화장치가 있어 <b>설치하지 않을 수 있음</b>':'바닥면적 '+a+'㎡ → <b>'+ad+'개</b> (10㎡ 이하 1개, 10㎡ 초과 2개 이상), 보일러·조리기구·변전설비 등 방호대상에 유효하게 분사되는 위치')+'</td></tr>';
+  h+='<tr><th>근거</th><td><span class="hint">NFTC 101 표 2.1.1.3 제1호 '+(t==='k'?'나목':t==='b'?'가목':'다목')+' · 2.1.1.3(2.1.1.2 능력단위와 별도로 추가)</span></td></tr>';}
+ else if(t==='p'){var c=Math.ceil(n2(a/50));h+='<tr><th>추가 소화기</th><td>'+a+'㎡ ÷ 50㎡ = '+n2(a/50)+' → <b>'+c+'개</b> 이상(적응성 있는 소화기, 또는 유효설치방호체적 이내의 가스·분말·고체에어로졸 자동소화장치, 캐비닛형자동소화장치)</td></tr><tr><th>참고</th><td>통신기기실·전자기기실을 제외한 장소는 교류 600V 또는 직류 750V 이상인 것에 한함. 관리자 출입이 곤란한 변전실 등은 제1호 다목(25㎡마다)을 보세요.</td></tr><tr><th>근거</th><td><span class="hint">NFTC 101 표 2.1.1.3 제2호</span></td></tr>';}
+ else{h+='<tr><th>추가 소화기</th><td>금속화재용 소화기(D급) <b>1개 이상</b>을 금속재료로부터 보행거리 20m 이내</td></tr><tr><th>근거</th><td><span class="hint">NFTC 101 표 2.1.1.3 제7호</span></td></tr>';}
+ h+='</table><ul class="note"><li>위험물(지정수량 1/5~1배 미만), 특수가연물, 가연성가스 연소기·저장실, 가스 제조·저장 장소는 표 2.1.1.3 제3호~제6호를 원문으로 확인하세요(이 계산 미포함).</li><li>소형소화기 감소(2.2.1)는 근린생활·판매·숙박·업무시설 등에는 적용되지 않습니다.</li></ul>';
+ o.innerHTML=h;};
+$('b4').onclick=function(){var N=Math.floor(+$('wn').value),x=$('wx').value,P=parseFloat($('wp').value),Q=parseFloat($('wq').value),o=$('r4');
+ if(!(N>0)){o.innerHTML='<div class="err">옥내소화전 개수를 1 이상 넣어 주세요.</div>';return;}
+ var k=Math.min(N,2),V=n2(k*2.6),R=n2(V/3),pump=k*130;
+ var h='<table><tr><th>수원(저수량)</th><td>min('+N+', 2)개 × 2.6㎥ = <b>'+V+'㎥ 이상</b><br><span class="hint">NFTC 102 2.1.1(가장 많은 층의 개수, 2개 이상이면 2개)</span></td></tr>'+
+ '<tr><th>옥상수원</th><td>'+(x?'<b>예외</b>: 2.1.2('+x+')에 해당하여 옥상 설치 제외':'유효수량의 1/3 이상 = '+V+' ÷ 3 = <b>'+R+'㎥ 이상</b>을 주된 옥상에 별도 설치')+'<br><span class="hint">NFTC 102 2.1.2</span></td></tr>'+
+ '<tr><th>펌프 토출량</th><td>'+k+'개 × 130 L/min = <b>'+pump+' L/min 이상</b><br><span class="hint">NFTC 102 2.2.1.4</span></td></tr>';
+ if(!isNaN(P)||!isNaN(Q)){var ok1=isNaN(P)?null:P>=0.17,ok2=isNaN(Q)?null:Q>=130,hi=!isNaN(P)&&P>0.7;
+  h+='<tr><th>방수 성능 판정</th><td>'+(ok1==null?'':'방수압력 '+P+'MPa: '+(ok1?'적합(0.17MPa 이상)':'<b>부적합</b>(0.17MPa 미만)')+'<br>')+(ok2==null?'':'방수량 '+Q+'L/min: '+(ok2?'적합(130L/min 이상)':'<b>부적합</b>(130L/min 미만)')+'<br>')+(hi?'<b>0.7MPa 초과</b>: 호스접결구 인입 측에 감압장치 필요<br>':'')+'<span class="hint">NFTC 102 2.2.1.3(해당 층 2개 동시 사용 시 노즐선단 기준)</span></td></tr>';}
+ o.innerHTML=h+'</table>';};
+$('b3').click();$('b4').click();
+})();
+</script><script src="../assets/ui.js" defer></script>
 </body>
 </html>
