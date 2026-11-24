@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방안전관리자 선임 첫 30일 할 일 (무료) | 선임신고 14일·실무교육 6개월·겸직 제한 자동 계산</title>
+<meta name="description" content="선임일과 등급만 넣으면 선임신고 14일, 성명 게시, 실무교육 6개월(수료 1년 이내 인정), 소방계획서·자위소방대·업무수행기록·훈련 일정과 겸직 불가 여부를 법 조문과 함께 체크리스트로. 휴대폰 알림(.ics)·A4 인쇄.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/start30.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#C8322B"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>.todo td:first-child{width:34px;text-align:center}.todo input[type=checkbox]{width:20px;height:20px}.dd{font-weight:700;white-space:nowrap}.late{color:var(--brand-text)}</style>
+<script src="../gc.js"></script><script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>선임 첫 30일 할 일</h1><p>선임신고·게시·실무교육·계획서 기한 자동 · 겸직 제한 표시<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="calendar.html">연간 달력</a><a href="./#all">전체 기능</a></nav>
+</div></header>
+<main id="main">
+<section class="card noprint">
+<h2>입력 (수첩 홈의 건물 정보와 같이 씁니다)</h2>
+<div class="g3">
+<div><label class="f" for="s-app">선임일</label><input id="s-app" type="date"></div>
+<div><label class="f" for="s-grade">소방안전관리대상물 등급</label><select id="s-grade"><option value="">선택</option><option>특급</option><option>1급</option><option>2급</option><option>3급</option></select></div>
+<div><label class="f" for="s-edu">가장 최근 강습·실무교육 수료일</label><input id="s-edu" type="date"><div class="hint">모르면 비워 두세요</div></div>
+<div><label class="f" for="s-type">선임 형태</label><select id="s-type"><option value="self">자격자 직접 선임</option><option value="agent">업무대행 감독자로 선임(법 제24조제3항)</option></select></div>
+<div><label class="f" for="s-other">다른 법령 안전관리자 겸임</label><select id="s-other"><option value="n">아니오</option><option value="y">예(전기·가스·위험물 등)</option></select></div>
+</div>
+<div class="btns"><button type="button" id="b-run" data-gc="kit-start30">할 일 만들기</button><button type="button" class="sub" id="b-ics">휴대폰 알림(.ics)</button><button type="button" class="gray" id="b-print">A4 인쇄</button></div>
+</section>
+<section class="card" id="out" aria-live="polite"></section>
+<p class="hint noprint">계획서는 <a href="https://pefp96-web.github.io/sobang-docs/">연간 서류 자동 생성기</a>로 만들 수 있고, 작성 대행은 <a href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">크몽</a>에서 받습니다.</p>
+</main>
+<footer class="noprint">근거(2026-11-25 국가법령정보센터 원문 확인): 화재의 예방 및 안전관리에 관한 법률 [시행 2026. 2. 27.] 제24조제2항·제3항·제5항, 제26조제1항, 제34조, 제37조, 제50조제3항, 제52조 · 같은 법 시행령 [시행 2026. 7. 1.] 제26조, 제27조, 제38조 · 같은 법 시행규칙 [시행 2026. 7. 1.] 제10조, 제11조제5항, 제14조제1항, 제15조, 제29조제3항(2025. 6. 26. 개정), 제36조. 기간은 민법 기간 계산(첫날 빼고, 끝날이 토·공휴일이면 다음 날)으로 계산했습니다. 실무교육 일정은 한국소방안전원 공고로 확인하세요. 참고용</footer>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var ITEMS=[];
+function addMonths(d,m){var x=new Date(d.getFullYear(),d.getMonth()+m,d.getDate());if(x.getDate()!==d.getDate())x=new Date(d.getFullYear(),d.getMonth()+m+1,0);return x;}
+function adj(e){while(KIT.offDay(e))e=KIT.add(e,1);return e;}
+function run(){
+ var a=KIT.parse($('s-app').value),g=$('s-grade').value,edu=KIT.parse($('s-edu').value),agent=$('s-type').value==='agent',other=$('s-other').value==='y',o=$('out');
+ if(!a){o.innerHTML='<p class="hint">선임일을 넣고 할 일 만들기를 누르세요. 입력은 이 기기에 자동 저장됩니다.</p>';return;}
+ var L=[];
+ function it(t,d,law,note,id){L.push({t:t,d:d,law:law,note:note||'',id:id});}
+ var d14=KIT.deadline(a,14);
+ it('소방서에 선임신고(별지 제15호서식, 종합정보망 가능)',d14,'화재예방법 제26조제1항 · 시행규칙 제14조제5항','기한을 넘기면 200만원 이하 과태료(법 제52조제2항제3호)','rep');
+ it('출입자가 보기 쉬운 곳에 소방안전관리자 현황표 게시: 대상물 명칭·등급, 성명·선임일자, 연락처, 근무 위치(수신기 또는 종합방재실)',d14,'화재예방법 제26조제1항 · 시행규칙 제15조·별표 2','게시하지 않아도 200만원 이하 과태료(법 제52조제2항제3호). 법은 신고와 같은 조항에서 정하고 있어 신고 때 함께 하는 것을 권장','post');
+ // 실무교육
+ var eduNote,eduD;
+ if(agent){eduD=addMonths(a,3);eduD=adj(eduD);eduNote='업무대행 감독자로 선임되면 선임된 날부터 3개월 이내 교육(법 제24조제3항).';}
+ else if(edu&&edu<=a&&addMonths(edu,12)>=a){var base=edu;eduD=KIT.add(addMonths(base,24),-1);eduNote='강습·실무교육 수료 후 1년 이내 선임이라 수료일('+KIT.fmt(edu)+')을 실무교육 받은 날로 봅니다. 다음 실무교육은 2년이 되는 날 전까지(시행규칙 제29조제3항 단서).';}
+ else{eduD=adj(addMonths(a,6));eduNote='선임된 날부터 6개월 이내, 그 뒤 2년마다 1회 이상(시행규칙 제29조제3항).'+(edu?' 입력한 수료일이 선임일 전 1년을 넘어 인정되지 않습니다.':'');}
+ it('소방안전관리자 실무교육 받기',eduD,'화재예방법 제34조제1항제2호 · 시행규칙 제29조제3항',eduNote+' 받지 않으면 100만원 이하 과태료(법 제52조제3항).','edu');
+ it('소방계획서 작성·시행(일반현황, 소방시설 현황, 자체점검·정비계획, 피난계획, 자위소방대 등)',null,'화재예방법 제24조제5항제1호 · 시행령 제27조','법령에서 따로 정한 작성 기한은 찾지 못했습니다(확인 범위 안). 업무 시작 직후 작성을 권장. 연간 서류 자동 생성기로 초안 가능','plan');
+ it('자위소방대·초기대응체계 편성(대장·부대장 각 1명)과 근무자 소방교육',null,'시행규칙 제11조 제2항·제5항','연 1회 이상 소집·점검·교육. 소방훈련과 함께 해도 됨(같은 조 제6항)','jaw');
+ var mEnd=KIT.lastDay(a.getFullYear(),a.getMonth());
+ it('업무수행기록표(별지 제12호서식) 첫 작성',mEnd,'화재예방법 시행규칙 제10조','월 1회 이상 작성, 보수·정비 필요 사항은 관계인에게 알리고 기록, 2년 보관. 첫 달 말일을 목표로 표시','rec');
+ it('소방훈련·교육 연간 일정 잡기',null,'화재예방법 제37조 · 시행규칙 제36조','연 1회 이상.'+((g==='특급'||g==='1급')?' 특급·1급은 실시한 날부터 30일 이내 결과 제출(법 제37조제2항, 시행령 제38조), 미제출 200만원 이하 과태료(법 제52조제2항제5호).':''),'drill');
+ it('지난 자체점검 결과·지적사항 인수받기(이행 중인 지적, 점검기록표 게시 여부)',null,'소방시설법 제23조·제24조','법정 기한 항목이 아니라 인수인계 권장 항목입니다. 지적사항 대장에 옮겨 두세요','hand');
+ ITEMS=L;
+ var warn='';
+ if(g==='특급'||g==='1급'){warn='<div class="'+(other?'err':'warn')+'"><b>겸직 제한: '+g+' 소방안전관리대상물</b>은 소방안전관리업무 전담 대상이라 전기·가스·위험물 등 다른 안전관리자가 소방안전관리자를 겸할 수 없습니다(법 제24조제2항, 시행령 제26조). 다른 법령에 특별한 규정이 있으면 예외(같은 항 단서). 위반 시 300만원 이하 과태료(법 제52조제1항제2호).'+(other?' <b>지금 겸임으로 입력되어 있습니다. 예외 근거를 확인하세요.</b>':'')+'</div>';}
+ else if(g){warn='<div class="ok">'+g+' 대상물은 시행령 제26조의 전담 대상(특급·1급)이 아니어서 법 제24조제2항의 겸직 제한이 적용되지 않습니다.</div>';}
+ KIT.get('start30-done').then(function(done){done=done||{};
+  o.innerHTML='<h2>선임일 '+KIT.fmt(a)+' 기준 할 일'+(g?' ('+g+')':'')+'</h2>'+warn+'<div class="tbl-wrap"><table class="todo"><tr><th>완료</th><th>할 일</th><th>기한</th><th>근거·메모</th></tr>'+L.map(function(x){var left=x.d?KIT.daysLeft(x.d):null;return '<tr><td><input type="checkbox" data-id="'+x.id+'" aria-label="완료"'+(done[x.id]?' checked':'')+'></td><td>'+KIT.esc(x.t)+'</td><td class="dd'+(left!=null&&left<0&&!done[x.id]?' late':'')+'">'+(x.d?KIT.fmt(x.d)+'<br><span class="hint">'+(left>=0?'D-'+left:(-left)+'일 지남')+'</span>':'기한 규정 없음')+'</td><td><span class="law">'+KIT.esc(x.law)+'</span><br><span class="hint">'+KIT.esc(x.note)+'</span></td></tr>';}).join('')+'</table></div>'+
+  '<p class="hint">선임 자체의 기한: 관계인은 사용승인·해임·퇴직 등 사유가 생긴 날부터 30일 이내에 선임해야 합니다(시행규칙 제14조제1항). 선임하지 않으면 300만원 이하 벌금(법 제50조제3항제3호).</p>';
+ });
+}
+function save(){KIT.building().then(function(b){b.appointed=$('s-app').value;b.grade=$('s-grade').value;if($('s-edu').value)b.eduFirst=$('s-edu').value;return KIT.saveBuilding(b);});KIT.set('start30',{type:$('s-type').value,other:$('s-other').value,edu:$('s-edu').value});}
+['s-app','s-grade','s-edu','s-type','s-other'].forEach(function(i){$(i).addEventListener('change',function(){save();run();});});
+$('b-run').onclick=function(){save();run();};
+$('b-print').onclick=function(){run();setTimeout(function(){window.print();},80);};
+$('out').addEventListener('change',function(e){var id=e.target.dataset.id;if(!id)return;KIT.get('start30-done').then(function(d){d=d||{};d[id]=e.target.checked;return KIT.set('start30-done',d);});});
+$('b-ics').onclick=function(){if(!ITEMS.length)run();var ev=ITEMS.filter(function(x){return x.d;});if(!ev.length){KIT.toast('선임일을 먼저 넣어 주세요');return;}
+ function ymd(d){return KIT.key(d).replace(/-/g,'');}
+ var s='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//fire-safety-tools//start30//KO\r\n'+ev.map(function(x,i){return 'BEGIN:VEVENT\r\nUID:start30-'+x.id+'-'+ymd(x.d)+'@fire-safety-tools\r\nDTSTAMP:'+ymd(new Date())+'T000000Z\r\nDTSTART;VALUE=DATE:'+ymd(x.d)+'\r\nDTEND;VALUE=DATE:'+ymd(KIT.add(x.d,1))+'\r\nSUMMARY:[소방] '+x.t.slice(0,40).replace(/[,;]/g,' ')+'\r\nDESCRIPTION:'+(x.law+' '+x.note).replace(/[,;\n]/g,' ').slice(0,300)+'\r\nBEGIN:VALARM\r\nTRIGGER:-P3D\r\nACTION:DISPLAY\r\nDESCRIPTION:기한 3일 전\r\nEND:VALARM\r\nEND:VEVENT\r\n';}).join('')+'END:VCALENDAR\r\n';
+ KIT.download('선임_첫30일_할일.ics',s,'text/calendar;charset=utf-8');};
+Promise.all([KIT.building(),KIT.get('start30')]).then(function(r){var b=r[0]||{},s=r[1]||{};if(b.appointed)$('s-app').value=b.appointed;if(b.grade)$('s-grade').value=b.grade;$('s-edu').value=s.edu||b.eduFirst||'';if(s.type)$('s-type').value=s.type;if(s.other)$('s-other').value=s.other;run();});
+})();
+</script>
+<script src="../assets/ui.js" defer></script>
+</body>
+</html>

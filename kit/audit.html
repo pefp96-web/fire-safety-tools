@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>화재안전조사 대비 자체 점검표 + 위반별 과태료 상한 (무료) | 방화문·비상구·수신기·점검기록표·선임 게시</title>
+<meta name="description" content="소방서 화재안전조사·불시 점검 전에 자주 지적되는 22개 항목(피난·방화시설, 수신기 차단, 소화기, 점검기록표·선임 게시, 훈련·교육)을 체크하고 불량은 지적사항 대장으로 보냅니다. 소방시설법·화재예방법·다중이용업소법 과태료·벌칙 상한 표.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/audit.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#C8322B"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>.ck td{vertical-align:top}.ck select{min-width:92px}.ck tr.ng td{background:var(--brand-soft)}.ck .it{font-weight:600}.amt{white-space:nowrap;font-weight:700}#sum b{font-variant-numeric:tabular-nums}</style>
+<script src="../gc.js"></script><script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>화재안전조사 대비 점검</h1><p>자주 잡히는 항목 체크 · 불량은 지적사항 대장으로 · 과태료 상한 표<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="defects.html">지적사항 대장</a><a href="./#all">전체 기능</a></nav>
+</div></header>
+<main id="main">
+<section class="card">
+<p class="hint" style="margin-top:0">항목마다 양호·불량·해당 없음을 고르세요. 선택은 이 기기에 자동 저장됩니다. 금액은 법률이 정한 <b>상한</b>이며 실제 부과 금액은 각 법 시행령의 과태료 부과기준(별표)에 따릅니다.</p>
+<div class="g3"><div><label class="f" for="a-date">점검일</label><input id="a-date" type="date"></div><div><label class="f" for="a-who">점검자</label><input id="a-who" placeholder="이름"></div><div><label class="f" for="a-multi">다중이용업소가 있나요?</label><select id="a-multi"><option value="n">없음</option><option value="y">있음(아래 항목 추가)</option></select></div></div>
+<p id="sum" class="hint" aria-live="polite"></p>
+<div class="tbl-wrap"><table class="ck" id="ck"></table></div>
+<div class="btns"><button type="button" id="b-send" data-gc="kit-audit-to-defects">불량 항목 지적사항 대장으로 보내기</button><button type="button" class="sub" id="b-print">A4 인쇄</button><button type="button" class="gray" id="b-reset">선택 지우기</button></div>
+</section>
+<section class="card">
+<h2>위반별 과태료·벌칙 상한</h2>
+<div class="tbl-wrap"><table id="fines"></table></div>
+<p class="hint">출처: 소방시설 설치 및 관리에 관한 법률 [시행 2024. 12. 1.] 제56조·제58조·제61조, 화재의 예방 및 안전관리에 관한 법률 [시행 2026. 2. 27.] 제50조·제52조, 다중이용업소의 안전관리에 관한 특별법 [시행 2024. 1. 4.] 제25조. 2026-11-25 국가법령정보센터 원문 확인.</p>
+</section>
+<p class="hint noprint">사진으로 사전 점검을 받아 보려면 <a href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">크몽</a>(도구는 무료).</p>
+</main>
+<footer class="noprint">이 점검표는 법령에서 정한 서식이 아니라 수첩의 자체 점검 양식입니다. 화재안전조사의 실제 항목·방법은 화재의 예방 및 안전관리에 관한 법률 제7조 이하와 관할 소방서 안내를 따르세요. 참고용</footer>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var S='소방시설법',F='화재예방법',M='다중이용업소법';
+var P300S='과태료 300만원 이하('+S+' 제61조제1항',P300F='과태료 300만원 이하('+F+' 제52조제1항',P200F='과태료 200만원 이하('+F+' 제52조제2항';
+var ITEMS=[
+['피난·방화시설','a1','방화문 닫힘 유지(고임목·도어스톱으로 열어 두지 않음), 자동폐쇄장치 작동',S+' 제16조제1항제1호·제3호',P300S+'제3호)'],
+['피난·방화시설','a2','비상구·계단·복도 등 피난통로에 물건 적치 없음',S+' 제16조제1항제2호',P300S+'제3호)'],
+['피난·방화시설','a3','방화셔터 아래·방화문 주변 장애물 없음',S+' 제16조제1항제2호',P300S+'제3호)'],
+['피난·방화시설','a4','피난시설·방화구획·방화시설을 임의로 바꾸지 않음(칸막이 설치, 방화문 교체 등)',S+' 제16조제1항제4호',P300S+'제3호)'],
+['소방시설','b1','수신기 정상(스위치 정상 위치, 화재·고장 표시 없음, 전원·예비전원 정상)',S+' 제12조제1항',P300S+'제1호)'],
+['소방시설','b2','경종·비상방송·연동·펌프를 꺼 두거나 잠가 두지 않음(점검·정비 때만 일시 가능)',S+' 제12조제3항','벌칙: 5년 이하 징역 또는 5천만원 이하 벌금('+S+' 제56조제1항)'],
+['소방시설','b3','소화기: 층마다, 보행거리 소형 20m 이내, 바닥에서 1.5m 이하, 표지 부착, 압력 정상','NFTC 101 2.1.1.4·2.1.1.6',P300S+'제1호)'],
+['소방시설','b4','주방자동소화장치(설치된 곳): 감지부·차단장치 정상, 수신부 확인 가능','NFTC 101 2.1.2',P300S+'제1호)'],
+['소방시설','b5','옥내소화전함 앞 적치물 없음, 호스·관창 비치, 표시등 점등',S+' 제12조제1항',P300S+'제1호)'],
+['소방시설','b6','유도등 상시 점등, 비상조명등 작동, 유도표지 가림 없음',S+' 제12조제1항',P300S+'제1호)'],
+['소방시설','b7','방염대상물품(커튼·카펫·소파 등) 방염 성능 확인 자료 보관',S+' 제20조제1항',P300S+'제4호)'],
+['서류·게시','c1','자체점검 실시 및 결과 보고(관계인 → 소방서)',S+' 제22조제1항, 제23조제3항','미실시: 1년 이하 징역 또는 1천만원 이하 벌금(제58조제1호) / 미보고·거짓: '+P300S+'제8호)'],
+['서류·게시','c2','지적사항 이행계획 기간 안에 완료하고 완료 보고',S+' 제23조제4항',P300S+'제9호)'],
+['서류·게시','c3','점검기록표를 출입자가 쉽게 보는 곳에 게시',S+' 제24조제1항',P300S+'제10호)'],
+['서류·게시','c4','소방안전관리자 선임, 14일 이내 선임신고, 현황표 게시',F+' 제24조제1항, 제26조제1항','미선임: 300만원 이하 벌금('+F+' 제50조제3항제3호) / 미신고·미게시: '+P200F+'제3호)'],
+['서류·게시','c5','소방계획서 작성·시행, 업무수행기록표 월 1회 작성·2년 보관',F+' 제24조제5항, 시행규칙 제10조','업무 미수행: '+P300F+'제3호)'],
+['서류·게시','c6','소방훈련·교육 연 1회 이상 실시와 기록(특급·1급은 30일 이내 결과 제출)',F+' 제37조제1항·제2항, 시행규칙 제36조','미실시: '+P300F+'제7호) / 미제출: '+P200F+'제5호)'],
+['서류·게시','c7','소방안전관리자·보조자 실무교육 이수',F+' 제34조제1항제2호','과태료 100만원 이하('+F+' 제52조제3항)'],
+['서류·게시','c8','다른 안전관리자 겸직 여부(특급·1급은 겸직 불가)',F+' 제24조제2항',P300F+'제2호)'],
+['화기·공사','d1','화기 취급 시 지킬 사항, 특수가연물 저장·취급 기준',F+' 제17조제4항·제5항',P200F+'제1호)'],
+['화기·공사','d2','공사 현장 임시소방시설(소화기·간이소화장치 등) 설치·관리',S+' 제15조제1항',P300S+'제2호)'],
+['화기·공사','d3','소방안전관리자 시정 요구를 받은 관계인의 조치(불이익 처우 금지)',F+' 제27조제3항·제4항','요구 안 한 관리자·불이익 준 관계인: 300만원 이하 벌금('+F+' 제50조제3항제4호·제5호)']
+];
+var MULTI=[
+['다중이용업소','m1','안전시설등(소화기, 간이스프링클러 대상, 비상벨·자탐, 피난기구·유도등, 비상구, 영상음향차단장치 등) 설치·유지',M+' 제9조제1항','과태료 300만원 이하('+M+' 제25조제1항제2호)'],
+['다중이용업소','m2','실내장식물 불연·준불연(합판·목재는 방염 성능, 면적 제한)',M+' 제10조','과태료 300만원 이하('+M+' 제25조제1항제3호)'],
+['다중이용업소','m3','피난안내도 비치·피난안내 영상 상영',M+' 제12조제1항','과태료 300만원 이하('+M+' 제25조제1항제5호)'],
+['다중이용업소','m4','안전시설등 정기점검(분기 1회) 결과서 작성·1년 보관',M+' 제13조제1항, 시행규칙 제14조','과태료 300만원 이하('+M+' 제25조제1항제6호)'],
+['다중이용업소','m5','화재배상책임보험 가입',M+' 제13조의2제1항','과태료 300만원 이하('+M+' 제25조제1항제6호의2)']
+];
+var ST={};
+function list(){return ITEMS.concat($('a-multi').value==='y'?MULTI:[]);}
+function draw(){
+ var L=list(),cat='';var h='<tr><th>분야</th><th>점검 항목</th><th>근거</th><th>위반 시 상한</th><th>결과</th></tr>';
+ L.forEach(function(x){var v=ST[x[1]]||'';h+='<tr class="'+(v==='불량'?'ng':'')+'"><td>'+(x[0]!==cat?(cat=x[0]):'')+'</td><td class="it">'+KIT.esc(x[2])+'</td><td class="law">'+KIT.esc(x[3])+'</td><td class="hint">'+KIT.esc(x[4])+'</td><td><select data-id="'+x[1]+'" aria-label="결과"><option value=""></option><option'+(v==='양호'?' selected':'')+'>양호</option><option'+(v==='불량'?' selected':'')+'>불량</option><option'+(v==='해당 없음'?' selected':'')+'>해당 없음</option></select></td></tr>';});
+ $('ck').innerHTML=h;var c={양호:0,불량:0,'해당 없음':0,'':0};L.forEach(function(x){c[ST[x[1]]||'']++;});
+ $('sum').innerHTML='전체 <b>'+L.length+'</b>개 · 양호 <b>'+c['양호']+'</b> · 불량 <b>'+c['불량']+'</b> · 해당 없음 <b>'+c['해당 없음']+'</b> · 미확인 <b>'+c['']+'</b>';
+}
+function fines(){var R=[
+['소방시설 폐쇄·차단(경종·수신기·펌프 끄기 등)',S+' 제56조제1항','5년 이하 징역 또는 5천만원 이하 벌금(사상 시 7년·7천만원 / 10년·1억원)'],
+['자체점검을 하지 않음',S+' 제58조제1호','1년 이하 징역 또는 1천만원 이하 벌금'],
+['소방안전관리자 미선임',F+' 제50조제3항제3호','300만원 이하 벌금'],
+['화재안전조사 거부·방해·기피',F+' 제50조제3항제1호','300만원 이하 벌금'],
+['소방시설 설치·관리 위반, 피난·방화시설 폐쇄·훼손·적치, 방염 위반, 점검 결과 미보고, 이행 미완료, 점검기록표 미게시',S+' 제61조제1항','과태료 300만원 이하'],
+['소방안전관리 업무 미수행, 겸직 위반, 훈련·교육 미실시, 피난유도 안내정보 미제공',F+' 제52조제1항','과태료 300만원 이하'],
+['선임신고·성명 게시 안 함, 훈련·교육 결과 미제출, 화기·특수가연물 기준 위반',F+' 제52조제2항','과태료 200만원 이하'],
+['실무교육 미이수',F+' 제52조제3항','과태료 100만원 이하'],
+['다중이용업소 안전시설등·실내장식물·피난안내도·정기점검·화재배상책임보험 위반',M+' 제25조제1항','과태료 300만원 이하']];
+ $('fines').innerHTML='<tr><th>위반</th><th>근거</th><th>상한</th></tr>'+R.map(function(r){return '<tr><td>'+r[0]+'</td><td class="law">'+r[1]+'</td><td class="amt">'+r[2]+'</td></tr>';}).join('');}
+function save(){KIT.set('audit',{st:ST,date:$('a-date').value,who:$('a-who').value,multi:$('a-multi').value});}
+$('ck').addEventListener('change',function(e){var id=e.target.dataset.id;if(!id)return;ST[id]=e.target.value;save();draw();});
+['a-date','a-who','a-multi'].forEach(function(i){$(i).addEventListener('change',function(){save();draw();});});
+$('b-print').onclick=function(){window.print();};
+$('b-reset').onclick=function(){if(!confirm('선택을 모두 지울까요?'))return;ST={};save();draw();};
+$('b-send').onclick=function(){var ng=list().filter(function(x){return ST[x[1]]==='불량';});if(!ng.length){KIT.toast('불량으로 고른 항목이 없습니다');return;}
+ var day=$('a-date').value||KIT.key(KIT.today());
+ Promise.all(ng.map(function(x){return KIT.put('defects',{id:KIT.uid(),found:day,kind:'기타',loc:'',eq:x[0],desc:x[2]+' (화재안전조사 대비 자체 점검)',act:'',notice:'',report:'',fix:'',fixdesc:'',sent:'',pre:'',post:'',law:x[3]});}))
+ .then(function(){KIT.toast(ng.length+'건을 지적사항 대장에 넣었습니다');setTimeout(function(){location.href='defects.html';},900);});};
+KIT.get('audit').then(function(o){o=o||{};ST=o.st||{};$('a-date').value=o.date||KIT.key(KIT.today());$('a-who').value=o.who||'';$('a-multi').value=o.multi||'n';draw();fines();});
+})();
+</script>
+<script src="../assets/ui.js" defer></script>
+</body>
+</html>

@@ -57,7 +57,17 @@
 <div class="btns"><button id="j-save" data-gc="kit-judge-save">점검표 설비 목록으로 저장</button><a class="btn sub" href="inspect.html">자체점검 점검표로</a><button class="gray" onclick="print()">인쇄</button></div>
 </section>
 
-<footer>
+<section class="card" id="change">
+<h2>증축·용도변경 때 어떤 기준을 적용하나 (1차판)</h2>
+<p class="hint" style="margin-top:0">기존 건물을 늘리거나 용도를 바꿀 때, 지금(변경 당시) 기준을 어디까지 적용하는지 가려 줍니다. 1차판은 근린생활시설·업무시설·공동주택 사례를 기준으로 만들었고, 설치 대상 수치는 위 판정 결과(시행령 별표 4)로 다시 확인하세요.</p>
+<div class="g3">
+<div><label class="f" for="ch-kind">변경 종류</label><select id="ch-kind"><option value="add">증축</option><option value="use">용도변경</option></select></div>
+<div><label class="f" for="ch-use">건물 주용도</label><select id="ch-use"><option>근린생활시설</option><option>업무시설</option><option>공동주택</option><option>그 밖(1차판 범위 밖)</option></select></div>
+<div id="ch-add-w"><label class="f" for="ch-sep">기존 부분과 증축 부분 사이</label><select id="ch-sep"><option value="none">구획 없음(하나로 이어짐)</option><option value="fire">내화구조 바닥·벽으로 구획</option><option value="shutter">자동방화셔터로 구획</option><option value="door">60분+ 또는 60분 방화문으로 구획</option><option value="rest">화재 위험 낮은 공장 안 33㎡ 이하 직원 휴게실 증축</option><option value="canopy">화재 위험 낮은 공장에 캐노피(3면 이상 벽 없음) 설치</option></select></div>
+<div id="ch-use-w" hidden><label class="f" for="ch-risk">용도변경 결과</label><select id="ch-risk"><option value="same">위험이 같거나 커짐(일반적인 경우)</option><option value="less">구조·설비가 연소 확대 요인이 적어지거나 피난·진압이 쉬워짐</option><option value="fuel">천장·바닥·벽에 고정된 가연물이 줄어듦</option></select></div>
+</div>
+<div id="ch-out" aria-live="polite" style="margin-top:10px"></div>
+</section><footer>
 <table><tr><th>기준 법령(법제처 국가법령정보센터 원문, 확인일 2026-11-24)</th></tr>
 <tr><td>소방시설 설치 및 관리에 관한 법률 시행령 [별표 4] (개정 2026. 9. 29., 현행 시행 2026. 10. 2., 대통령령 제36728호)</td></tr>
 <tr><td>화재의 예방 및 안전관리에 관한 법률 시행령 [별표 4] (개정 2024. 5. 7., 현행 시행 2026. 7. 1., 대통령령 제36432호)</td></tr></table>
@@ -199,6 +209,24 @@ $('j-test').onclick=function(){var t={use:'근린생활시설',area:'2400',above
 KIT.building().then(function(b){if(b.judge&&b.judge.input){IDS.forEach(function(k){if(b.judge.input[k]!=null)$('j-'+k).value=b.judge.input[k];});}});
 })();
 </script>
-<script src="../assets/ui.js" defer></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+function run(){var k=$('ch-kind').value,u=$('ch-use').value,h='';$('ch-add-w').hidden=k!=='add';$('ch-use-w').hidden=k!=='use';
+ if(k==='add'){var s=$('ch-sep').value;
+  if(s==='none')h='<div class="warn"><b>건물 전체(기존 부분 포함)</b>에 증축 당시의 소방시설 설치 기준(시행령·화재안전기준)을 적용합니다. 예: 증축으로 연면적·층수가 늘어 스프링클러 등 설치 대상이 되면 기존 부분에도 설치해야 할 수 있습니다.</div>';
+  else h='<div class="ok"><b>증축 부분</b>에는 증축 당시 기준을 적용하고, <b>기존 부분</b>에는 증축 당시 기준을 적용하지 않습니다(종전 기준 유지). 사유: '+$('ch-sep').selectedOptions[0].text+'.</div>';
+  h+='<p class="law">근거: 소방시설법 제13조제3항, 시행령 제15조제1항'+(s==='none'?' 본문':' 단서 제'+({fire:1,shutter:2,door:2,rest:3,canopy:4})[s]+'호')+' (2025. 11. 25. 개정, 시행령 [시행 2026. 10. 2.])</p>';}
+ else{var r=$('ch-risk').value;
+  if(r==='same')h='<div class="warn"><b>용도변경되는 부분에만</b> 용도변경 당시의 소방시설 설치 기준을 적용합니다. 바뀌지 않는 나머지 부분은 종전 기준.</div><p class="law">근거: 소방시설법 제13조제3항, 시행령 제15조제2항 본문</p>';
+  else h='<div class="ok"><b>건물 전체</b>에 용도변경 <b>전</b>에 적용되던 기준을 적용합니다(새 기준을 적용하지 않음). 사유: '+$('ch-risk').selectedOptions[0].text+'.</div><p class="law">근거: 시행령 제15조제2항 단서 제'+(r==='less'?1:2)+'호</p>';}
+ h+='<ul class="hint" style="padding-left:18px"><li>증축·용도변경과 별개로, 기준이 강화되어도 소화기구·비상경보설비·자동화재탐지설비·자동화재속보설비·피난구조설비 중 대통령령·화재안전기준으로 정하는 것, 공동구·전력통신 지하구·노유자시설·의료시설의 소방시설 중 정하는 것은 강화된 기준을 기존 건물에도 적용할 수 있습니다(소방시설법 제13조제1항 단서).</li>'+
+ (u==='공동주택'?'<li>공동주택은 「공동주택의 화재안전기술기준(NFTC 608)」이 함께 적용됩니다(이 화면은 해당 기준을 판정하지 않음).</li>':'')+(u.indexOf('그 밖')===0?'<li>1차판 범위 밖 용도입니다. 결론은 같은 조문으로 나오지만 용도별 특례가 있을 수 있어 질의회신을 함께 보세요.</li>':'')+
+ '<li>비슷한 사례: <a href="qna.html?q='+(k==='add'?'증축':'용도변경')+'">질의회신 찾기에서 「'+(k==='add'?'증축':'용도변경')+'」 사례 보기</a>. 최종 판단은 관할 소방서(건축허가 동의 단계)에서 합니다.</li></ul>';
+ $('ch-out').innerHTML=h;KIT.set('judge-change',{k:k,u:u,s:$('ch-sep').value,r:$('ch-risk').value});}
+['ch-kind','ch-use','ch-sep','ch-risk'].forEach(function(i){$(i).addEventListener('change',run);});
+KIT.get('judge-change').then(function(o){if(o){$('ch-kind').value=o.k;$('ch-use').value=o.u;$('ch-sep').value=o.s;$('ch-risk').value=o.r;}run();});
+})();
+</script><script src="../assets/ui.js" defer></script>
 </body>
 </html>

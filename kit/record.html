@@ -55,7 +55,24 @@
 <div id="tod" class="hint"></div>
 </section>
 <section class="card"><h2>저장된 기록</h2><table><thead><tr><th>수행일자</th><th>결과</th><th></th></tr></thead><tbody id="list"></tbody></table></section>
-<footer>근거(확인일 2026-11-24): 화재의 예방 및 안전관리에 관한 법률 시행규칙(시행 2026.7.1.) 제10조①(별지 제12호서식, 월 1회 이상)·②(보수·정비 필요 사항 지체 없이 관계인에게 알리고 기록)·③(작성한 날부터 2년 보관), 별지 제12호서식 작성요령(수신기·제어반·가압송수장치 중점 확인). 참고용이며 서식 원본은 법제처 국가법령정보센터에서 확인하세요.</footer>
+<section class="card" id="demand">
+<h2>관계인 시정 요구·보고 기록</h2>
+<p class="hint" style="margin-top:0">법령 위반을 발견하면 관계인에게 조치를 요구하고, 시정하지 않으면 소방서에 알려야 합니다(화재예방법 제27조제3항). 날짜와 방법을 남겨 두면 책임 다툼 때 근거가 됩니다. 요구하지 않은 소방안전관리자, 요구를 이유로 불이익을 준 관계인은 300만원 이하 벌금(제50조제3항제4호·제5호).</p>
+<div class="g3">
+<div><label class="f" for="dm-found">발견일</label><input id="dm-found" type="date"></div>
+<div><label class="f" for="dm-loc">위치·설비</label><input id="dm-loc" placeholder="예: 지하1층 방화문"></div>
+<div><label class="f" for="dm-req">시정 요구일</label><input id="dm-req" type="date"></div>
+<div style="grid-column:1/-1"><label class="f" for="dm-desc">위반 내용</label><textarea id="dm-desc" placeholder="예: 방화문 도어스톱으로 상시 개방, 앞에 박스 적치"></textarea></div>
+<div><label class="f" for="dm-act">요구한 조치</label><select id="dm-act"><option>수리</option><option>개수</option><option>이전</option><option>제거</option><option>교체</option><option>기타</option></select></div>
+<div><label class="f" for="dm-way">요구 방법</label><select id="dm-way"><option>서면(전달 확인)</option><option>문자·메신저</option><option>전자우편</option><option>대면(구두)</option></select></div>
+<div><label class="f" for="dm-to">요구 받은 관계인</label><input id="dm-to" placeholder="소유자·관리자·점유자 성명"></div>
+<div><label class="f" for="dm-due">조치 요청 기한</label><input id="dm-due" type="date"></div>
+<div><label class="f" for="dm-res">결과</label><select id="dm-res"><option>진행 중</option><option>시정함</option><option>시정 안 함</option></select></div>
+<div><label class="f" for="dm-fire">소방서에 알린 날(시정 안 할 때)</label><input id="dm-fire" type="date"></div>
+</div>
+<div class="btns"><button type="button" id="dm-save" data-gc="kit-demand-save">저장</button><button type="button" class="sub" id="dm-letter">이 건 조치 요구서 인쇄</button><button type="button" class="sub" id="dm-book">요구·보고 기록부 인쇄</button><button type="button" class="gray" id="dm-new">새로 쓰기</button></div>
+<div class="tbl-wrap"><table><thead><tr><th>요구일</th><th>위치·내용</th><th>관계인</th><th>결과</th><th></th></tr></thead><tbody id="dm-list"></tbody></table></div>
+</section><footer>근거(확인일 2026-11-24, 시정 요구 기록은 2026-11-25): 화재의 예방 및 안전관리에 관한 법률(시행 2026.2.27.) 제27조제3항·제4항, 제50조제3항제4호·제5호 · 화재의 예방 및 안전관리에 관한 법률 시행규칙(시행 2026.7.1.) 제10조①(별지 제12호서식, 월 1회 이상)·②(보수·정비 필요 사항 지체 없이 관계인에게 알리고 기록)·③(작성한 날부터 2년 보관), 별지 제12호서식 작성요령(수신기·제어반·가압송수장치 중점 확인). 참고용이며 서식 원본은 법제처 국가법령정보센터에서 확인하세요.</footer>
 </main>
 <div id="sheet"></div>
 <script>
@@ -122,6 +139,23 @@ KIT.building().then(function(b){B=b;$('bld').textContent=bldText();blank();retur
 window.__kitRecordRead=read;
 })();
 </script>
-<script src="../assets/ui.js" defer></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var F=['found','loc','req','desc','act','way','to','due','res','fire'],cur=null,L=[],B={};
+function read(){var r=cur||{id:KIT.uid(),type:'demand'};F.forEach(function(k){r[k]=$('dm-'+k).value.trim();});r.v={'요구일':r.req,'내용':r.loc+' '+r.desc};r.updated=new Date().toISOString();return r;}
+function fill(r){cur=r;F.forEach(function(k){$('dm-'+k).value=r?(r[k]||''):'';});if(!r){$('dm-found').value=$('dm-req').value=KIT.key(KIT.today());$('dm-res').value='진행 중';$('dm-act').value='수리';$('dm-way').value='서면(전달 확인)';}}
+function draw(){$('dm-list').innerHTML=L.length?L.map(function(r){var late=r.res==='시정 안 함'&&!r.fire;return '<tr><td>'+KIT.esc(r.req||'')+'</td><td>'+KIT.esc((r.loc||'')+' · '+(r.desc||'').slice(0,40))+'</td><td>'+KIT.esc(r.to||'')+'</td><td>'+KIT.esc(r.res||'')+(late?' <span class="pill red">소방서 통보 필요</span>':'')+'</td><td><button class="sm sub" data-o="'+r.id+'">열기</button> <button class="sm gray" data-d="'+r.id+'">삭제</button></td></tr>';}).join(''):'<tr><td colspan="5" class="hint">아직 없습니다.</td></tr>';}
+function load(){return KIT.all('logs').then(function(a){L=a.filter(function(x){return x.type==='demand';}).sort(function(p,q){return (q.req||'').localeCompare(p.req||'');});draw();});}
+$('dm-save').onclick=function(){var r=read();if(!r.desc){KIT.toast('위반 내용을 적어 주세요');return;}KIT.put('logs',r).then(function(){KIT.toast('저장했습니다');cur=r;load();});};
+$('dm-new').onclick=function(){fill(null);};
+$('dm-list').onclick=function(e){var t=e.target;if(t.dataset.o){fill(JSON.parse(JSON.stringify(L.find(function(x){return x.id===t.dataset.o;}))));$('demand').scrollIntoView();}if(t.dataset.d&&confirm('지울까요?'))KIT.del('logs',t.dataset.d).then(load);};
+function pr(h){var f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.appendChild(f);var d=f.contentWindow.document;d.open();d.write('<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>인쇄</title><style>body{font-family:"Malgun Gothic",sans-serif;font-size:12.5px;line-height:1.6}table{width:100%;border-collapse:collapse}th,td{border:1px solid #555;padding:6px;text-align:left;vertical-align:top}th{background:#eee}h1{text-align:center;font-size:19px}@page{size:A4;margin:14mm}</style></head><body>'+h+'</body></html>');d.close();setTimeout(function(){f.contentWindow.print();setTimeout(function(){f.remove();},1500);},250);}
+var LAW='「화재의 예방 및 안전관리에 관한 법률」 제27조제3항: 소방안전관리자는 소방시설ㆍ피난시설ㆍ방화시설 및 방화구획 등이 법령에 위반된 것을 발견한 때에는 지체 없이 관계인에게 개수ㆍ이전ㆍ제거ㆍ수리 등 필요한 조치를 할 것을 요구하여야 하며, 관계인이 시정하지 아니하는 경우 소방본부장 또는 소방서장에게 그 사실을 알려야 한다. 같은 조 제4항: 조치요구를 받은 관계인은 지체 없이 이에 따라야 하며, 이를 이유로 소방안전관리자를 해임하거나 보수 지급을 거부하는 등 불이익한 처우를 하여서는 아니 된다.';
+$('dm-letter').onclick=function(){var r=read();var e=KIT.esc;pr('<h1>소방시설 등 위반사항 조치 요구서</h1><table><tr><th style="width:24%">대상물</th><td>'+e(B.name||'')+' ('+e(B.addr||'')+')</td></tr><tr><th>받는 사람(관계인)</th><td>'+e(r.to)+'</td></tr><tr><th>발견일</th><td>'+e(r.found)+'</td></tr><tr><th>위치·설비</th><td>'+e(r.loc)+'</td></tr><tr><th>위반 내용</th><td>'+e(r.desc).replace(/\n/g,'<br>')+'</td></tr><tr><th>요구 조치</th><td>'+e(r.act)+'</td></tr><tr><th>조치 요청 기한</th><td>'+e(r.due||'지체 없이')+'</td></tr></table><p style="font-size:11.5px">'+LAW+'</p><p>위와 같이 조치를 요구합니다. 기한까지 시정되지 않으면 관할 소방서에 그 사실을 알리게 됨을 안내드립니다.</p><p style="text-align:right">'+e(r.req)+'<br>소방안전관리자 '+e(B.manager||'')+' (서명)</p><table><tr><th style="width:24%">수령 확인</th><td>수령일: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 성명: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (서명)</td></tr></table>');};
+$('dm-book').onclick=function(){var e=KIT.esc;pr('<h1>관계인 시정 요구 및 소방서 보고 기록부</h1><p>대상물: '+e(B.name||'')+' · 소방안전관리자: '+e(B.manager||'')+'</p><table><tr><th>발견일</th><th>요구일·방법</th><th>위치·위반 내용</th><th>요구 조치·기한</th><th>관계인</th><th>결과</th><th>소방서 통보일</th></tr>'+L.slice().reverse().map(function(r){return '<tr><td>'+e(r.found)+'</td><td>'+e(r.req)+'<br>'+e(r.way)+'</td><td>'+e(r.loc)+'<br>'+e(r.desc)+'</td><td>'+e(r.act)+'<br>'+e(r.due)+'</td><td>'+e(r.to)+'</td><td>'+e(r.res)+'</td><td>'+e(r.fire)+'</td></tr>';}).join('')+'</table><p style="font-size:10.5px">'+LAW+' 보수·정비가 필요한 사항은 관계인에게 알리고 별지 제12호서식에 기록, 2년 보관(같은 법 시행규칙 제10조제2항·제3항).</p>');};
+KIT.building().then(function(b){B=b||{};fill(null);load();});
+})();
+</script><script src="../assets/ui.js" defer></script>
 </body>
 </html>
