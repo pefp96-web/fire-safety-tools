@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소화펌프 성능시험표 자동 판정 (무료) | 체절 140%·150% 운전 65% 기준</title>
+<meta name="description" content="정격토출량·정격토출압력과 체절·정격·150% 운전 측정값만 넣으면 NFTC 102 2.2.1.7 기준으로 펌프 성능을 자동 판정하고 성능시험표를 A4로 인쇄합니다. 무료·가입 없음·오프라인.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/pump.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#C8322B"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<style>.num{text-align:right;font-variant-numeric:tabular-nums}.res-ok{color:var(--ok);font-weight:700}.res-ng{color:var(--brand-text);font-weight:700}.curve{width:100%;max-width:560px;height:auto;display:block;margin:12px 0}</style>
+<script src="../gc.js"></script><script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>펌프 성능시험표</h1><p>체절·정격·150% 운전 자동 판정 · 성능곡선 · A4 인쇄<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="inspect.html">점검표</a><a href="./#all">전체 기능</a></nav>
+</div></header>
+<main id="main">
+<section class="card noprint">
+<h2>펌프 정보</h2>
+<div class="g3">
+<div><label class="f" for="p-name">펌프 이름·위치</label><input id="p-name" placeholder="예: 옥내소화전 주펌프(지하2층 펌프실)"></div>
+<div><label class="f" for="p-q">정격토출량 (L/min)</label><input id="p-q" type="number" inputmode="decimal" min="0" step="any" placeholder="예: 650"></div>
+<div><label class="f" for="p-p">정격토출압력 (MPa)</label><input id="p-p" type="number" inputmode="decimal" min="0" step="any" placeholder="예: 0.7"></div>
+</div>
+<h3>측정값</h3>
+<div class="tbl-wrap"><table>
+<thead><tr><th>운전</th><th>토출량 (L/min)</th><th>토출압력 (MPa)</th><th>흡입측 (MPa, 선택)</th></tr></thead>
+<tbody>
+<tr><td>체절운전(토출량 0)</td><td class="num">0</td><td><input id="m0p" type="number" inputmode="decimal" step="any" aria-label="체절 토출압력"></td><td><input id="m0s" type="number" inputmode="decimal" step="any" aria-label="체절 흡입측"></td></tr>
+<tr><td>정격운전(100%)</td><td><input id="m1q" type="number" inputmode="decimal" step="any" aria-label="정격 토출량"></td><td><input id="m1p" type="number" inputmode="decimal" step="any" aria-label="정격 토출압력"></td><td><input id="m1s" type="number" inputmode="decimal" step="any" aria-label="정격 흡입측"></td></tr>
+<tr><td>최대운전(150%)</td><td><input id="m2q" type="number" inputmode="decimal" step="any" aria-label="150% 토출량"></td><td><input id="m2p" type="number" inputmode="decimal" step="any" aria-label="150% 토출압력"></td><td><input id="m2s" type="number" inputmode="decimal" step="any" aria-label="150% 흡입측"></td></tr>
+</tbody></table></div>
+<div class="g3" style="margin-top:12px">
+<div><label class="f" for="p-date">시험일</label><input id="p-date" type="date"></div>
+<div><label class="f" for="p-who">시험자</label><input id="p-who" placeholder="이름"></div>
+<div><label class="f" for="p-memo">비고</label><input id="p-memo" placeholder="예: 유량계 175% 측정 가능 확인"></div>
+</div>
+<div class="btns"><button type="button" id="b-run">판정하기</button><button type="button" class="sub" id="b-print">A4 인쇄</button><button type="button" class="gray" id="b-sample">예시값 넣기</button></div>
+</section>
+<section class="card" id="out" aria-live="polite"></section>
+</main>
+<footer class="noprint">근거: 옥내소화전설비의 화재안전기술기준(NFTC 102) [시행 2026. 7. 1., 국립소방연구원공고 제2026-34호] 2.2.1.7(체절운전 시 정격토출압력 140% 초과 금지, 정격토출량 150% 운전 시 정격토출압력 65% 이상), 2.3.7.2(유량측정장치 정격토출량 175% 이상 측정), 2.3.8(릴리프밸브는 체절압력 미만 개방). 2026-11-24 국가법령정보센터 원문 확인. 스프링클러(NFTC 103) 등 다른 설비도 같은 기준인지는 해당 기준 원문을 확인하세요. 참고용 · 제작 김재환</footer>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var IDS=['p-name','p-q','p-p','m0p','m0s','m1q','m1p','m1s','m2q','m2p','m2s','p-date','p-who','p-memo'];
+function v(i){var x=parseFloat($(i).value);return isNaN(x)?null:x;}
+function r2(x){return Math.round(x*1000)/1000;}
+function save(){var o={};IDS.forEach(function(i){o[i]=$(i).value;});KIT.set('pump',o);}
+function run(){
+ var Q=v('p-q'),P=v('p-p'),o=$('out');
+ if(!(Q>0)||!(P>0)){o.innerHTML='<div class="warn">정격토출량과 정격토출압력을 넣어 주세요.</div>';return;}
+ var rows=[],ok=true;
+ var p0=v('m0p'),p1=v('m1p'),q1=v('m1q'),q2=v('m2q'),p2=v('m2p');
+ function row(n,need,got,pass,law){rows.push('<tr><td>'+n+'</td><td>'+need+'</td><td class="num">'+(got==null?'-':got)+'</td><td>'+(pass==null?'측정값 없음':pass?'<span class="res-ok">적합</span>':'<span class="res-ng">부적합</span>')+'</td><td class="law">'+law+'</td></tr>');if(pass===false)ok=false;}
+ row('체절운전 토출압력','정격토출압력 '+P+'MPa × 140% = <b>'+r2(P*1.4)+'MPa 이하</b>',p0==null?null:p0+'MPa ('+Math.round(p0/P*100)+'%)',p0==null?null:p0<=P*1.4,'NFTC 102 2.2.1.7');
+ row('정격운전 토출압력','정격토출량 '+Q+'L/min에서 정격토출압력 '+P+'MPa 이상',p1==null?null:p1+'MPa'+(q1!=null?' @ '+q1+'L/min':''),p1==null?null:p1>=P,'NFTC 102 1.7.1.4~1.7.1.5 정의');
+ row('150% 운전 토출압력','토출량 '+r2(Q*1.5)+'L/min에서 '+P+'MPa × 65% = <b>'+r2(P*0.65)+'MPa 이상</b>',p2==null?null:p2+'MPa'+(q2!=null?' @ '+q2+'L/min':''),p2==null?null:(p2>=P*0.65&&(q2==null||q2>=Q*1.5)),'NFTC 102 2.2.1.7');
+ var warn='';
+ if(q2!=null&&q2<Q*1.5)warn+='<div class="warn">150% 운전 토출량이 '+q2+'L/min으로 '+r2(Q*1.5)+'L/min보다 적습니다. 150% 유량까지 올려 다시 재세요.</div>';
+ var svg=curve(Q,P,[[0,p0],[q1==null?Q:q1,p1],[q2==null?Q*1.5:q2,p2]]);
+ o.innerHTML='<h2>소화펌프 성능시험 결과표</h2><p>'+KIT.esc($('p-name').value||'펌프')+' · 시험일 '+KIT.esc($('p-date').value||'-')+' · 시험자 '+KIT.esc($('p-who').value||'-')+'</p>'+
+ '<div class="tbl-wrap"><table><thead><tr><th>항목</th><th>기준</th><th>측정</th><th>판정</th><th>근거</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>'+warn+
+ '<p><b>종합: '+(ok?'<span class="res-ok">기준 충족</span>':'<span class="res-ng">기준 미달 항목 있음 → 지적사항 대장에 적고 보수</span>')+'</b></p>'+svg+
+ '<p class="hint">비고: '+KIT.esc($('p-memo').value||'-')+' · 유량측정장치는 정격토출량의 175%('+r2(Q*1.75)+'L/min) 이상까지 잴 수 있어야 함(NFTC 102 2.3.7.2).</p>';
+ save();
+}
+function curve(Q,P,pts){
+ var W=520,H=260,L=48,B=32,mx=Q*1.8,my=P*1.6;
+ function X(q){return L+(q/mx)*(W-L-12);} function Y(p){return H-B-(p/my)*(H-B-12);}
+ var g='<svg class="curve" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="펌프 성능곡선"><rect x="0" y="0" width="'+W+'" height="'+H+'" fill="none"/>';
+ g+='<line x1="'+L+'" y1="'+(H-B)+'" x2="'+(W-8)+'" y2="'+(H-B)+'" stroke="currentColor" stroke-opacity=".4"/><line x1="'+L+'" y1="12" x2="'+L+'" y2="'+(H-B)+'" stroke="currentColor" stroke-opacity=".4"/>';
+ g+='<polyline fill="none" stroke="#8B95A1" stroke-dasharray="4 4" points="'+X(0)+','+Y(P*1.4)+' '+X(Q)+','+Y(P)+' '+X(Q*1.5)+','+Y(P*0.65)+'"/>';
+ var ps=pts.filter(function(p){return p[1]!=null;});
+ if(ps.length)g+='<polyline fill="none" stroke="#C8322B" stroke-width="2.5" points="'+ps.map(function(p){return X(p[0])+','+Y(p[1]);}).join(' ')+'"/>'+ps.map(function(p){return '<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="4" fill="#C8322B"/>';}).join('');
+ g+='<text x="'+L+'" y="'+(H-8)+'" font-size="11" fill="currentColor">0</text><text x="'+(X(Q)-10)+'" y="'+(H-8)+'" font-size="11" fill="currentColor">100%</text><text x="'+(X(Q*1.5)-10)+'" y="'+(H-8)+'" font-size="11" fill="currentColor">150%</text>';
+ g+='<text x="4" y="'+(Y(P)+4)+'" font-size="11" fill="currentColor">'+P+'</text><text x="'+(W-170)+'" y="22" font-size="11" fill="currentColor">빨강: 측정 · 점선: 기준 한계</text></svg>';
+ return g;
+}
+$('b-run').onclick=run;
+$('b-print').onclick=function(){run();setTimeout(function(){window.print();},60);};
+$('b-sample').onclick=function(){var s={'p-name':'옥내소화전 주펌프(예시)','p-q':650,'p-p':0.7,'m0p':0.92,'m1q':650,'m1p':0.72,'m2q':975,'m2p':0.55};for(var k in s)$(k).value=s[k];run();};
+IDS.forEach(function(i){$(i).addEventListener('change',function(){if(v('p-q')&&v('p-p'))run();else save();});});
+KIT.get('pump').then(function(o){if(o)IDS.forEach(function(i){if(o[i]!=null)$(i).value=o[i];});if(!$('p-date').value)$('p-date').value=KIT.key(KIT.today());if(v('p-q')&&v('p-p'))run();else $('out').innerHTML='<p class="hint">정격값과 측정값을 넣고 판정하기를 누르세요. 입력은 이 기기에 자동 저장됩니다.</p>';});
+if(KIT.netBadge)KIT.netBadge();
+})();
+</script>
+<script src="../assets/ui.js" defer></script>
+</body>
+</html>

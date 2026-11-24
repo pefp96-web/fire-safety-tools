@@ -6,7 +6,8 @@
 <title>여러 건물 소방 관리 목록 (무료) | 사용승인월·점검 종류 검색, 일정 미등록·입력 누락 알림, 건축물대장 입력 도우미</title>
 <meta name="description" content="관리하는 건물을 목록으로 두고 사용승인월과 종합·작동점검 종류로 찾고, 올해 점검 기록이 없는 건물과 입력이 빠진 건물을 알려 줍니다. 세움터·건축HUB 건축물대장 열람 바로가기와 붙여넣기 입력 도우미 포함.">
 <link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/buildings.html">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f2a36"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#C8322B"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="kit.css">
 <script src="../gc.js"></script><script src="common.js"></script>
 </head>
@@ -91,5 +92,6 @@ function load(){return Promise.all([KIT.all('buildings'),KIT.all('inspections'),
 load();
 })();
 </script>
+<script src="../assets/ui.js" defer></script>
 </body>
 </html>

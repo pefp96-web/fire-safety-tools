@@ -8,6 +8,7 @@
 <link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/calendar.html">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="kit.css">
 <script src="../gc.js"></script>
 <script src="common.js"></script>
@@ -128,5 +129,6 @@ $('c-make').onclick=make;
 $('c-ics').onclick=function(){if(!EV.length)make();if(!EV.length)return;KIT.download('소방_법정업무_'+ys.value+'.ics',ics(),'text/calendar;charset=utf-8');KIT.toast('알림 파일을 받았습니다. 열어서 캘린더에 추가하세요');};
 })();
 </script>
+<script src="../assets/ui.js" defer></script>
 </body>
 </html>

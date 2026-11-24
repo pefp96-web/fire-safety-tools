@@ -6,7 +6,8 @@
 <title>소방시설 설치대상·소방안전관리대상물 등급 판정 (무료) | 소방시설법 시행령 별표 4·화재예방법 시행령 별표 4</title>
 <meta name="description" content="용도·연면적·층수만 넣으면 설치해야 하는 소방시설(소방시설법 시행령 별표 4)과 소방안전관리대상물 등급(화재예방법 시행령 별표 4)을 조항과 함께 보여 줍니다. 무료·가입 없음.">
 <link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/judge.html">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f2a36"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#C8322B"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="kit.css">
 <script src="../gc.js"></script><script src="common.js"></script>
 </head>
@@ -198,5 +199,6 @@ $('j-test').onclick=function(){var t={use:'근린생활시설',area:'2400',above
 KIT.building().then(function(b){if(b.judge&&b.judge.input){IDS.forEach(function(k){if(b.judge.input[k]!=null)$('j-'+k).value=b.judge.input[k];});}});
 })();
 </script>
+<script src="../assets/ui.js" defer></script>
 </body>
 </html>
