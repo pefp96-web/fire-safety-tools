@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방안전관리 기록부 모음 (무료) | 소방훈련·교육 결과 기록부, 화재·비화재보, 화기취급, 공사·정비, 외관점검표 + 결재 서명</title>
+<meta name="description" content="소방훈련·교육 실시 결과 기록부(별지 제28호), 자위소방대·초기대응체계 교육훈련 기록부(별지 제13호), 소방시설등 외관점검표·자체점검 기록부(고시 별지 제6·7호)와 화재·비화재보, 화기취급 작업, 공사·정비, 피해복구, 홍보, 협의회 회의록을 휴대폰으로 쓰고 결재 서명까지 받아 인쇄합니다.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/logs.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f2a36"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<style>
+.tabs{display:flex;flex-wrap:wrap;gap:6px}.tabs button{background:#fff;color:#33404c;border-color:#b8c0c8;font-size:14px;padding:8px 10px}.tabs button.on{background:#1f2a36;color:#fff;border-color:#1f2a36}
+.sign{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sign div{border:1px solid #b8c0c8;border-radius:4px;padding:6px;text-align:center;font-size:13px}
+.sign canvas{width:100%;height:90px;border:1px dashed #b8c0c8;touch-action:none;background:#fff}
+.og{overflow:auto}.og table{font-size:12px}.og td,.og th{padding:3px;text-align:center}.og td:first-child{text-align:left;min-width:220px}
+.og select{padding:2px;font-size:13px;width:44px}
+#pv{display:none}@media print{#app{display:none}#pv{display:block}}
+</style>
+<script src="../gc.js"></script><script src="common.js"></script>
+</head>
+<body>
+<div id="app">
+<header class="top"><div class="in">
+<div><h1>기록부 모음 + 결재</h1><p>법정 서식 4종 + 현장 기록부 6종 · 서명란<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="record.html">업무수행기록표</a><a href="./#all">전체 기능</a></nav>
+</div></header>
+<main>
+<section class="card"><div class="tabs" id="tabs"></div><p class="law" id="lawline"></p></section>
+<section class="card" id="form"></section>
+<section class="card"><h2>저장된 기록</h2><div id="saved"></div></section>
+</main>
+<footer style="max-width:980px;margin:0 auto;padding:0 14px 30px">
+<table><tr><th>근거(법제처 국가법령정보센터 원문, 확인일 2026-11-24)</th></tr>
+<tr><td>화재예방법 시행규칙(시행 2026. 7. 1.) 별지 제28호서식 소방훈련ㆍ교육 실시 결과 기록부, 별지 제13호서식 자위소방대 및 초기대응체계 교육ㆍ훈련 실시 결과 기록부, 제36조(기록 2년 보관)</td></tr>
+<tr><td>소방시설 자체점검사항 등에 관한 고시(시행 2022. 12. 1.) 별지 제6호서식 소방시설등 외관점검표, 별지 제7호서식 소방시설 자체점검 기록부 · 소방시설법 시행규칙 별표 3 제4호(공공기관 외관점검 월 1회, 2년 보관)</td></tr>
+<tr><td>화재·비화재보, 화기취급 작업, 공사·정비, 피해복구, 홍보, 협의회 회의록은 법정 서식이 아닌 이 수첩의 현장 기록 양식입니다.</td></tr></table>
+<p>제작 김재환 · <a href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">소방계획서·서류 대행(크몽)</a></p>
+</footer>
+</div>
+<div id="pv"></div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var T={
+ t28:{t:'소방훈련ㆍ교육 실시 결과 기록부',law:'화재예방법 시행규칙 별지 제28호서식 (법정 서식)',f:[['h','소방훈련 결과'],['tdate','일시','datetime-local'],['tplace','장소'],['ttype','훈련 구분','sel',['자체훈련','합동훈련']],['tteacher','훈련교관'],['ttarget','참석대상(명)','num'],['tin','참석(명)','num'],['tout','미참석(명)','num'],['tmat','훈련보조재료'],['tfire','훈련내용: 소화훈련','area'],['tcall','훈련내용: 통보훈련','area'],['tevac','훈련내용: 피난훈련','area'],['tres','훈련성과','area'],['tprob','문제점','area'],['tplan','개선계획','area'],['h','소방교육 결과'],['edate','일시','datetime-local'],['eplace','장소'],['eteacher','교육강사'],['etarget','참석대상(명)','num'],['ein','참석(명)','num'],['eout','미참석(명)','num'],['econ','교육내용','area'],['eres','교육성과','area'],['eprob','문제점','area'],['eplan','개선계획','area'],['photos','소방훈련·교육 관련사진(4장까지)','photos']]},
+ t13:{t:'자위소방대 및 초기대응체계 교육ㆍ훈련 실시 결과 기록부',law:'화재예방법 시행규칙 별지 제13호서식 (법정 서식)',f:[['wdate','작성일자','date'],['writer','작성자'],['h','근무인원'],['wd','평일 주간(시간·인원)'],['wn','평일 야간(시간·인원)'],['hd','휴일 주간(시간·인원)'],['hn','휴일 야간(시간·인원)'],['h','자위소방대'],['jtot','총원(명)','num'],['jchief','대장 성명'],['jtel','대장 연락처'],['jvice','부대장(명)','num'],['jcall','통보연락(명)','num'],['jfire','초기소화(명)','num'],['jevac','피난유도(명)','num'],['jemer','비상연락(명)','num'],['ctot','초기대응체계 조직구성 총원(명)','num'],['h','교육ㆍ훈련 결과'],['rjt','자위소방대 총원','num'],['rji','자위소방대 참석','num'],['rjo','자위소방대 미참석','num'],['rct','초기대응 총원','num'],['rci','초기대응 참석','num'],['rco','초기대응 미참석','num'],['when','일시/장소'],['main','주요내용','area'],['sup','보완사항','area'],['act','조치사항','area'],['att','참석확인 명단(한 줄에 한 명: 직책 성명)','area']]},
+ outer:{t:'소방시설등 외관점검표',law:'소방시설 자체점검사항 등에 관한 고시 별지 제6호서식 (법정 서식, 공공기관 월 1회 의무·일반 건물은 자체 관리용)',grid:true},
+ rec7:{t:'소방시설 자체점검 기록부',law:'소방시설 자체점검사항 등에 관한 고시 별지 제7호서식 (법정 서식)',f:[['d','① 점검일자','date'],['fac','② 점검시설'],['con','③ 점검내용','area'],['res','④ 점검결과','sel',['양호','불량']],['act','⑤ 결과조치','area'],['memo','⑥ 비고']]},
+ fire:{t:'화재·비화재보 기록부',law:'현장 기록 양식(법정 서식 아님)',f:[['d','발생 일시','datetime-local'],['kind','구분','sel',['비화재보(오동작)','화재','설비 고장']],['zone','경계구역·위치'],['det','작동 기기(감지기 종류·발신기 등)'],['cause','원인','area'],['act','조치(복구 내용)','area'],['rec','복구 일시','datetime-local'],['call','119·소방서 신고','sel',['안 함','신고함']],['dmg','피해(인명·재산)','area'],['photos','사진','photos']]},
+ hot:{t:'화기취급 작업 기록부',law:'현장 기록 양식(법정 서식 아님)',f:[['d','작업 일시','datetime-local'],['place','작업 장소'],['work','작업 종류','sel',['용접','용단','그라인더','가스 토치','기타 화기']],['co','작업 업체·작업자'],['watch','화재감시자'],['ext','소화기 비치','sel',['비치','미비치']],['clear','주변 가연물 제거·덮개','sel',['완료','미완료']],['stop','감지기·설비 일시 정지 여부와 복구 시각'],['end','작업 종료 후 잔불 확인 시각','datetime-local'],['memo','특이사항','area'],['photos','사진','photos']]},
+ work:{t:'공사·정비 기록부',law:'현장 기록 양식(법정 서식 아님)',f:[['s','시작일','date'],['e','완료일','date'],['fac','대상 설비'],['co','시공·정비 업체'],['con','내용','area'],['off','소방시설 차단(정지) 여부·기간'],['ok','복구 후 작동 확인','sel',['확인함','확인 안 함']],['report','착공·완공 신고 대상 여부'],['photos','전·후 사진','photos']]},
+ dmg:{t:'피해복구 기록부',law:'현장 기록 양식(법정 서식 아님)',f:[['d','발생일','date'],['what','피해 내용','area'],['fix','복구 내용','area'],['cost','비용(원)','num'],['done','완료일','date'],['photos','사진','photos']]},
+ promo:{t:'소방안전 홍보 기록부',law:'현장 기록 양식(법정 서식 아님)',f:[['d','일시','date'],['to','대상'],['how','방법','sel',['게시물','방송','교육','안내문','기타']],['con','내용','area'],['photos','사진','photos']]},
+ meet:{t:'소방안전관리 협의회 회의록',law:'현장 기록 양식(법정 서식 아님)',f:[['d','일시','datetime-local'],['place','장소'],['who','참석자','area'],['agenda','안건','area'],['dec','결정사항','area'],['next','다음 할 일·담당','area']]}
+};
+var OUTER=[['1. 소화기구 및 자동소화장치',['소화기: 거주자 등이 손쉽게 사용할 수 있는 장소에 설치되어 있는지 여부','소화기: 구획된 거실(바닥면적 33㎡ 이상)마다 소화기 설치 여부','소화기: 소화기 표지 설치 여부','소화기: 소화기의 변형·손상 또는 부식이 있는지 여부','소화기: 지시압력계(녹색범위)의 적정 여부','소화기: 수동식 분말소화기 내용연수(10년) 적정 여부','자동확산소화기: 견고하게 고정되어 있는지 여부','자동확산소화기: 소화기의 변형·손상 또는 부식이 있는지 여부','자동확산소화기: 지시압력계(녹색범위)의 적정 여부','자동소화장치: 수신부가 설치된 경우 수신부 정상(예비전원, 음향장치 등) 여부','자동소화장치: 본체용기, 방출구, 분사헤드 등의 변형·손상 또는 부식이 있는지 여부','자동소화장치: 소화약제의 지시압력 적정 및 외관의 이상 여부','자동소화장치: 감지부(또는 화재감지기) 및 차단장치 설치 상태 적정 여부']],
+['2. 옥내외 소화전 설비',['수원: 주된수원의 유효수량 적정여부(겸용설비 포함)','수원: 보조수원(옥상)의 유효수량 적정여부','수원: 수조 표시 설치상태 적정 여부','가압송수장치: 펌프 흡입측 연성계·진공계 및 토출측 압력계 등 부속장치의 변형·손상 유무','송수구: 송수구 설치장소 적정 여부(소방차가 쉽게 접근할 수 있는 장소)','배관: 급수배관 개폐밸브 설치(개폐표시형, 흡입측 버터플라이 제외) 적정 여부','함 및 방수구 등: 함 개방 용이성 및 장애물 설치 여부 등 사용 편의성 적정 여부','함 및 방수구 등: 위치표시등 적정 설치 및 정상 점등 여부','함 및 방수구 등: 소화전 표시 및 사용요령(외국어 병기) 기재 표지판 설치상태 적정 여부','함 및 방수구 등: 함 내 소방호스 및 관창 비치 적정 여부','제어반: 펌프 별 자동·수동 전환스위치 위치 적정 여부']],
+['3. (간이)스프링클러설비, 물분무소화설비, 미분무소화설비, 포소화설비',['수원: 주된수원의 유효수량 적정여부(겸용설비 포함)','수원: 보조수원(옥상)의 유효수량 적정여부','수원: 수조 표시 설치상태 적정 여부','저장탱크(포소화설비): 포소화약제 저장량의 적정 여부','가압송수장치: 펌프 흡입측 연성계·진공계 및 토출측 압력계 등 부속장치의 변형·손상 유무','유수검지장치: 유수검지장치실 설치 적정(실내 또는 구획, 출입문 크기, 표지) 여부','배관: 급수배관 개폐밸브 설치(개폐표시형, 흡입측 버터플라이 제외) 적정 여부','배관: 준비작동식 유수검지장치 및 일제개방밸브 2차측 배관 부대설비 설치 적정','배관: 유수검지장치 시험장치 설치 적정(설치 위치, 배관구경, 개폐밸브 및 개방형 헤드, 물받이통 및 배수관) 여부','배관: 다른 설비의 배관과의 구분 상태 적정 여부','기동장치: 수동조작함(설치높이, 표시등) 설치 적정 여부','제어밸브 등(물분무소화설비): 제어밸브 설치 위치 적정 및 표지 설치 여부','배수설비(물분무소화설비가 설치된 차고·주차장): 배수설비(배수구, 기름분리장치 등) 설치 적정 여부','헤드: 헤드의 변형·손상 유무 및 살수장애 여부','호스릴방식(미분무소화설비, 포소화설비): 소화약제저장용기 근처 및 호스릴함 위치표시등 정상 점등 및 표지 설치 여부','송수구: 송수구 설치장소 적정 여부(소방차가 쉽게 접근할 수 있는 장소)','제어반: 펌프 별 자동·수동 전환스위치 정상위치에 있는지 여부']],
+['4. 이산화탄소, 할론, 할로겐화합물 및 불활성기체, 분말소화설비',['저장용기: 설치장소 적정 및 관리 여부','저장용기: 저장용기 설치장소 표지 설치 여부','저장용기: 소화약제 저장량 적정 여부','기동장치: 기동장치 설치 적정(출입구 부근 등, 높이 보호장치, 표지 전원표시등) 여부','배관 등: 배관의 변형·손상 유무','분사헤드: 분사헤드의 변형·손상 유무','호스릴방식: 소화약제저장용기의 위치표시등 정상 점등 및 표지 설치 여부','안전시설 등(이산화탄소소화설비): 방호구역 출입구 부근 잘 보이는 장소에 소화약제 방출 위험경고표지 부착 여부','안전시설 등(이산화탄소소화설비): 방호구역 출입구 외부 인근에 공기호흡기 설치 여부']],
+['5. 자동화재탐지설비, 비상경보설비, 시각경보기, 비상방송설비, 자동화재속보설비',['수신기: 설치장소 적정 및 스위치 정상 위치 여부','수신기: 상용전원 공급 및 전원표시등 정상점등 여부','수신기: 예비전원(축전지) 상태 적정 여부','감지기: 감지기의 변형 또는 손상이 있는지 여부(단독경보형감지기 포함)','음향장치: 음향장치(경종 등) 변형·손상 여부','시각경보장치: 시각경보장치 변형·손상 여부','발신기: 발신기 변형·손상 여부','발신기: 위치표시등 변형·손상 및 정상점등 여부','비상방송설비: 확성기 설치 적정(층마다 설치, 수평거리) 여부','비상방송설비: 조작부 상 설비 작동층 또는 작동구역 표시 여부','자동화재속보설비: 상용전원 공급 및 전원표시등 정상 점등 여부']],
+['6. 피난기구, 유도등(유도표지), 비상조명등 및 휴대용비상조명등',['피난기구: 피난에 유효한 개구부 확보(크기, 높이에 따른 발판, 창문 파괴장치) 및 관리 상태','피난기구: 피난기구(지지대 포함)의 변형·손상 또는 부식이 있는지 여부','피난기구: 피난기구의 위치표시 표지 및 사용방법 표지 부착 적정 여부','유도등: 유도등 상시(3선식의 경우 점검스위치 작동 시) 점등 여부','유도등: 유도등의 변형 및 손상 여부','유도등: 장애물 등으로 인한 시각장애 여부','유도표지: 유도표지의 변형 및 손상 여부','유도표지: 설치 상태(쉽게 떨어지지 않는 방식, 장애물 등으로 시각장애 유무) 적정 여부','비상조명등: 비상조명등 변형·손상 여부','비상조명등: 예비전원 내장형의 경우 점검스위치 설치 및 정상 작동 여부','휴대용비상조명등: 휴대용비상조명등의 변형 및 손상 여부','휴대용비상조명등: 사용 시 자동으로 점등되는지 여부']],
+['7. 제연설비, 특별피난계단의 계단실 및 부속실 제연설비',['제연구역의 구획: 제연경계의 폭, 수직거리 적정 설치 여부','배출구, 유입구: 배출구, 공기유입구 변형·훼손 여부','기동장치: 제어반 각종 스위치류 표시장치(작동표시등 등) 정상 여부','외기취입구: 설치위치(오염공기 유입방지, 배기구 등으로부터 이격거리) 적정 여부','외기취입구: 설치구조(빗물·이물질 유입방지 등) 적정 여부','제연구역의 출입문: 폐쇄상태 유지 또는 화재 시 자동폐쇄 구조 여부','수동기동장치: 기동장치 설치(위치, 전원표시등 등) 적정 여부']],
+['8. 연결송수관설비, 연결살수설비',['연결송수관설비 송수구: 표지 및 송수압력범위 표지 적정 설치 여부','방수구: 위치표시(표시등, 축광식표지) 적정 여부','방수기구함: 호스 및 관창 비치 적정 여부','방수기구함: ‘방수기구함’ 표지 설치상태 적정 여부','연결살수설비 송수구: 표지 및 송수구역 일람표 설치 여부','연결살수설비 송수구: 송수구의 변형 또는 손상 여부','연결살수설비 헤드: 헤드의 변형·손상 유무','연결살수설비 헤드: 헤드 살수장애 여부']],
+['9. 비상콘센트설비, 무선통신보조설비, 지하구',['비상콘센트설비 콘센트: 변형·손상·현저한 부식이 없고 전원의 정상 공급여부','비상콘센트설비 보호함: ‘비상콘센트’표지 설치상태 적정 여부','비상콘센트설비 보호함: 위치표시등 설치 및 정상 점등 여부','무선통신보조설비 무선기기접속단자: 설치장소(소방활동 용이성, 상시 근무장소) 적정여부','무선통신보조설비 무선기기접속단자: 보호함 ‘무선기기접속단자’ 표지 설치 여부','지하구(연소방지설비 등): 연소방지설비 헤드의 변형·손상 여부','지하구(연소방지설비 등): 연소방지설비 송수구 1m 이내 살수구역 안내표지 설치상태 적정 여부','방화벽: 방화문 관리상태 및 정상기능 적정 여부']],
+['10. 기타사항',['피난·방화시설: 방화문 및 방화셔터의 관리 상태(폐쇄·훼손·변경) 및 정상 기능 적정 여부','피난·방화시설: 비상구 및 피난통로 확보 적정여부(피난·방화시설 주변 장애물 적치 포함)','방염: 선처리 방염대상물품의 적합 여부(방염성능시험성적서 및 합격표시 확인)','방염: 후처리 방염대상물품의 적합 여부(방염성능검사결과 확인)']],
+['11. 위험물 저장·취급시설',['가연물 방치 여부','채광 및 환기 설비 관리상태 이상 유무','위험물 종류에 따른 주의사항을 표시한 게시판 설치 유무','기름찌꺼기나 폐액 방치 여부','위험물 안전관리자 선임 여부','화재 시 응급조치 방법 및 소방관서 등 비상연락망 확보 여부']],
+['12. 화기시설',['화기시설 주변 적정(거리, 수량, 능력단위) 소화기 설치 유무','건축물의 가연성부분 및 가연성물질로부터 1m 이상의 안전거리 확보 유무','가연성가스 또는 증기가 발생하거나 체류할 우려가 없는 장소에 설치 유무','연료탱크가 연소기로부터 2m 이상의 수평 거리 확보 유무','채광 및 환기설비 설치 유무','방화환경조성 및 주의, 경고표시 유무']],
+['13. 가연성 가스시설',['「도시가스사업법」 등에 따른 검사 실시 유무','채광이 되어 있고 환기 및 비를 피할 수 있는 장소에 용기 설치 유무','가스누설경보기 설치 유무','용기, 배관, 밸브 및 연소기의 파손, 변형, 노후 또는 부식 여부','환기설비 설치 유무','화재 시 연료를 차단할 수 있는 개폐밸브 설치상태 적정 여부','방화환경조성 및 주의, 경고표시 유무']],
+['14. 전기시설',['「전기사업법」에 따른 점검 또는 검사 실시 유무','개폐기 설치상태 등 손상 여부','규격 전선 사용 여부','전선의 접속 상태 및 전선피복의 손상 여부','누전차단기 설치상태 적정여부','방화환경조성 및 주의, 경고표시 설치 유무','전기 관련 기술자 등의 근무 여부']]];
+var cur='t28',REC=null,ALL=[],B={};
+$('tabs').innerHTML=Object.keys(T).map(function(k){return '<button data-k="'+k+'">'+T[k].t+'</button>';}).join('');
+$('tabs').onclick=function(e){var b=e.target.closest('button');if(!b)return;cur=b.dataset.k;REC=null;render();};
+function blank(){var r={id:KIT.uid(),type:cur,created:KIT.key(new Date()),v:{},photos:[],sign:{},names:{}};if(cur==='outer'){r.v.year=String(new Date().getFullYear());r.grid={};r.months={};}return r;}
+function fieldHTML(f){if(f[0]==='h')return '<h3 style="grid-column:1/-1">'+f[1]+'</h3>';if(f[2]==='photos')return '<div style="grid-column:1/-1"><label class="f">'+f[1]+'</label><input type="file" accept="image/*" multiple data-photos="1"><div class="ph" id="phs"></div></div>';var v=KIT.esc(REC.v[f[0]]||'');var inp=f[2]==='area'?'<textarea data-k="'+f[0]+'">'+v+'</textarea>':f[2]==='sel'?'<select data-k="'+f[0]+'"><option value=""></option>'+f[3].map(function(o){return '<option'+(REC.v[f[0]]===o?' selected':'')+'>'+o+'</option>';}).join('')+'</select>':'<input data-k="'+f[0]+'" type="'+(f[2]==='num'?'text':f[2]||'text')+'"'+(f[2]==='num'?' inputmode="numeric"':'')+' value="'+v+'">';return '<div'+(f[2]==='area'?' style="grid-column:1/-1"':'')+'><label class="f">'+f[1]+'</label>'+inp+'</div>';}
+function gridHTML(){var mon=[1,2,3,4,5,6,7,8,9,10,11,12];var h='<div class="g3"><div><label class="f">기관명·대상물</label><input data-k="org" value="'+KIT.esc(REC.v.org||B.name||'')+'"></div><div><label class="f">연도</label><input data-k="year" value="'+KIT.esc(REC.v.year)+'"></div><div><label class="f">이번에 체크할 달</label><select id="og-m">'+mon.map(function(m){return '<option'+(m===new Date().getMonth()+1?' selected':'')+'>'+m+'</option>';}).join('')+'</select></div></div><p class="hint">칸을 누르면 ○ → × → / → 빈칸 순으로 바뀝니다. 해당 없는 장은 접어 두세요.</p><div class="og">';
+ OUTER.forEach(function(sec,si){h+='<details'+(si<1?' open':'')+'><summary><b>'+sec[0]+'</b></summary><table><tr><th>점검 내용</th>'+mon.map(function(m){return '<th>'+m+'월</th>';}).join('')+'</tr>'+sec[1].map(function(it,ii){var key=si+'-'+ii;return '<tr><td>'+KIT.esc(it)+'</td>'+mon.map(function(m){var v=(REC.grid[key]||{})[m]||'';return '<td data-g="'+key+'" data-m="'+m+'" style="cursor:pointer;font-size:15px">'+v+'</td>';}).join('')+'</tr>';}).join('')+'</table></details>';});
+ h+='</div><h3>월별 점검 내역(점검월일·결과·점검자·확인자)</h3><div class="g3"><div><label class="f">점검 월일</label><input type="date" id="om-d"></div><div><label class="f">결과</label><select id="om-r"><option>양호</option><option>불량</option></select></div><div><label class="f">점검자</label><input id="om-p"></div><div><label class="f">확인자</label><input id="om-c"></div></div><div class="btns"><button class="sm" id="om-add">이 달 내역 저장</button></div><div id="om-list" class="hint"></div>';return h;}
+function signHTML(){var roles=['담당','소방안전관리자','관계인(확인자)'];return '<h3>결재란(손가락으로 서명)</h3><div class="sign">'+roles.map(function(r,i){return '<div>'+r+'<input data-name="'+i+'" placeholder="성명" value="'+KIT.esc(REC.names[i]||'')+'" style="margin:4px 0;padding:6px;font-size:14px"><canvas data-sig="'+i+'" width="300" height="110"></canvas><button class="sm gray" data-clr="'+i+'">지우기</button></div>';}).join('')+'</div>';}
+function render(){[].forEach.call($('tabs').children,function(b){b.className=b.dataset.k===cur?'on':'';});var t=T[cur];$('lawline').textContent='근거: '+t.law;if(!REC)REC=blank();
+ $('form').innerHTML='<h2>'+t.t+'</h2>'+(t.grid?gridHTML():'<div class="g3">'+t.f.map(fieldHTML).join('')+'</div>')+signHTML()+'<div class="btns"><button id="lg-save" data-gc="kit-log-save">저장</button><button class="sub" id="lg-print" data-gc="kit-log-print">인쇄(A4)</button><button class="gray" id="lg-new">새로 쓰기</button></div>';
+ photos();sigs();savedList();if(t.grid)omList();}
+function photos(){var p=$('phs');if(!p)return;p.innerHTML=REC.photos.map(function(s,i){return '<div style="display:inline-block;margin:4px"><img class="photo" src="'+s+'" style="max-height:120px"><button class="sm gray" data-delp="'+i+'">지우기</button></div>';}).join('');}
+function sigs(){[].forEach.call(document.querySelectorAll('canvas[data-sig]'),function(c){var i=c.dataset.sig,ctx=c.getContext('2d'),dn=false;ctx.lineWidth=2.4;ctx.lineCap='round';if(REC.sign[i]){var im=new Image();im.onload=function(){ctx.drawImage(im,0,0);};im.src=REC.sign[i];}
+ function pos(e){var r=c.getBoundingClientRect();return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height];}
+ c.onpointerdown=function(e){dn=true;c.setPointerCapture(e.pointerId);var p=pos(e);ctx.beginPath();ctx.moveTo(p[0],p[1]);};c.onpointermove=function(e){if(!dn)return;var p=pos(e);ctx.lineTo(p[0],p[1]);ctx.stroke();};c.onpointerup=function(){dn=false;REC.sign[i]=c.toDataURL('image/png');};});}
+$('form').addEventListener('input',function(e){var k=e.target.dataset.k;if(k)REC.v[k]=e.target.value;if(e.target.dataset.name!=null)REC.names[e.target.dataset.name]=e.target.value;});
+$('form').addEventListener('change',function(e){var t=e.target;if(t.dataset.k)REC.v[t.dataset.k]=t.value;if(t.dataset.photos){var fs=[].slice.call(t.files,0,4-REC.photos.length);Promise.all(fs.map(function(f){return KIT.shrink(f,1000);})).then(function(a){REC.photos=REC.photos.concat(a).slice(0,cur==='t28'?4:6);photos();});}});
+$('form').addEventListener('click',function(e){var t=e.target;if(t.dataset.clr!=null){var c=document.querySelector('canvas[data-sig="'+t.dataset.clr+'"]');c.getContext('2d').clearRect(0,0,c.width,c.height);delete REC.sign[t.dataset.clr];}
+ if(t.dataset.delp!=null){REC.photos.splice(+t.dataset.delp,1);photos();}
+ if(t.dataset.g){var g=REC.grid[t.dataset.g]=REC.grid[t.dataset.g]||{};var seq=['','○','×','/'];g[t.dataset.m]=seq[(seq.indexOf(g[t.dataset.m]||'')+1)%4];t.textContent=g[t.dataset.m];}
+ if(t.id==='om-add'){var m=$('og-m').value;REC.months[m]={d:$('om-d').value,r:$('om-r').value,p:$('om-p').value,c:$('om-c').value};omList();KIT.toast(m+'월 내역을 넣었습니다. 저장을 누르세요');}
+ if(t.id==='lg-save'){REC.updated=new Date().toISOString();KIT.put('logs',REC).then(function(){KIT.toast('저장했습니다');load();});}
+ if(t.id==='lg-new'){REC=blank();render();}
+ if(t.id==='lg-print'){doPrint();}});
+function omList(){var e=$('om-list');if(!e)return;e.innerHTML=Object.keys(REC.months).sort(function(a,b){return a-b;}).map(function(m){var x=REC.months[m];return m+'월: '+x.d+' '+x.r+' · 점검자 '+KIT.esc(x.p)+' · 확인자 '+KIT.esc(x.c);}).join('<br>');}
+function savedList(){var L=ALL.filter(function(x){return x.type===cur;}).sort(function(a,b){return (b.updated||'').localeCompare(a.updated||'');});$('saved').innerHTML=L.length?'<table><tr><th>저장일</th><th>내용</th><th></th></tr>'+L.map(function(x){var v=x.v,first=Object.keys(v).map(function(k){return v[k];}).filter(Boolean).slice(0,2).join(' · ');return '<tr><td>'+(x.updated||'').slice(0,10)+'</td><td>'+KIT.esc(first)+'</td><td><button class="sm sub" data-open="'+x.id+'">열기</button> <button class="sm gray" data-del="'+x.id+'">삭제</button></td></tr>';}).join('')+'</table>':'<p class="hint">아직 없습니다.</p>';}
+$('saved').onclick=function(e){var t=e.target;if(t.dataset.open){REC=JSON.parse(JSON.stringify(ALL.find(function(x){return x.id===t.dataset.open;})));render();scrollTo(0,0);}if(t.dataset.del&&confirm('지울까요?')){KIT.del('logs',t.dataset.del).then(load);}};
+function doPrint(){var t=T[cur];var css='<style>body{font-family:"Malgun Gothic",sans-serif;font-size:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #555;padding:5px;text-align:left;vertical-align:top}th{background:#eee;width:30%}h1{text-align:center;font-size:19px}.ap{float:right;border-collapse:collapse;margin-bottom:8px}.ap td,.ap th{width:90px;text-align:center;font-size:11px}.ap img{width:84px;height:34px;object-fit:contain}.og td,.og th{width:auto;padding:2px;font-size:9.5px;text-align:center}.og td:first-child{text-align:left}.ph img{width:48%;max-height:230px;object-fit:contain;margin:1%}@page{size:A4;margin:12mm}</style>';
+ var ap='<table class="ap"><tr><th>담당</th><th>소방안전관리자</th><th>관계인</th></tr><tr>'+[0,1,2].map(function(i){return '<td>'+(REC.sign[i]?'<img src="'+REC.sign[i]+'">':'<br><br>')+'</td>';}).join('')+'</tr><tr>'+[0,1,2].map(function(i){return '<td>'+KIT.esc(REC.names[i]||'')+'</td>';}).join('')+'</tr></table>';
+ var h=css+ap+'<div style="clear:both"></div><div style="font-size:10px">'+KIT.esc(t.law)+'</div><h1>'+t.t+'</h1>';
+ if(t.grid){var mon=[1,2,3,4,5,6,7,8,9,10,11,12];h+='<table><tr><th>기관명</th><td>'+KIT.esc(REC.v.org||B.name||'')+'</td><th>소재지</th><td>'+KIT.esc(B.addr||'')+'</td></tr><tr><th>소방안전관리자</th><td colspan="3">'+KIT.esc(B.manager||'')+'</td></tr></table><h3>소방시설등 점검내역</h3><table><tr><th>점검월일</th><th>점검결과</th><th>점검자</th><th>확인자</th></tr>'+Object.keys(REC.months).sort(function(a,b){return a-b;}).map(function(m){var x=REC.months[m];return '<tr><td>'+x.d+'</td><td>'+x.r+'</td><td>'+KIT.esc(x.p)+'</td><td>'+KIT.esc(x.c)+'</td></tr>';}).join('')+'</table>';
+  OUTER.forEach(function(sec,si){var used=sec[1].some(function(it,ii){return REC.grid[si+'-'+ii];});if(!used)return;h+='<h3>'+sec[0]+' ('+KIT.esc(REC.v.year)+'년도)</h3><table class="og"><tr><th>점검 내용</th>'+mon.map(function(m){return '<th>'+m+'월</th>';}).join('')+'</tr>'+sec[1].map(function(it,ii){return '<tr><td>'+KIT.esc(it)+'</td>'+mon.map(function(m){return '<td>'+((REC.grid[si+'-'+ii]||{})[m]||'')+'</td>';}).join('')+'</tr>';}).join('')+'</table>';});h+='<p style="font-size:10px">※ 점검결과란은 양호 ○, 불량 ×, 해당없는 항목은 /. 확인자는 해당 공공기관 소방안전 관련 부서 또는 소방안전관리자가 선임된 부서의 책임자(고시 별지 제6호서식).</p>';}
+ else{h+='<table><tr><th>대상명</th><td>'+KIT.esc(B.name||'')+'</td></tr><tr><th>소재지</th><td>'+KIT.esc(B.addr||'')+'</td></tr><tr><th>소방안전관리 등급</th><td>'+['특급','1급','2급','3급'].map(function(g){return (B.grade===g?'[√]':'[  ]')+g;}).join(' ')+'</td></tr>'+t.f.map(function(f){if(f[0]==='h')return '<tr><td colspan="2" style="background:#f3f3f3"><b>'+f[1]+'</b></td></tr>';if(f[2]==='photos')return '';return '<tr><th>'+f[1]+'</th><td>'+KIT.esc(REC.v[f[0]]||'').replace(/\n/g,'<br>')+'</td></tr>';}).join('')+'</table>'+(REC.photos.length?'<div class="ph">'+REC.photos.map(function(s){return '<img src="'+s+'">';}).join('')+'</div>':'');}
+ $('pv').innerHTML=h;setTimeout(function(){print();},200);}
+function load(){return KIT.all('logs').then(function(a){ALL=a;savedList();});}
+Promise.all([KIT.building(),KIT.all('logs')]).then(function(r){B=r[0];ALL=r[1];var q=new URLSearchParams(location.search).get('t');if(q&&T[q])cur=q;render();});
+})();
+</script>
+</body>
+</html>

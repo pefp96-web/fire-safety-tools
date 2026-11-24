@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>방재실 근무·당직표 자동 만들기 (무료) | 주간·야간·당직·비번 순환, 대체근무, 인쇄</title>
+<meta name="description" content="근무자 이름과 순환 순서(주간·야간·비번·휴무 등)만 넣으면 한 달 근무·당직표를 만들고, 칸을 눌러 바꾸거나 대체근무자를 적어 A4로 인쇄합니다. 무료·가입 없음.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/duty.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f2a36"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<style>.dg{overflow:auto}.dg table{font-size:12px}.dg td,.dg th{padding:4px 3px;text-align:center;min-width:30px}.dg td.n{text-align:left;min-width:70px}.dg td.c{cursor:pointer}.wk{background:#fdf0ef}.s주{background:#eef4fb}.s야{background:#ece9f6}.s당{background:#fff6e5}.s비,.s휴{color:#8a949e}.sub{font-size:10px;color:#c8322b;display:block}@media print{header.top,.noprint{display:none}.dg td,.dg th{font-size:9px;padding:2px}@page{size:A4 landscape;margin:8mm}}</style>
+<script src="../gc.js"></script><script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>근무·당직표</h1><p>순환 근무 자동 배치 · 칸 눌러 수정 · 대체근무<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="logs.html">기록부</a><a href="./#all">전체 기능</a></nav>
+</div></header>
+<main>
+<section class="card noprint">
+<div class="g3">
+<div><label class="f" for="d-m">달</label><input id="d-m" type="month"></div>
+<div><label class="f" for="d-start">순환 시작일</label><input id="d-start" type="date"><div class="hint">이 날 첫 번째 사람이 순서 첫 칸부터 시작</div></div>
+<div><label class="f" for="d-pat">순환 순서(쉼표)</label><input id="d-pat" value="주,야,비,휴"><div class="hint">주=주간, 야=야간, 당=당직, 비=비번, 휴=휴무</div></div>
+</div>
+<label class="f" for="d-names" style="margin-top:8px">근무자(한 줄에 한 명, 순서대로 한 칸씩 어긋나게 배치)</label><textarea id="d-names">근무자1
+근무자2
+근무자3
+근무자4</textarea>
+<div class="btns"><button id="d-make" data-gc="kit-duty-make">근무표 만들기</button><button class="sub" onclick="print()">인쇄</button><button class="gray" id="d-save">저장</button></div>
+<p class="hint">칸을 누르면 순서대로 바뀝니다. 길게 누르거나(휴대폰) 오른쪽 클릭하면 대체근무자를 적습니다. 날마다 주간·야간이 빠졌는지 아래에 표시합니다.</p>
+</section>
+<section class="card"><h2 id="d-title"></h2><div class="dg" id="grid"></div><div id="gap" class="noprint"></div></section>
+<footer class="noprint">근무 형태·인원 기준은 건물과 회사 규정에 따릅니다(법정 서식 아님). 방재실 상주 인원은 자동화재속보설비 설치 면제(소방시설법 시행령 별표 4 제2호사목 단서) 판단 등에 쓰입니다. · 제작 김재환</footer>
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};var D={cells:{},sub:{}};
+var SEQ=['주','야','당','비','휴',''];
+function names(){return $('d-names').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);}
+function pat(){return $('d-pat').value.split(',').map(function(s){return s.trim();}).filter(Boolean);}
+function days(){var p=$('d-m').value.split('-');var y=+p[0],m=+p[1]-1;var n=new Date(y,m+1,0).getDate();var a=[];for(var i=1;i<=n;i++)a.push(new Date(y,m,i));return a;}
+function make(keep){var N=names(),P=pat(),st=KIT.parse($('d-start').value)||days()[0];if(!keep){D.cells={};D.sub={};}days().forEach(function(d){var k=KIT.key(d);var off=Math.round((d-st)/864e5);N.forEach(function(nm,i){var key=nm+'|'+k;if(keep&&D.cells[key]!=null)return;var idx=((off-i)%P.length+P.length)%P.length;D.cells[key]=P[idx];});});draw();}
+function draw(){var N=names(),A=days();$('d-title').textContent=$('d-m').value.replace('-','년 ')+'월 근무·당직표'+(D.bname?' · '+D.bname:'');var W='일월화수목금토';
+ var h='<table><tr><th>성명</th>'+A.map(function(d){return '<th class="'+(KIT.offDay(d)?'wk':'')+'">'+d.getDate()+'<br>'+W[d.getDay()]+'</th>';}).join('')+'</tr>';
+ N.forEach(function(nm){h+='<tr><td class="n">'+KIT.esc(nm)+'</td>'+A.map(function(d){var key=nm+'|'+KIT.key(d),v=D.cells[key]||'';return '<td class="c s'+v+'" data-k="'+KIT.esc(key)+'">'+v+(D.sub[key]?'<span class="sub">'+KIT.esc(D.sub[key])+'</span>':'')+'</td>';}).join('')+'</tr>';});
+ h+='</table>';$('grid').innerHTML=h;
+ var gaps=[];A.forEach(function(d){var k=KIT.key(d);var has={};N.forEach(function(nm){has[D.cells[nm+'|'+k]]=1;});var need=pat().filter(function(x){return x==='주'||x==='야'||x==='당';});var miss=need.filter(function(x){return !has[x];});if(miss.length)gaps.push(d.getDate()+'일: '+miss.join('·')+' 없음');});
+ $('gap').innerHTML=gaps.length?'<div class="warn">빈 근무: '+gaps.join(', ')+'</div>':'<div class="ok">모든 날 주간·야간(당직) 근무자가 있습니다.</div>';}
+$('grid').addEventListener('click',function(e){var td=e.target.closest('td.c');if(!td)return;var k=td.dataset.k;D.cells[k]=SEQ[(SEQ.indexOf(D.cells[k]||'')+1)%SEQ.length];draw();});
+$('grid').addEventListener('contextmenu',function(e){var td=e.target.closest('td.c');if(!td)return;e.preventDefault();var k=td.dataset.k;var v=prompt('대체근무자 이름(지우려면 비움)',D.sub[k]||'');if(v!==null){if(v)D.sub[k]=v;else delete D.sub[k];draw();}});
+$('d-make').onclick=function(){make(false);};
+$('d-save').onclick=function(){D.m=$('d-m').value;D.start=$('d-start').value;D.pat=$('d-pat').value;D.names=$('d-names').value;KIT.set('duty',D).then(function(){KIT.toast('저장했습니다');});};
+var t=new Date();$('d-m').value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0');$('d-start').value=KIT.key(new Date(t.getFullYear(),t.getMonth(),1));
+Promise.all([KIT.get('duty'),KIT.building()]).then(function(r){if(r[0]){D=r[0];D.cells=D.cells||{};D.sub=D.sub||{};if(D.m)$('d-m').value=D.m;if(D.start)$('d-start').value=D.start;if(D.pat)$('d-pat').value=D.pat;if(D.names)$('d-names').value=D.names;}D.bname=r[1].name||'';make(true);});
+$('d-m').onchange=function(){make(true);};
+})();
+</script>
+</body>
+</html>

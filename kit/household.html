@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>아파트 세대 소방점검표 (무료·앱 설치 없음) | 소방시설 외관점검표(세대 점검용) 별지 제36호서식</title>
+<meta name="description" content="입주민이 휴대폰으로 소방시설 외관점검표(세대 점검용, 소방시설법 시행규칙 별지 제36호서식) 20개 항목을 정상·불량·해당없음으로 체크하고 관리사무소에 카톡으로 보냅니다. 관리사무소는 받은 결과를 모아 집계합니다.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/household.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f2a36"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<style>.q{padding:10px 0;border-bottom:1px solid #e3e6ea}.q p{margin:0 0 6px;font-size:16px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.three button{background:#fff;color:#33404c;border-color:#b8c0c8;font-size:16px;padding:12px 4px}.three button.on0{background:#2d6a3e;color:#fff;border-color:#2d6a3e}.three button.on1{background:#c8322b;color:#fff;border-color:#c8322b}.three button.on2{background:#56616c;color:#fff;border-color:#56616c}.grp{background:#eef1f4;padding:6px 8px;font-weight:600;margin-top:10px;border-radius:4px}</style>
+<script src="../gc.js"></script><script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>우리 집 소방점검표</h1><p>세대 점검용 외관점검표 · 앱 설치·가입 없음<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="#admin">관리사무소용</a></nav>
+</div></header>
+<main>
+<section class="card">
+<div class="g3">
+<div><label class="f" for="h-apt">대상명(아파트)</label><input id="h-apt"></div>
+<div><label class="f" for="h-dong">동</label><input id="h-dong" inputmode="numeric"></div>
+<div><label class="f" for="h-ho">호</label><input id="h-ho" inputmode="numeric"></div>
+<div><label class="f" for="h-date">점검일</label><input id="h-date" type="date"></div>
+<div><label class="f" for="h-who">점검자</label><select id="h-who"><option>입주자</option><option>소방안전관리자</option></select></div>
+<div><label class="f" for="h-name">이름</label><input id="h-name"></div>
+<div><label class="f" for="h-tel">전화번호</label><input id="h-tel" inputmode="tel"></div>
+</div>
+</section>
+<section class="card" id="qs"></section>
+<section class="card">
+<label class="f" for="h-memo">비고(위치·구조·용도 등 표로 적기 어려운 내용)</label><textarea id="h-memo"></textarea>
+<div id="h-sum" class="ok"></div>
+<div class="btns"><button id="h-send" data-gc="kit-hh-send">관리사무소에 보내기(카톡 등)</button><button class="sub" onclick="print()">인쇄</button><button class="gray" id="h-reset">처음부터</button></div>
+<p class="hint">보내기를 누르면 결과 글과 결과 파일(.json)을 휴대폰 공유 창으로 보냅니다. 서버로 가는 자료는 없습니다.</p>
+</section>
+<section class="card" id="admin">
+<h2>관리사무소용: 세대 결과 모으기</h2>
+<p class="hint">입주민에게 받은 결과 파일(.json)을 여러 개 한 번에 고르면 표로 모읍니다. 입주민에게 보낼 링크: <b id="h-link"></b> <button class="sm gray" id="h-copy">링크 복사</button></p>
+<input type="file" id="h-files" accept=".json,application/json" multiple>
+<div id="h-agg"></div>
+<div class="btns"><button class="sub" id="h-csv">집계 엑셀(CSV) 받기</button></div>
+</section>
+<footer>근거: 소방시설 설치 및 관리에 관한 법률 시행규칙 [별지 제36호서식] 소방시설 외관점검표(세대 점검용) <개정 2025. 12. 1.> (법제처 원문, 확인일 2026-11-24). 항목 문구는 원문 그대로. · 제작 김재환</footer>
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var Q=[['소화설비','소화기',['손쉽게 사용할 수 있는 장소에 설치 여부','용기 변형ㆍ손상ㆍ부식 여부','안전핀 체결 여부','지시압력계의 정상 여부','수동식 분말소화기 내용연수(10년) 적정 여부']],['소화설비','자동확산소화기',['설치상태 및 외형의 변형ㆍ손상ㆍ부식 여부','지시압력계의 정상 여부']],['소화설비','주거용 주방자동소화장치',['소화약제용기 지시압력계의 정상 여부','수신부의 전원표시등 정상 점등 여부']],['소화설비','스프링클러',['헤드 변형ㆍ손상ㆍ부식 유무']],['경보설비','자동화재탐지설비',['감지기 변형ㆍ손상ㆍ탈락 여부']],['경보설비','가스누설경보기',['전원표시등 정상 점등 여부']],['피난설비','완강기',['피난기구 위치 적정성 여부','완강기 외형의 변형ㆍ손상ㆍ부식 여부','설치 여부 및 장애물로 인한 피난 지장 여부']],['피난설비','피난구용 내림식 사다리',['피난기구 위치 표지 및 사용방법 표지 유무','설치 여부 및 장애물로 인한 피난 지장 여부']],['기타설비','대피공간',['방화문(방화구획)의 적정 여부','적치물(쌓아놓은 물건)로 인한 피난 장애 여부']],['기타설비','경량칸막이',['정보를 포함한 표지 부착 여부','적치물(쌓아놓은 물건)로 인한 피난 장애 여부']]];
+var L=['정상','불량','해당없음'],R={};
+var FLAT=[];Q.forEach(function(g,gi){g[2].forEach(function(t,ti){FLAT.push({k:gi+'-'+ti,g:g[0],e:g[1],t:t});});});
+function draw(){var h='',last='';Q.forEach(function(g,gi){if(g[1]!==last)h+='<div class="grp">'+g[0]+' · '+g[1]+'</div>';last=g[1];g[2].forEach(function(t,ti){var k=gi+'-'+ti;h+='<div class="q"><p>'+t+'</p><div class="three" data-k="'+k+'">'+L.map(function(l,i){return '<button data-v="'+i+'" class="'+(R[k]===i?'on'+i:'')+'">'+l+'</button>';}).join('')+'</div></div>';});});$('qs').innerHTML=h;sum();}
+$('qs').onclick=function(e){var b=e.target.closest('button');if(!b)return;var k=b.parentNode.dataset.k;R[k]=+b.dataset.v;draw();save();};
+function sum(){var d=FLAT.filter(function(x){return R[x.k]!=null;}).length,bad=FLAT.filter(function(x){return R[x.k]===1;});$('h-sum').className=bad.length?'warn':'ok';$('h-sum').innerHTML=d+'/'+FLAT.length+' 항목 체크 · 불량 '+bad.length+'건'+(bad.length?'<br>'+bad.map(function(x){return x.e+': '+x.t;}).join('<br>'):'');}
+var F=['apt','dong','ho','date','who','name','tel','memo'];
+function data(){var o={app:'fst-household',form:'소방시설법 시행규칙 별지 제36호서식',r:{}};F.forEach(function(k){o[k]=$('h-'+k).value;});FLAT.forEach(function(x){o.r[x.e+' | '+x.t]=R[x.k]==null?'':L[R[x.k]];});return o;}
+function save(){var o=data();o.id='me';o.R=R;KIT.put('households',o);}
+F.forEach(function(k){$('h-'+k).addEventListener('change',save);});
+$('h-send').onclick=function(){var o=data();var bad=FLAT.filter(function(x){return R[x.k]===1;});var txt='[세대 소방점검] '+o.apt+' '+o.dong+'동 '+o.ho+'호 ('+o.date+', '+o.who+' '+o.name+')\n체크 '+FLAT.filter(function(x){return R[x.k]!=null;}).length+'/'+FLAT.length+', 불량 '+bad.length+'건'+(bad.length?'\n- '+bad.map(function(x){return x.e+': '+x.t;}).join('\n- '):'')+(o.memo?'\n비고: '+o.memo:'');var file=new File([JSON.stringify(o)],'세대점검_'+o.dong+'동'+o.ho+'호.json',{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],text:txt,title:'세대 소방점검 결과'}).catch(function(){});}else if(navigator.share){navigator.share({text:txt}).catch(function(){});}else{KIT.download(file.name,JSON.stringify(o),'application/json');navigator.clipboard&&navigator.clipboard.writeText(txt);KIT.toast('결과 파일을 받고 글을 복사했습니다');}};
+$('h-reset').onclick=function(){if(confirm('체크를 모두 지울까요?')){R={};draw();save();}};
+var AGG=[];
+$('h-files').onchange=function(e){Promise.all([].map.call(e.target.files,function(f){return f.text().then(function(t){try{return JSON.parse(t);}catch(x){return null;}});})).then(function(a){a.forEach(function(o){if(o&&o.app==='fst-household')AGG.push(o);});agg();});};
+function agg(){var keys=FLAT.map(function(x){return x.e+' | '+x.t;});var badCnt={};keys.forEach(function(k){badCnt[k]=AGG.filter(function(o){return o.r[k]==='불량';}).length;});$('h-agg').innerHTML='<p>모은 세대 '+AGG.length+'곳 · 불량 있는 세대 '+AGG.filter(function(o){return keys.some(function(k){return o.r[k]==='불량';});}).length+'곳</p><table><tr><th>동·호</th><th>점검일</th><th>불량</th></tr>'+AGG.map(function(o){var b=keys.filter(function(k){return o.r[k]==='불량';});return '<tr><td>'+KIT.esc(o.dong+'동 '+o.ho+'호')+'</td><td>'+KIT.esc(o.date)+'</td><td>'+(b.length?KIT.esc(b.join(', ')):'없음')+'</td></tr>';}).join('')+'</table><h3>항목별 불량 세대 수</h3><table>'+keys.filter(function(k){return badCnt[k];}).map(function(k){return '<tr><td>'+KIT.esc(k)+'</td><td>'+badCnt[k]+'</td></tr>';}).join('')+'</table>';}
+$('h-csv').onclick=function(){var keys=FLAT.map(function(x){return x.e+' | '+x.t;});var rows=[['동','호','점검일','점검자','이름','전화'].concat(keys).concat(['비고'])].concat(AGG.map(function(o){return [o.dong,o.ho,o.date,o.who,o.name,o.tel].concat(keys.map(function(k){return o.r[k]||'';})).concat([o.memo]);}));KIT.download('세대점검_집계.csv','\ufeff'+rows.map(function(r){return r.map(function(c){return '"'+String(c==null?'':c).replace(/"/g,'""')+'"';}).join(',');}).join('\n'),'text/csv;charset=utf-8');};
+var P=new URLSearchParams(location.search);
+var link=location.origin+location.pathname+'?apt=';
+KIT.building().then(function(b){var apt=P.get('apt')||b.name||'';$('h-link').textContent=link+encodeURIComponent(b.name||'아파트이름');return KIT.all('households').then(function(a){var me=a.find(function(x){return x.id==='me';});if(me){F.forEach(function(k){if(me[k])$('h-'+k).value=me[k];});R=me.R||{};}if(P.get('apt'))$('h-apt').value=P.get('apt');else if(!$('h-apt').value)$('h-apt').value=apt;if(!$('h-date').value)$('h-date').value=KIT.key(new Date());draw();});});
+$('h-copy').onclick=function(){navigator.clipboard&&navigator.clipboard.writeText($('h-link').textContent).then(function(){KIT.toast('복사했습니다');});};
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>여러 건물 소방 관리 목록 (무료) | 사용승인월·점검 종류 검색, 일정 미등록·입력 누락 알림, 건축물대장 입력 도우미</title>
+<meta name="description" content="관리하는 건물을 목록으로 두고 사용승인월과 종합·작동점검 종류로 찾고, 올해 점검 기록이 없는 건물과 입력이 빠진 건물을 알려 줍니다. 세움터·건축HUB 건축물대장 열람 바로가기와 붙여넣기 입력 도우미 포함.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/buildings.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f2a36"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script><script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>건물 목록</h1><p>여러 건물 · 복합 검색 · 일정 미등록 알림<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="calendar.html">달력</a><a href="./#all">전체 기능</a></nav>
+</div></header>
+<main>
+<section class="card"><h2>알림</h2><div id="alerts"></div></section>
+<section class="card">
+<h2>찾기</h2>
+<div class="g3">
+<div><label class="f" for="f-m">사용승인월</label><select id="f-m"><option value="">전체</option></select></div>
+<div><label class="f" for="f-k">점검 종류</label><select id="f-k"><option value="">전체</option><option value="y">종합점검 대상</option><option value="n">작동점검만</option></select></div>
+<div><label class="f" for="f-q">이름·주소·등급</label><input id="f-q"></div>
+<div><label class="f" for="f-this">이번 달 점검</label><select id="f-this"><option value="">상관없음</option><option value="1">이번 달 점검 있는 건물만</option></select></div>
+</div>
+<div id="list" style="margin-top:10px"></div>
+<div class="btns"><button id="b-add" data-gc="kit-bld-add">건물 추가</button><button class="sub" id="b-cur">지금 수첩 건물을 목록에 넣기</button><button class="gray" id="b-csv">목록 CSV</button></div>
+</section>
+<section class="card" id="edit" hidden>
+<h2 id="e-title">건물</h2>
+<div class="g3">
+<div><label class="f" for="e-name">상호(건물명)</label><input id="e-name"></div>
+<div><label class="f" for="e-addr">소재지</label><input id="e-addr"></div>
+<div><label class="f" for="e-use">주용도</label><input id="e-use"></div>
+<div><label class="f" for="e-grade">등급</label><select id="e-grade"><option value="">선택</option><option>특급</option><option>1급</option><option>2급</option><option>3급</option></select></div>
+<div><label class="f" for="e-approval">사용승인일</label><input id="e-approval" type="date"></div>
+<div><label class="f" for="e-comp">종합점검 대상</label><select id="e-comp"><option value="">선택</option><option value="y">예</option><option value="n">아니오(작동점검만)</option></select></div>
+<div><label class="f" for="e-area">연면적(㎡)</label><input id="e-area" inputmode="decimal"></div>
+<div><label class="f" for="e-above">지상층</label><input id="e-above" inputmode="numeric"></div>
+<div><label class="f" for="e-under">지하층</label><input id="e-under" inputmode="numeric"></div>
+<div><label class="f" for="e-dongs">동수</label><input id="e-dongs" inputmode="numeric"></div>
+<div><label class="f" for="e-manager">소방안전관리자</label><input id="e-manager"></div>
+<div><label class="f" for="e-tel">연락처</label><input id="e-tel" inputmode="tel"></div>
+</div>
+<h3>건축물대장 입력 도우미</h3>
+<p class="hint">정적 페이지는 인증키를 숨길 수 없어 건축물대장 자동 조회를 하지 않습니다(공공데이터포털 '국토교통부_건축HUB_건축물대장정보 서비스'는 활용신청·인증키 필요). 대신 아래에서 대장을 열람하고, 화면 글자를 복사해 붙여 넣으면 숫자를 찾아 칸에 넣습니다.</p>
+<div class="btns" style="margin-top:0"><a class="btn sub" target="_blank" rel="noopener" href="https://www.eais.go.kr/" data-gc="kit-open-eais">세움터 열기</a><a class="btn sub" target="_blank" rel="noopener" href="https://www.hub.go.kr/" data-gc="kit-open-hub">건축HUB 열기</a><a class="btn sub" target="_blank" rel="noopener" href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=15000000098">정부24 건축물대장 발급</a></div>
+<textarea id="e-paste" placeholder="건축물대장 화면 글자를 붙여 넣으세요. 예: 대지위치 ○○시 ○○구 ... 연면적 2,400.5㎡ 주용도 제2종근린생활시설 층수 지하 1층 / 지상 5층 사용승인일 2015.04.17"></textarea>
+<div class="btns"><button class="sm sub" id="e-parse">붙여 넣은 글에서 찾기</button></div><p class="hint" id="e-pmsg"></p>
+<div class="btns"><button id="e-save" data-gc="kit-bld-save">저장</button><button class="sub" id="e-use2">이 건물로 수첩 쓰기</button><button class="gray" id="e-del">삭제</button></div>
+</section>
+<footer>점검 달 계산: 종합점검 대상은 사용승인일이 속하는 달 종합점검·6개월 뒤 작동점검, 작동점검만 대상은 사용승인일이 속하는 달(소방시설법 시행규칙 별표 3 제2호라목·제3호라목, 시행 2026. 10. 19. 판, 확인일 2026-11-24). 특급 반기 종합점검, 학교 6월 30일 특례, 최초점검은 따로 확인. · 제작 김재환</footer>
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var F=['name','addr','use','grade','approval','comp','area','above','under','dongs','manager','tel'];
+var ALL=[],INS=[],ED=null,ACT={};
+for(var m=1;m<=12;m++)$('f-m').innerHTML+='<option value="'+m+'">'+m+'월</option>';
+function months(b){if(!b.approval)return [];var m=+b.approval.slice(5,7);if(b.comp==='y')return [{m:m,k:'종합'},{m:(m+5)%12+1,k:'작동'}];return [{m:m,k:'작동'}];}
+function lastInsp(b){var y=String(new Date().getFullYear());return INS.filter(function(x){return (x.bid&&x.bid===b.id)||(!x.bid&&x.bname&&x.bname===b.name);}).filter(function(x){return (x.s||'').slice(0,4)===y;});}
+function alerts(){var now=new Date().getMonth()+1,y=new Date().getFullYear(),A=[];
+ ALL.forEach(function(b){var miss=['approval','comp','grade','addr'].filter(function(k){return !b[k];});if(miss.length)A.push('<li><b>'+KIT.esc(b.name||'(이름 없음)')+'</b>: 입력 누락 '+miss.map(function(k){return {approval:'사용승인일',comp:'종합점검 대상 여부',grade:'등급',addr:'소재지'}[k];}).join('·')+' → 점검 일정을 만들 수 없음</li>');
+  var done=lastInsp(b);months(b).forEach(function(x){var kd=done.some(function(d){return (d.kind||'').indexOf(x.k)===0&&+(d.s||'').slice(5,7)===x.m;});if(x.m<now&&!kd)A.push('<li><b>'+KIT.esc(b.name)+'</b>: '+x.m+'월 '+x.k+'점검 기록 없음(지남) — 점검표에 기록했는지 확인</li>');else if((x.m===now||x.m===now%12+1)&&!kd)A.push('<li><b>'+KIT.esc(b.name)+'</b>: '+x.m+'월 '+x.k+'점검 예정'+(x.m===now?'(이번 달)':'(다음 달)')+'</li>');});});
+ if(!ALL.length)A.push('<li>건물이 없습니다. 아래 버튼으로 추가하세요.</li>');
+ $('alerts').innerHTML='<ul style="margin:0;padding-left:18px">'+A.join('')+'</ul>'+(A.length?'':'<p class="ok">알림 없음</p>');}
+function list(){var fm=$('f-m').value,fk=$('f-k').value,q=$('f-q').value.trim(),th=$('f-this').value,now=new Date().getMonth()+1;
+ var L=ALL.filter(function(b){if(fm&&(!b.approval||+b.approval.slice(5,7)!==+fm))return false;if(fk&&b.comp!==fk)return false;if(q&&[b.name,b.addr,b.grade,b.use].join(' ').indexOf(q)<0)return false;if(th&&!months(b).some(function(x){return x.m===now;}))return false;return true;});
+ $('list').innerHTML='<p class="hint">'+L.length+'곳</p><table><tr><th>건물</th><th>등급</th><th>점검 달</th><th>올해 기록</th><th></th></tr>'+L.map(function(b){return '<tr><td>'+KIT.esc(b.name)+(ACT.id===b.id?' <span class="pill green">수첩 사용 중</span>':'')+'<div class="hint">'+KIT.esc(b.addr||'')+'</div></td><td>'+KIT.esc(b.grade||'-')+'</td><td>'+(months(b).map(function(x){return x.m+'월 '+x.k;}).join(', ')||'<span class="pill red">사용승인일 없음</span>')+'</td><td>'+lastInsp(b).length+'건</td><td><button class="sm sub" data-e="'+b.id+'">열기</button></td></tr>';}).join('')+'</table>';}
+['f-m','f-k','f-q','f-this'].forEach(function(i){$(i).addEventListener('input',list);});
+$('list').onclick=function(e){var id=e.target.dataset.e;if(id)open(ALL.find(function(b){return b.id===id;}));};
+function open(b){ED=b;$('edit').hidden=false;$('e-title').textContent=b.name||'새 건물';F.forEach(function(k){$('e-'+k).value=b[k]||'';});$('e-pmsg').textContent='';$('edit').scrollIntoView();}
+function read(){F.forEach(function(k){ED[k]=$('e-'+k).value.trim();});return ED;}
+$('b-add').onclick=function(){open({id:KIT.uid()});};
+$('b-cur').onclick=function(){KIT.building().then(function(b){if(!b.name){KIT.toast('수첩 홈에 건물 정보가 없습니다');return;}if(!b.id)b.id=KIT.uid();var x=JSON.parse(JSON.stringify(b));return KIT.put('buildings',x).then(function(){return KIT.saveBuilding(b);}).then(load).then(function(){KIT.toast('목록에 넣었습니다');});});};
+$('e-save').onclick=function(){read();if(!ED.name){KIT.toast('건물명을 넣으세요');return;}KIT.put('buildings',ED).then(function(){var p=ACT.id===ED.id?KIT.building().then(function(a){F.forEach(function(k){a[k]=ED[k];});return KIT.saveBuilding(a);}):null;return p;}).then(load).then(function(){KIT.toast('저장했습니다');});};
+$('e-use2').onclick=function(){read();KIT.put('buildings',ED).then(function(){return KIT.building();}).then(function(a){if(a.id&&a.name&&a.id!==ED.id)return KIT.put('buildings',JSON.parse(JSON.stringify(a)));}).then(function(){return KIT.saveBuilding(JSON.parse(JSON.stringify(ED)));}).then(load).then(function(){KIT.toast(ED.name+'(으)로 수첩을 바꿨습니다. 달력·점검표·기록표가 이 건물 기준이 됩니다');});};
+$('e-del').onclick=function(){if(!confirm('목록에서 지울까요? 점검 기록은 남습니다.'))return;KIT.del('buildings',ED.id).then(function(){$('edit').hidden=true;return load();});};
+$('e-parse').onclick=function(){var t=$('e-paste').value.replace(/\s+/g,' '),got=[];
+ var a=t.match(/연면적[^0-9]{0,10}([\d,]+(?:\.\d+)?)/);if(a){$('e-area').value=a[1].replace(/,/g,'');got.push('연면적');}
+ var d=t.match(/사용승인일[^0-9]{0,10}(\d{4})[.\-년\s]+(\d{1,2})[.\-월\s]+(\d{1,2})/);if(d){$('e-approval').value=d[1]+'-'+d[2].padStart(2,'0')+'-'+d[3].padStart(2,'0');got.push('사용승인일');}
+ var u=t.match(/지하\s*(\d+)\s*층/);if(u){$('e-under').value=u[1];got.push('지하층');}
+ var g=t.match(/지상\s*(\d+)\s*층/);if(g){$('e-above').value=g[1];got.push('지상층');}
+ var p=t.match(/주용도\s*:?\s*([가-힣0-9·,\s]{2,20}?)(?=\s(?:주구조|층수|지붕|높이|건축면적|연면적|세대|$))/);if(p){$('e-use').value=p[1].trim();got.push('주용도');}
+ var ad=t.match(/(?:대지위치|도로명주소)\s*:?\s*([가-힣0-9\-\s]{6,60}?)(?=\s(?:지번|도로명|명칭|※|$))/);if(ad&&!$('e-addr').value){$('e-addr').value=ad[1].trim();got.push('소재지');}
+ $('e-pmsg').textContent=got.length?'찾아서 넣음: '+got.join(', ')+'. 맞는지 눈으로 확인하고 저장하세요.':'찾은 값이 없습니다. 칸에 직접 넣으세요.';};
+$('b-csv').onclick=function(){var rows=[['건물명','소재지','주용도','등급','사용승인일','종합점검 대상','연면적','지상','지하','소방안전관리자','연락처','점검 달']].concat(ALL.map(function(b){return F.filter(function(k){return k!=='dongs';}).map(function(k){return b[k]||'';}).concat([months(b).map(function(x){return x.m+'월 '+x.k;}).join(' ')]);}));KIT.download('건물목록.csv','\ufeff'+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n'),'text/csv;charset=utf-8');};
+function load(){return Promise.all([KIT.all('buildings'),KIT.all('inspections'),KIT.building()]).then(function(r){ALL=r[0];INS=r[1];ACT=r[2];if(ACT.name&&!ACT.id){ACT.id=KIT.uid();KIT.saveBuilding(ACT);}if(ACT.id&&ACT.name&&!ALL.some(function(b){return b.id===ACT.id;})){ALL.push(JSON.parse(JSON.stringify(ACT)));KIT.put('buildings',JSON.parse(JSON.stringify(ACT)));}alerts();list();});}
+load();
+})();
+</script>
+</body>
+</html>

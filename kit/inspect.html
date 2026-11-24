@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방시설 자체점검 점검표 모바일 작성 (무료·가입 없음) | 1,149개 점검항목·사진·결과보고서·기록표 출력</title>
+<meta name="description" content="소방시설 자체점검사항 등에 관한 고시 별지 제4호서식 점검항목 1,149개를 건물에 있는 설비만 골라 휴대폰으로 ○×/ 체크하고, 항목별 사진, 진단 요약, 점검표·실시결과 보고서(별지 제9호)·자체점검기록표(별표 5)·조치결과표를 인쇄·공유합니다.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/inspect.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f2a36"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<style>
+.it{border-bottom:1px solid #e3e6ea;padding:8px 0}
+.it .q{font-size:14px}.it .q b{color:#56616c;font-weight:600;margin-right:4px}
+.ox{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.ox button{padding:8px 14px;font-size:16px;background:#fff;color:#33404c;border-color:#b8c0c8;min-width:52px}
+.ox button.on1{background:#2d6a3e;border-color:#2d6a3e;color:#fff}.ox button.on2{background:#c8322b;border-color:#c8322b;color:#fff}.ox button.on3{background:#56616c;border-color:#56616c;color:#fff}
+.bad{background:#fcf4f3;border:1px solid #e3b5b1;border-radius:4px;padding:8px;margin-top:6px}
+details.sec{background:#fff;border:1px solid #d9dde2;border-radius:6px;margin-bottom:8px;padding:0 12px}
+details.sec>summary{padding:12px 0;font-weight:600;cursor:pointer}
+.facs{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 12px;font-size:14px}
+.facs label{display:flex;gap:6px;align-items:center}.facs input{width:auto}
+.sum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.sum div{background:#f8f9fa;border:1px solid #d9dde2;border-radius:6px;padding:8px}.sum b{display:block;font-size:22px}
+#pv{display:none}
+@media print{#app{display:none}#pv{display:block}.pg{page-break-after:always}}
+@media (max-width:700px){.facs{grid-template-columns:1fr}.sum{grid-template-columns:repeat(2,1fr)}}
+</style>
+<script src="../gc.js"></script><script src="common.js"></script><script src="checklist-data.js"></script>
+</head>
+<body>
+<div id="app">
+<header class="top"><div class="in">
+<div><h1>자체점검 점검표</h1><p>고시 별지 제4호서식 점검항목 1,149개 · 건물 보유 설비만 표시<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="defects.html">지적사항</a><a href="./#all">전체 기능</a></nav>
+</div></header>
+<main>
+<section class="card">
+<h2>1. 점검 기본 정보</h2>
+<div class="g3">
+<div><label class="f" for="i-sel">점검 기록</label><select id="i-sel"></select></div>
+<div><label class="f" for="i-kind">점검 구분</label><select id="i-kind"><option value="작동점검">작동점검</option><option value="종합점검(최초점검)">종합점검(최초점검)</option><option value="종합점검(그 밖의 종합점검)">종합점검(그 밖의 종합점검)</option></select><div class="hint">작동점검이면 ●(종합점검 전용) 항목은 숨깁니다</div></div>
+<div><label class="f" for="i-by">점검자</label><select id="i-by"><option>관계인</option><option>소방안전관리자</option><option>소방시설관리업자</option></select></div>
+<div><label class="f" for="i-s">점검 시작일</label><input id="i-s" type="date"></div>
+<div><label class="f" for="i-e">점검 종료일</label><input id="i-e" type="date"></div>
+<div><label class="f" for="i-days">총 점검일수</label><input id="i-days" inputmode="numeric"></div>
+<div><label class="f" for="i-name">점검자 성명(업체명)</label><input id="i-name"></div>
+<div><label class="f" for="i-tel">전화번호</label><input id="i-tel" inputmode="tel"></div>
+<div><label class="f" for="i-use">대상물 구분(용도)</label><input id="i-use" placeholder="예: 근린생활시설"></div>
+</div>
+<h3>점검인력(별지 제9호 1쪽)</h3>
+<div id="staff"></div>
+<div class="btns"><button class="sm gray" id="st-add">인력 줄 추가</button></div>
+<div class="btns">
+<button id="i-new" data-gc="kit-insp-new">새 점검 시작</button>
+<button class="sub" id="i-clone" data-gc="kit-insp-clone">지난 점검 이어서 시작</button>
+<button class="gray" id="i-del">이 기록 삭제</button>
+</div>
+<p class="hint" id="i-msg"></p>
+</section>
+
+<section class="card">
+<h2>2. 이 건물에 있는 설비 (32종)</h2>
+<p class="hint">고른 설비의 항목만 아래에 나옵니다. <a href="judge.html">설치대상 판정</a>에서 저장하면 자동으로 체크됩니다.</p>
+<div class="facs" id="facs"></div>
+</section>
+
+<section class="card">
+<h2>3. 진단 요약</h2>
+<div class="sum"><div><b id="s-ok">0</b>양호 ○</div><div><b id="s-bad">0</b>불량 ×</div><div><b id="s-na">0</b>해당없음 /</div><div><b id="s-left">0</b>남은 항목</div></div>
+<div id="diag" class="ok" style="margin-top:10px"></div>
+<p class="hint">진단 3단계(정상·조치필요·긴급)는 이 수첩의 구분입니다(법정 구분 아님). 불량 중 '긴급'을 체크한 것이 있으면 긴급으로 표시합니다.</p>
+<div class="btns">
+<button id="o-check" data-gc="kit-print-checklist">점검표 출력</button>
+<button id="o-report" data-gc="kit-print-report">실시결과 보고서(별지 제9호)</button>
+<button id="o-photo" data-gc="kit-print-photo">사진첩</button>
+<button id="o-label" data-gc="kit-print-label">자체점검기록표(게시용)</button>
+<button id="o-fix" data-gc="kit-print-fix">조치결과표</button>
+<button class="sub" id="o-def" data-gc="kit-insp-to-defects">불량을 지적사항 대장으로</button>
+<button class="sub" id="o-share" data-gc="kit-insp-share">보고서 공유(카톡 등)</button>
+<button class="gray" id="o-hand">손으로 채울 칸 보기</button>
+</div>
+<div id="hand"></div>
+</section>
+
+<div id="list"></div>
+<p class="hint">항목 문구·번호: 소방시설 자체점검사항 등에 관한 고시 [별지 제4호서식] (소방청고시 제2022-71호, 시행 2022. 12. 1., 법제처 현행 표시 확인 2026-11-24). 점검결과 표시: 양호 ○, 불량 ×, 해당없음 /. ● 항목은 종합점검만.</p>
+</main>
+<footer style="max-width:980px;margin:0 auto;padding:0 14px 30px">
+<table><tr><th>기준(법제처 국가법령정보센터 원문, 확인일 2026-11-24)</th></tr>
+<tr><td>소방시설법 시행규칙(시행 2026. 10. 19.) 제20조·제23조, 별지 제9호서식(개정 2025. 12. 1.) 실시결과 보고서, 별표 5 자체점검기록표(개정 2025. 12. 1.), 제25조(기록표 게시)</td></tr>
+<tr><td>소방시설 자체점검사항 등에 관한 고시(시행 2022. 12. 1.) 제5조, 별지 제4호서식 점검표</td></tr></table>
+<p>제작 김재환 · <a href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">보고서 작성·검토 대행(크몽)</a> · 사진·기록은 이 기기에만 저장</p>
+</footer>
+</div>
+<div id="pv"></div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var CL=window.CHECKLIST, B={}, CUR=null, ALL=[];
+var FIELDS=['kind','by','s','e','days','name','tel','use'];
+function blank(){return {id:KIT.uid(),created:KIT.key(new Date()),kind:'작동점검',by:'소방안전관리자',s:KIT.key(new Date()),e:KIT.key(new Date()),days:'1',name:'',tel:'',use:'',staff:[{role:'주된 점검인력',name:'',lic:'',no:'',date:''}],facs:(B.facilities||[]).slice(),res:{},memo:{},urg:{},photo:{},bid:B.id||''};}
+function comp(){return CUR.kind.indexOf('종합')===0;}
+function save(){if(!CUR)return;FIELDS.forEach(function(k){CUR[k]=$('i-'+k).value;});CUR.updated=new Date().toISOString();CUR.bname=B.name||'';return KIT.put('inspections',CUR);}
+var tmr;function later(){clearTimeout(tmr);tmr=setTimeout(function(){save();summary();},300);}
+function sel(){$('i-sel').innerHTML=ALL.sort(function(a,b){return (b.s||'').localeCompare(a.s||'');}).map(function(x){return '<option value="'+x.id+'"'+(CUR&&x.id===CUR.id?' selected':'')+'>'+KIT.esc((x.s||'')+' '+x.kind+(x.bname?' · '+x.bname:''))+'</option>';}).join('');}
+function staffUI(){$('staff').innerHTML=CUR.staff.map(function(p,i){return '<div class="g3" style="margin-bottom:6px" data-i="'+i+'"><div><select data-k="role"><option'+(p.role==='주된 점검인력'?' selected':'')+'>주된 점검인력</option><option'+(p.role==='보조 점검인력'?' selected':'')+'>보조 점검인력</option></select></div><div><input data-k="name" placeholder="성명" value="'+KIT.esc(p.name)+'"></div><div><input data-k="lic" placeholder="자격구분" value="'+KIT.esc(p.lic)+'"></div><div><input data-k="no" placeholder="자격번호" value="'+KIT.esc(p.no)+'"></div><div><input data-k="date" placeholder="점검참여일(기간)" value="'+KIT.esc(p.date)+'"></div></div>';}).join('');}
+$('staff').addEventListener('input',function(e){var row=e.target.closest('[data-i]');if(!row)return;CUR.staff[+row.dataset.i][e.target.dataset.k]=e.target.value;later();});
+$('st-add').onclick=function(){if(CUR.staff.length>=6){KIT.toast('서식 칸은 6줄입니다');return;}CUR.staff.push({role:'보조 점검인력',name:'',lic:'',no:'',date:''});staffUI();later();};
+function facsUI(){$('facs').innerHTML=CL.map(function(s){return '<label><input type="checkbox" value="'+s.no+'"'+(CUR.facs.indexOf(s.no)>=0?' checked':'')+'> '+s.no+'. '+KIT.esc(s.name)+'</label>';}).join('');}
+$('facs').addEventListener('change',function(e){var v=+e.target.value;if(e.target.checked){if(CUR.facs.indexOf(v)<0)CUR.facs.push(v);}else CUR.facs=CUR.facs.filter(function(x){return x!==v;});CUR.facs.sort(function(a,b){return a-b;});later();listUI();});
+function items(){var out=[];CL.forEach(function(s){if(CUR.facs.indexOf(s.no)<0)return;s.u.forEach(function(u){u.i.forEach(function(it){if(it[2]&&!comp())return;out.push({sec:s,u:u,it:it});});});});return out;}
+function listUI(){
+ var h='';CL.forEach(function(s){if(CUR.facs.indexOf(s.no)<0)return;var cnt=0,done=0,bad=0;var body=s.u.map(function(u){var sub='';var rows=u.i.filter(function(it){return !(it[2]&&!comp());}).map(function(it){cnt++;var r=CUR.res[it[0]]||'';if(r)done++;if(r==='x')bad++;var head=(it[3]&&it[3]!==sub)?'<div class="hint" style="margin-top:6px">['+KIT.esc(it[3])+']</div>':'';sub=it[3];return head+'<div class="it" id="it-'+it[0]+'"><div class="q"><b>'+it[0]+'</b>'+(it[2]?'● ':'')+KIT.esc(it[1])+'</div><div class="ox" data-n="'+it[0]+'"><button data-v="o" class="'+(r==='o'?'on1':'')+'">○</button><button data-v="x" class="'+(r==='x'?'on2':'')+'">×</button><button data-v="/" class="'+(r==='/'?'on3':'')+'">/</button><label class="btn sub sm" style="padding:8px 10px">사진<input type="file" accept="image/*" capture="environment" data-ph="'+it[0]+'" style="display:none"></label></div>'+(r==='x'||CUR.photo[it[0]]?'<div class="bad"><input data-memo="'+it[0]+'" placeholder="불량 내용·위치(예: 3층 복도 소화기 압력 미달 2개)" value="'+KIT.esc(CUR.memo[it[0]]||'')+'"><label style="font-size:13px;display:inline-flex;gap:4px;margin-top:6px"><input type="checkbox" data-urg="'+it[0]+'" style="width:auto"'+(CUR.urg[it[0]]?' checked':'')+'> 긴급(바로 조치 필요)</label>'+(CUR.photo[it[0]]?'<img class="photo" src="'+CUR.photo[it[0]]+'" alt="사진"><button class="sm gray" data-delph="'+it[0]+'">사진 지우기</button>':'')+'</div>':'')+'</div>';}).join('');return rows?'<h3>'+u.c+'. '+KIT.esc(u.n)+'</h3>'+rows:'';}).join('');
+ h+='<details class="sec"'+(bad?' open':'')+'><summary>'+s.no+'. '+KIT.esc(s.name)+' <span class="pill'+(bad?' red':done===cnt?' green':'')+'">'+done+'/'+cnt+(bad?' · 불량 '+bad:'')+'</span> <button class="sm gray" data-all="'+s.no+'" style="float:right;margin-top:-4px">남은 항목 모두 ○</button></summary>'+body+'</details>';});
+ $('list').innerHTML=h||'<div class="warn">2번에서 건물에 있는 설비를 고르세요.</div>';summary();
+}
+$('list').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+ if(b.dataset.all){e.preventDefault();var s=CL.find(function(x){return x.no===+b.dataset.all;});s.u.forEach(function(u){u.i.forEach(function(it){if(it[2]&&!comp())return;if(!CUR.res[it[0]])CUR.res[it[0]]='o';});});later();listUI();return;}
+ if(b.dataset.delph){delete CUR.photo[b.dataset.delph];later();listUI();return;}
+ var box=b.closest('.ox');if(!box||!b.dataset.v)return;var n=box.dataset.n;CUR.res[n]=CUR.res[n]===b.dataset.v?'':b.dataset.v;var op=[].map.call(document.querySelectorAll('details.sec'),function(d){return d.open;});later();listUI();[].forEach.call(document.querySelectorAll('details.sec'),function(d,i){d.open=op[i]||d.open;});var el=$('it-'+n);if(el&&CUR.res[n]==='x'){var m=el.querySelector('[data-memo]');if(m)m.focus();}});
+$('list').addEventListener('input',function(e){if(e.target.dataset.memo){CUR.memo[e.target.dataset.memo]=e.target.value;later();}});
+$('list').addEventListener('change',function(e){var t=e.target;if(t.dataset.urg){CUR.urg[t.dataset.urg]=t.checked;later();}if(t.dataset.ph&&t.files[0]){var n=t.dataset.ph;KIT.shrink(t.files[0],1280).then(function(d){CUR.photo[n]=d;return save();}).then(function(){var op=[].map.call(document.querySelectorAll('details.sec'),function(d){return d.open;});listUI();[].forEach.call(document.querySelectorAll('details.sec'),function(d,i){d.open=op[i]||d.open;});KIT.toast('사진을 붙였습니다');});}});
+function stat(){var L=items(),o=0,x=0,na=0,urg=0;L.forEach(function(r){var v=CUR.res[r.it[0]];if(v==='o')o++;else if(v==='x'){x++;if(CUR.urg[r.it[0]])urg++;}else if(v==='/')na++;});return {L:L,o:o,x:x,na:na,left:L.length-o-x-na,urg:urg};}
+function diagText(s){return s.urg?'긴급':s.x?'조치필요':'정상';}
+function summary(){var s=stat();$('s-ok').textContent=s.o;$('s-bad').textContent=s.x;$('s-na').textContent=s.na;$('s-left').textContent=s.left;var d=diagText(s);$('diag').className=d==='정상'?'ok':'warn';$('diag').innerHTML='<b>진단: '+d+'</b> · 불량 '+s.x+'건'+(s.urg?'(긴급 '+s.urg+'건)':'')+(s.left?' · 아직 '+s.left+'개 항목을 체크하지 않았습니다':' · 모든 항목 체크 완료');}
+function load(id){CUR=ALL.find(function(x){return x.id===id;});if(!CUR)return;if(!CUR.facs.length&&(B.facilities||[]).length&&!Object.keys(CUR.res).length){CUR.facs=B.facilities.slice();if(!CUR.use)CUR.use=B.use||'';if(!CUR.bid)CUR.bid=B.id||'';KIT.put('inspections',CUR);}FIELDS.forEach(function(k){$('i-'+k).value=CUR[k]||'';});staffUI();facsUI();listUI();sel();}
+['kind','by','s','e','days','name','tel','use'].forEach(function(k){$('i-'+k).addEventListener('change',function(){CUR[k]=$('i-'+k).value;if(k==='kind'){listUI();}if(k==='s'||k==='e'){var a=KIT.parse($('i-s').value),b=KIT.parse($('i-e').value);if(a&&b&&b>=a&&!$('i-days').value)$('i-days').value=Math.round((b-a)/864e5)+1;}later();});});
+$('i-sel').onchange=function(){save();load($('i-sel').value);};
+$('i-new').onclick=function(){save();CUR=blank();CUR.use=B.use||'';ALL.push(CUR);KIT.put('inspections',CUR).then(function(){load(CUR.id);KIT.toast('새 점검을 시작했습니다');});};
+$('i-clone').onclick=function(){if(!ALL.length){KIT.toast('지난 점검이 없습니다');return;}save();var prev=ALL.slice().sort(function(a,b){return (b.s||'').localeCompare(a.s||'');})[0];var c=JSON.parse(JSON.stringify(prev));c.id=KIT.uid();c.created=KIT.key(new Date());c.s=c.e=KIT.key(new Date());c.res={};c.urg={};c.photo={};c.memo={};c.prevBad=Object.keys(prev.res).filter(function(n){return prev.res[n]==='x';}).map(function(n){return {n:n,m:prev.memo[n]||''};});ALL.push(c);KIT.put('inspections',c).then(function(){load(c.id);$('i-msg').textContent='지난 점검('+(prev.s||'')+')의 설비·인력·점검자 정보를 복사했습니다. 지난번 불량 '+c.prevBad.length+'건은 맨 위에 다시 보여 줍니다.';showPrev();});};
+function showPrev(){if(!CUR.prevBad||!CUR.prevBad.length)return;var d=document.createElement('div');d.className='warn';d.innerHTML='<b>지난 점검 불량(먼저 다시 확인)</b><br>'+CUR.prevBad.map(function(p){return '<a href="#it-'+p.n+'">'+p.n+'</a> '+KIT.esc(p.m);}).join('<br>');$('list').prepend(d);}
+$('i-del').onclick=function(){if(!CUR||!confirm('이 점검 기록을 지울까요? 사진도 함께 지워집니다.'))return;KIT.del('inspections',CUR.id).then(function(){ALL=ALL.filter(function(x){return x.id!==CUR.id;});if(!ALL.length){CUR=blank();ALL.push(CUR);KIT.put('inspections',CUR);}load(ALL[0].id);KIT.toast('지웠습니다');});};
+// ---------- 출력 ----------
+var CSS='body{font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;font-size:11.5px;color:#000;margin:0}table{width:100%;border-collapse:collapse;margin:4px 0}th,td{border:1px solid #555;padding:4px;vertical-align:top;text-align:left}th{background:#eee}h1{font-size:18px;text-align:center;margin:6px 0}h2{font-size:13px;margin:10px 0 4px}.pg{page-break-after:always}.c{text-align:center}.ph{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ph div{border:1px solid #999;padding:4px;page-break-inside:avoid}.ph img{width:100%;max-height:260px;object-fit:contain}.small{font-size:10px;color:#333}@page{size:A4;margin:12mm}';
+function hdr(t,form){return '<div class="small">'+form+'</div><h1>'+t+'</h1>';}
+function chk(on){return on?'[√]':'[  ]';}
+function secResult(no){var s=CL.find(function(x){return x.no===no;});var any=false,bad=false,all=true;s.u.forEach(function(u){u.i.forEach(function(it){if(it[2]&&!comp())return;var v=CUR.res[it[0]];if(v)any=true;if(v==='x')bad=true;if(!v)all=false;});});return bad?'×':any?(all?'○':'○(일부 미체크)'):'';}
+function pChecklist(){var h=hdr('소방시설등 ['+(comp()?' ]작동점검 [√]종합점검':'√]작동점검 [ ]종합점검')+' 점검표','■ 소방시설 자체점검사항 등에 관한 고시 [별지 제4호서식]')+'<table><tr><th>건물명(상호)</th><td>'+KIT.esc(B.name||'')+'</td><th>대상물 구분</th><td>'+KIT.esc(CUR.use||'')+'</td></tr><tr><th>소재지</th><td colspan="3">'+KIT.esc(B.addr||'')+'</td></tr><tr><th>점검기간</th><td colspan="3">'+CUR.s+' ~ '+CUR.e+' (총 점검일수 '+(CUR.days||'')+'일)</td></tr></table><h2>□ 소방시설등 점검결과</h2><table><tr><th>해당설비</th><th>점검결과</th></tr>'+CL.map(function(s){return '<tr><td>'+chk(CUR.facs.indexOf(s.no)>=0)+' '+s.no+'. '+KIT.esc(s.name)+'</td><td class="c">'+(CUR.facs.indexOf(s.no)>=0?secResult(s.no):'')+'</td></tr>';}).join('')+'</table><div class="pg"></div>';
+ CL.forEach(function(s){if(CUR.facs.indexOf(s.no)<0)return;h+='<h2>'+s.no+'. '+KIT.esc(s.name)+' 점검표</h2><table><tr><th style="width:80px">번호</th><th>점검항목</th><th style="width:50px">점검결과</th></tr>';s.u.forEach(function(u){h+='<tr><th colspan="3">'+u.c+'. '+KIT.esc(u.n)+'</th></tr>';u.i.forEach(function(it){var show=!(it[2]&&!comp());h+='<tr><td>'+it[0]+'</td><td>'+(it[3]?'['+KIT.esc(it[3])+'] ':'')+(it[2]?'● ':'○ ')+KIT.esc(it[1])+(CUR.memo[it[0]]?'<br><b>불량: '+KIT.esc(CUR.memo[it[0]])+'</b>':'')+'</td><td class="c">'+(show?({o:'○',x:'×','/':'/'}[CUR.res[it[0]]]||''):'/')+'</td></tr>';});});h+='</table><p class="small">※ ●는 종합점검의 경우에만 해당. 점검결과란은 양호 ○, 불량 ×, 해당없는 항목은 /.</p>';});
+ return h;}
+function badList(){var out=[];CL.forEach(function(s){s.u.forEach(function(u){u.i.forEach(function(it){if(CUR.res[it[0]]==='x')out.push({s:s,u:u,it:it,m:CUR.memo[it[0]]||'',ph:CUR.photo[it[0]]||'',urg:!!CUR.urg[it[0]]});});});});return out;}
+var GROUP={1:'소화설비',2:'소화설비',3:'소화설비',4:'소화설비',5:'소화설비',6:'소화설비',7:'소화설비',8:'소화설비',9:'소화설비',10:'소화설비',11:'소화설비',12:'소화설비',13:'소화설비',14:'경보설비',15:'경보설비',16:'경보설비',17:'경보설비',18:'경보설비',19:'경보설비',20:'피난구조설비',21:'피난구조설비',22:'피난구조설비',23:'소화용수설비',24:'소화활동설비',25:'소화활동설비',26:'소화활동설비',27:'소화활동설비',28:'소화활동설비',29:'소화활동설비',30:'소화활동설비',31:'기타',32:'안전시설등'};
+function pReport(){var by=CUR.by;var h=hdr('['+(comp()?' ':'√')+']작동점검, ['+(comp()?'√':' ')+']종합점검(['+(CUR.kind.indexOf('최초')>0?'√':' ')+']최초점검, ['+(CUR.kind.indexOf('그 밖')>0?'√':' ')+']그 밖의 종합점검)<br>소방시설등 자체점검 실시결과 보고서','■ 소방시설 설치 및 관리에 관한 법률 시행규칙 [별지 제9호서식] <개정 2025. 12. 1.> (8쪽 중 제1쪽) · 이 수첩이 서식 항목 순서대로 옮겨 적은 사본')+
+ '<table><tr><th rowspan="3">특정소방대상물</th><th>명칭(상호)</th><td>'+KIT.esc(B.name||'')+'</td></tr><tr><th>대상물 구분(용도)</th><td>'+KIT.esc(CUR.use||'')+'</td></tr><tr><th>소재지</th><td>'+KIT.esc(B.addr||'')+'</td></tr><tr><th>점검기간</th><td colspan="2">'+CUR.s+' ~ '+CUR.e+' (총 점검일수: '+(CUR.days||'')+'일)</td></tr><tr><th>점검자</th><td colspan="2">'+chk(by==='관계인')+'관계인 '+chk(by==='소방안전관리자')+'소방안전관리자 '+chk(by==='소방시설관리업자')+'소방시설관리업자 (성명·업체명: '+KIT.esc(CUR.name)+', 전화번호: '+KIT.esc(CUR.tel)+')</td></tr><tr><th>전자우편 송달 동의</th><td colspan="2">[ ] 동의함 [ ] 동의하지 않음 · 관계인 (서명 또는 인) · 전자우편 주소 ______ (손으로 작성)</td></tr></table>'+
+ '<table><tr><th>구분</th><th>성명</th><th>자격구분</th><th>자격번호</th><th>점검참여일(기간)</th></tr>'+CUR.staff.map(function(p){return '<tr><td>'+KIT.esc(p.role)+'</td><td>'+KIT.esc(p.name)+'</td><td>'+KIT.esc(p.lic)+'</td><td>'+KIT.esc(p.no)+'</td><td>'+KIT.esc(p.date)+'</td></tr>';}).join('')+'</table><p>「소방시설 설치 및 관리에 관한 법률」 제23조제3항 및 같은 법 시행규칙 제23조제1항 및 제2항에 따라 위와 같이 소방시설등 자체점검 실시결과 보고서를 제출합니다.</p><p style="text-align:right">'+KIT.esc(CUR.e)+'<br>소방시설관리업자ㆍ소방안전관리자ㆍ관계인: '+KIT.esc(CUR.name)+' (서명 또는 인)</p><div class="pg"></div>'+
+ '<div class="small">(8쪽 중 제2쪽) 특정소방대상물 정보</div><table><tr><th>소방안전관리등급</th><td>'+['특급','1급','2급','3급'].map(function(g){return chk(B.grade===g)+g;}).join(' ')+'</td></tr><tr><th>소방안전관리자</th><td>성명: '+KIT.esc(B.manager||'')+' , 최근 교육이수일: '+KIT.esc(B.eduLast||B.eduFirst||'')+'</td></tr><tr><th>사용승인일</th><td>'+KIT.esc(B.approval||'')+'</td></tr><tr><th>연면적</th><td>'+KIT.esc(B.area||'')+' ㎡</td></tr><tr><th>층수</th><td>지상 '+KIT.esc(B.above||'')+'층 / 지하 '+KIT.esc(B.under||'')+'층</td></tr><tr><th>건물동수</th><td>'+KIT.esc(B.dongs||'')+' 개동</td></tr></table><p class="small">대표자·소방계획서·전년도 자체점검·교육훈련·화재보험·다중이용업소 현황·건축허가일·건축면적·높이·구조·계단·승강기·주차장은 손으로 작성(‘손으로 채울 칸’ 목록 참고).</p><div class="pg"></div>'+
+ '<div class="small">(8쪽 중 제3쪽) 소방시설등의 현황 · 점검 결과란은 양호○, 불량×, 해당없는 항목은 /</div><table><tr><th>구분</th><th>해당 설비</th><th>점검결과</th></tr>'+CL.filter(function(s){return s.no<=31;}).map(function(s){return '<tr><td>'+GROUP[s.no]+'</td><td>'+chk(CUR.facs.indexOf(s.no)>=0)+' '+KIT.esc(s.name)+'</td><td class="c">'+(CUR.facs.indexOf(s.no)>=0?secResult(s.no):'/')+'</td></tr>';}).join('')+'</table>'+(CUR.facs.indexOf(32)>=0?'<h2>2. 안전시설등 점검 결과(다중이용업소)</h2><p>결과: '+secResult(32)+'</p>':'')+'<p class="small">3. 소방시설등의 세부 현황(4~7쪽: 수원·펌프·설치장소·수량 등)은 원 서식에 손으로 작성합니다.</p><div class="pg"></div>'+
+ '<div class="small">(8쪽 중 제8쪽)</div><h2>4. 소방시설등 불량 세부 사항</h2><table><tr><th>설비명</th><th>점검번호</th><th>불량내용</th></tr>'+(badList().map(function(b){return '<tr><td>'+GROUP[b.s.no]+' · '+KIT.esc(b.s.name)+'</td><td>'+b.it[0]+'</td><td>'+KIT.esc(b.m||b.it[1])+(b.urg?' (긴급)':'')+'</td></tr>';}).join('')||'<tr><td colspan="3">불량 없음</td></tr>')+'</table><p class="small">점검번호는 소방시설등 자체점검표의 점검항목별 번호(점검번호 순). 첨부: 관계인 제출 시 소방시설등점검표, 소방서 제출 시 점검인력 배치확인서(관리업자 점검 때)·별지 제10호 이행계획서.</p>';return h;}
+function pPhoto(){var L=[];CL.forEach(function(s){s.u.forEach(function(u){u.i.forEach(function(it){if(CUR.photo[it[0]])L.push({n:it[0],t:it[1],ph:CUR.photo[it[0]],r:CUR.res[it[0]],m:CUR.memo[it[0]]||''});});});});return hdr('자체점검 사진첩 (점검번호 순)','이 수첩이 만든 첨부 사진 정리')+'<p>'+KIT.esc(B.name||'')+' · '+CUR.kind+' · '+CUR.s+' ~ '+CUR.e+' · 사진 '+L.length+'장</p><div class="ph">'+L.map(function(p){return '<div><img src="'+p.ph+'"><br><b>'+p.n+'</b> '+({o:'양호',x:'불량','/':'해당없음'}[p.r]||'')+' · '+KIT.esc(p.m||p.t)+'</div>';}).join('')+'</div>';}
+function pLabel(){var has=function(a,b){return CUR.facs.some(function(x){return x>=a&&x<=b;});};var bad=badList();var g=function(a,b){return bad.some(function(x){return x.s.no>=a&&x.s.no<=b;});};var sp=CUR.facs.indexOf(3)>=0;
+ return '<style>@page{size:A4 landscape;margin:10mm}.lb{border:14px solid rgb(65,143,222);outline:6px solid rgb(193,214,237);outline-offset:-20px;padding:28px 40px;font-size:20px;line-height:1.9;min-height:170mm}.lb h1{color:rgb(65,143,222);font-size:40px;margin:0 0 14px}.lb th{border:0;background:none;color:rgb(65,143,222);width:150px;text-align:left;font-size:20px}.lb td{border:0;font-size:20px}</style><div class="lb"><h1>소방시설등 자체점검기록표</h1><table><tr><th>•대상물명</th><td>: '+KIT.esc(B.name||'')+'</td></tr><tr><th>•주  소</th><td>: '+KIT.esc(B.addr||'')+'</td></tr><tr><th>•점검구분</th><td>: '+chk(!comp())+' 작동점검 &nbsp; '+chk(comp())+' 종합점검</td></tr><tr><th>•점 검 자</th><td>: '+KIT.esc(CUR.name)+'</td></tr><tr><th>•점검기간</th><td>: '+CUR.s+' ~ '+CUR.e+'</td></tr><tr><th>•보유시설</th><td>: 스프링클러설비 '+chk(sp)+' 설치( &nbsp; 층 ~ &nbsp; 층) '+chk(!sp)+' 미설치</td></tr><tr><th>•불량사항</th><td>: '+chk(g(1,13))+' 소화설비 '+chk(g(14,19))+' 경보설비 '+chk(g(20,22))+' 피난구조설비<br>&nbsp; '+chk(g(23,23))+' 소화용수설비 '+chk(g(24,30))+' 소화활동설비 '+chk(g(31,32))+' 기타설비 '+chk(!bad.length)+' 없음</td></tr><tr><th>•정비기간</th><td>: &nbsp; 년 &nbsp; 월 &nbsp; 일 ~ &nbsp; 년 &nbsp; 월 &nbsp; 일</td></tr></table><p style="text-align:right">'+KIT.esc(CUR.e)+'</p><p style="font-size:17px"><span style="color:rgb(65,143,222)">「소방시설 설치 및 관리에 관한 법률」</span> 제24조제1항 및 같은 법 시행규칙 제25조에 따라 소방시설등 자체점검결과를 게시합니다.</p></div><p class="small">소방시설법 시행규칙 [별표 5](개정 2025. 12. 1.) 양식: A4 가로, 외측 테두리 파랑(RGB 65,143,222), 내측 하늘색(RGB 193,214,237). 지정 글꼴(HY헤드라인M·윤고딕)은 기기에 없으면 비슷한 글꼴로 나옵니다. 스프링클러 설치 층·정비기간은 손으로 적으세요. 게시: 소방서 보고한 날부터 10일 이내, 출입자가 쉽게 볼 수 있는 곳에, 다음 기록표를 게시하기 전까지(시행규칙 제25조, 2025. 12. 1. 개정).</p>';}
+function pFix(){var bad=badList();return hdr('소방시설등 자체점검 조치결과표','이 수첩 양식(불량마다 대표 사진 1장)')+'<p>'+KIT.esc(B.name||'')+' · '+CUR.kind+' · 점검 '+CUR.s+' ~ '+CUR.e+'</p><table><tr><th>번호</th><th>점검번호</th><th>설비</th><th>불량 내용</th><th style="width:38%">대표 사진</th><th>조치 내용·완료일</th></tr>'+(bad.map(function(b,i){return '<tr><td>'+(i+1)+'</td><td>'+b.it[0]+'</td><td>'+KIT.esc(b.s.name)+'</td><td>'+KIT.esc(b.m||b.it[1])+(b.urg?'<br><b>긴급</b>':'')+'</td><td>'+(b.ph?'<img src="'+b.ph+'" style="width:100%;max-height:200px;object-fit:contain">':'사진 없음')+'</td><td></td></tr>';}).join('')||'<tr><td colspan="6">불량 없음</td></tr>')+'</table><p class="small">조치 후 사진·완료 보고 기한(10일)은 <b>지적사항 관리대장</b>에서 관리합니다(소방시설법 시행규칙 제23조).</p>';}
+function show(html){$('pv').innerHTML='<style>'+CSS+'</style>'+html;setTimeout(function(){print();},200);}
+$('o-check').onclick=function(){save();show(pChecklist());};
+$('o-report').onclick=function(){save();show(pReport());};
+$('o-photo').onclick=function(){save();show(pPhoto());};
+$('o-label').onclick=function(){save();show(pLabel());};
+$('o-fix').onclick=function(){save();show(pFix());};
+$('o-share').onclick=function(){save();var html='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>자체점검 결과</title><style>'+CSS+'</style></head><body>'+pReport()+'<div class="pg"></div>'+pChecklist()+'<div class="pg"></div>'+pFix()+'</body></html>';KIT.shareFile('자체점검_'+(B.name||'건물')+'_'+CUR.s+'.html',html,'text/html','자체점검 결과');};
+$('o-def').onclick=function(){var bad=badList();if(!bad.length){KIT.toast('불량 항목이 없습니다');return;}KIT.all('defects').then(function(D){var have={};D.forEach(function(d){if(d.src)have[d.src]=1;});var jobs=[];bad.forEach(function(b){var src=CUR.id+':'+b.it[0];if(have[src])return;jobs.push(KIT.put('defects',{id:KIT.uid(),src:src,found:CUR.e||CUR.s,kind:comp()?'종합점검':'작동점검',loc:'',eq:b.s.name,desc:'['+b.it[0]+'] '+(b.m||b.it[1]),act:'10',notice:'',report:'',fix:'',fixdesc:'',sent:'',pre:b.ph,post:''}));});return Promise.all(jobs).then(function(){KIT.toast('지적사항 대장에 '+jobs.length+'건 보냈습니다(이미 보낸 건 제외)');});});};
+$('o-hand').onclick=function(){var L=[];var miss=function(v,t){if(!v)L.push(t);};miss(B.name,'건물명(수첩 홈 건물 정보)');miss(B.addr,'소재지');miss(CUR.use,'대상물 구분(용도)');miss(CUR.name,'점검자 성명·업체명');miss(CUR.tel,'점검자 전화번호');CUR.staff.forEach(function(p,i){if(!p.lic||!p.no)L.push('점검인력 '+(i+1)+'줄 자격구분·자격번호');});miss(B.grade,'소방안전관리등급');miss(B.approval,'사용승인일');
+ L=L.map(function(t){return '<li>빈 칸: '+KIT.esc(t)+' → 수첩에 입력하면 자동으로 채워짐</li>';});
+ ['1쪽: 전자우편 송달 동의·관계인 서명(인), 제출자 서명(인)','2쪽: 대표자(소유자·관리자·점유자) 성명·전화, 소방안전관리자 자격 구분, 소방계획서 작성·보관, 전년도 자체점검·교육훈련 실시 여부, 화재보험(보험사·기간·금액), 다중이용업소 현황, 건축허가일·건축면적·세대수·높이·구조·지붕·경사로·계단·승강기·주차장','4~7쪽: 3. 소방시설등의 세부 현황(수원 유효수량, 펌프 전양정·토출량, 설치장소·수량, 가스계 약제량 등)','별지 제4호 점검표: 점검인력 서명, 관리업체 등록번호·대표자(인)','자체점검기록표: 스프링클러 설치 층(○층~○층), 정비기간','소방서 제출용: 별지 제10호 이행계획서(불량이 있을 때), 관리업자 점검 시 점검인력 배치확인서'].forEach(function(t){L.push('<li>손으로: '+t+'</li>');});
+ $('hand').innerHTML='<div class="warn"><b>손으로 채울 칸 '+L.length+'곳</b><ul style="margin:6px 0 0;padding-left:18px">'+L.join('')+'</ul></div>';};
+// 시작
+Promise.all([KIT.building(),KIT.all('inspections')]).then(function(r){B=r[0];ALL=r[1];if(!ALL.length){CUR=blank();CUR.use=B.use||'';ALL.push(CUR);KIT.put('inspections',CUR);}else CUR=ALL.slice().sort(function(a,b){return (b.updated||'').localeCompare(a.updated||'');})[0];load(CUR.id);showPrev();});
+window.addEventListener('beforeunload',save);
+})();
+</script>
+</body>
+</html>

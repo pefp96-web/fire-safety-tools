@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방 자체점검 점검인력 배치기준·점검 가능 면적 계산 + 견적 비교표 (무료) | 시행규칙 별표 4</title>
+<meta name="description" content="점검인력 1단위, 점검한도면적(종합 8,000㎡·작동 10,000㎡), 보조인력 추가, 용도별 가감계수, 아파트 점검한도 세대수(250세대)를 소방시설법 시행규칙 별표 4대로 계산하고, 점검업체 견적을 범위·인력·일정·부가세 포함 금액으로 나란히 비교합니다.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/staff.html">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f2a36"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<style>.qt input,.qt select{padding:6px;font-size:14px}.qt td,.qt th{font-size:13px}.diff{background:#fff6e5}</style>
+<script src="../gc.js"></script><script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>점검인력·점검면적 계산 + 견적 비교</h1><p>소방시설법 시행규칙 별표 4 (개정 2024. 11. 29.)<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="buildings.html">건물 목록</a><a href="./#all">전체 기능</a></nav>
+</div></header>
+<main>
+<section class="card">
+<h2>1. 점검 하루에 몇 ㎡(세대)까지, 며칠 걸리나</h2>
+<div class="g3">
+<div><label class="f" for="s-kind">점검 종류</label><select id="s-kind"><option value="c">종합점검</option><option value="w">작동점검</option></select></div>
+<div><label class="f" for="s-who">점검하는 사람</label><select id="s-who"><option value="biz">관리업자</option><option value="pro">선임된 소방시설관리사·소방기술사</option><option value="own">관계인</option></select></div>
+<div><label class="f" for="s-grade">소방안전관리대상물 등급</label><select id="s-grade"><option value="50">50층 이상 또는 성능위주설계</option><option value="특급">특급</option><option value="1급">1급</option><option value="2급" selected>2급</option><option value="3급">3급</option></select></div>
+<div><label class="f" for="s-cls">용도 구분(가감계수)</label><select id="s-cls"><option value="1.1">1류 1.1: 문화·집회, 종교, 판매, 의료, 노유자, 수련, 숙박, 위락, 창고, 교정, 발전, 지하가, 복합건축물</option><option value="1.0" selected>2류 1.0: 공동주택, 근린생활, 운수, 교육연구, 운동, 업무, 방송통신, 공장, 항공기·자동차, 군사, 관광휴게, 장례, 지하구</option><option value="0.9">3류 0.9: 위험물, 문화재, 동·식물, 자원순환, 묘지</option></select></div>
+<div><label class="f" for="s-area">실제 점검면적(㎡)</label><input id="s-area" inputmode="decimal"><div class="hint">아파트등은 비우고 세대수 입력</div></div>
+<div><label class="f" for="s-hh">아파트등 실제 점검 세대수</label><input id="s-hh" inputmode="numeric"></div>
+<div><label class="f" for="s-add">보조인력 추가(명)</label><input id="s-add" inputmode="numeric" value="0"><div class="hint">관리업자: 2명(같은 건축물 4명) 이내, 관리사·기술사: 2명 이내, 관계인: 추가 규정 없음</div></div>
+<div><label class="f" for="s-km">같은 날 여러 대상 간 최단거리 합(km)</label><input id="s-km" inputmode="decimal" value="0"></div>
+</div>
+<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:14px;font-size:14px">
+<label><input type="checkbox" id="s-nosp" style="width:auto"> 스프링클러 미설치</label>
+<label><input type="checkbox" id="s-nowd" style="width:auto"> 물분무등(호스릴 제외) 미설치</label>
+<label><input type="checkbox" id="s-nosm" style="width:auto"> 제연설비 미설치</label>
+</div>
+<div class="btns"><button id="s-run" data-gc="kit-staff-run">계산</button><button class="gray" id="s-ex">예시</button></div>
+<div id="s-out"></div>
+</section>
+
+<section class="card">
+<h2>2. 점검업체 견적 비교 체크표</h2>
+<p class="hint">받은 견적을 칸에 옮겨 적으면 부가세 포함 총액, 위 1번 기준 인력·일수 충족 여부를 나란히 보여 줍니다. '다른 칸만'을 켜면 업체끼리 다른 줄만 남습니다.</p>
+<div style="overflow:auto"><table class="qt" id="qt"></table></div>
+<div class="btns"><label style="font-size:14px"><input type="checkbox" id="q-diff" style="width:auto"> 다른 칸만 보기</label><button class="sub" id="q-save" data-gc="kit-quote-save">저장</button><button class="gray" onclick="print()">인쇄</button></div>
+</section>
+<footer>근거: 소방시설 설치 및 관리에 관한 법률 시행규칙 [별표 4] 소방시설등의 자체점검 시 점검인력의 배치기준(개정 2024. 11. 29., 현행 시행 2026. 10. 19. 판, 법제처 원문 확인 2026-11-24) 제1호~제10호. 며칠 걸리는지는 점검면적÷점검한도면적을 올림한 참고값이며, 실제 배치는 점검인력 배치 신고 기준을 따릅니다. 견적 금액 기준은 법령에 없어 비교만 합니다. · 제작 김재환</footer>
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+function n(k){var v=parseFloat(String($(k).value).replace(/,/g,''));return isNaN(v)?0:v;}
+function r1(x){return Math.round(x*10)/10;}
+var LAST=null;
+function run(){var c=$('s-kind').value==='c',who=$('s-who').value,g=$('s-grade').value,add=n('s-add'),area=n('s-area'),hh=n('s-hh'),k=parseFloat($('s-cls').value),km=n('s-km');
+ var unit={biz:'주된 점검인력(특급점검자) 1명 + 보조 점검인력(영 별표 9 주된·보조 기술인력) 2명 [제1호가목]',pro:'소방시설관리사 또는 소방기술사 1명 + 보조 점검인력 2명 [제1호나목]',own:'관계인 1명 + 보조 점검인력 2명 [제1호다목]'}[who];
+ var maxAdd={biz:'2명(같은 건축물 4명)',pro:'2명',own:'추가 규정 없음'}[who];
+ var grade={'50':['소방시설관리사 경력 5년 이상인 특급점검자 1명 이상','고급점검자 이상 1명 이상 및 중급점검자 이상 1명 이상','가목'],'특급':['소방시설관리사 경력 3년 이상인 특급점검자 1명 이상','고급점검자 이상 1명 이상 및 초급점검자 이상 1명 이상','나목'],'1급':['소방시설관리사 경력 1년 이상인 특급점검자 1명 이상','중급점검자 이상 1명 이상 및 초급점검자 이상 1명 이상','다목'],'2급':['소방시설관리사 경력 1년 이상인 특급점검자 1명 이상','중급점검자 이상 1명 이상 및 초급점검자 이상 1명 이상','다목'],'3급':['특급점검자 1명 이상','초급점검자 이상 2명 이상','라목']}[g];
+ var h='<table style="margin-top:10px"><tr><th>점검인력 1단위</th><td>'+unit+'<br>추가 가능: '+maxAdd+'</td></tr>';
+ if(who==='biz')h+='<tr><th>관리업자 배치기준(제2호'+grade[2]+')</th><td>주된: '+grade[0]+'<br>보조: '+grade[1]+'</td></tr>';
+ var days=null;
+ if(hh>0){var lim=250+60*add;var cut=(($('s-nosp').checked?.1:0)+($('s-nowd').checked?.1:0)+($('s-nosm').checked?.1:0))*hh;var eff=r1(hh-cut);var lim2=r1(lim-lim*0.02*Math.floor(km/5));days=Math.ceil(eff/lim2);
+  h+='<tr><th>점검한도 세대수(제7호가·나목)</th><td>250 + 60×'+add+' = '+lim+'세대'+(km>=5?' → 거리 감산 후 '+lim2+'세대(제7호다목2))':'')+'</td></tr><tr><th>점검세대수(제7호다목1))</th><td>'+hh+' − 미설치 감산 '+r1(cut)+' = '+eff+'세대</td></tr><tr><th>참고: 필요한 날 수</th><td><b>'+days+'일</b> (점검세대수÷점검한도 세대수 올림, 하루 점검세대수는 한도를 넘을 수 없음)</td></tr>';
+  h+='<tr><th>참고: 아파트와 다른 용도를 같은 날</th><td>점검대상 연면적으로 볼 때 '+(c?'종합 ×32':'작동 ×40')+' = '+r1(eff*(c?32:40))+'㎡ (제8호)</td></tr>';}
+ if(area>0){var base=c?8000:10000,step=c?2000:2500;var lim=base+step*add;var a1=r1(area*k);var cut=(($('s-nosp').checked?.1:0)+($('s-nowd').checked?.1:0)+($('s-nosm').checked?.1:0))*a1;var eff=r1(a1-cut);var lim2=r1(lim-lim*0.02*Math.floor(km/5));days=Math.ceil(eff/lim2);
+  h+='<tr><th>점검한도면적(제3·4호)</th><td>'+base.toLocaleString()+' + '+step.toLocaleString()+'×'+add+' = '+lim.toLocaleString()+'㎡'+(km>=5?' → 거리 감산(5km마다 0.02) 후 '+lim2.toLocaleString()+'㎡(제6호다목)':'')+'</td></tr><tr><th>점검면적(제6호가·나목)</th><td>'+area.toLocaleString()+'×'+k+' = '+a1.toLocaleString()+' − 미설치 감산 '+r1(cut).toLocaleString()+' = <b>'+eff.toLocaleString()+'㎡</b></td></tr><tr><th>참고: 필요한 날 수</th><td><b>'+days+'일</b> (점검면적÷점검한도면적 올림)</td></tr>';}
+ h+='<tr><th>그 밖</th><td>하루 5개 대상까지(제5호) · 종합과 작동을 같은 날 하면 작동 면적·세대수×0.8을 종합으로 봄(제9호) · 계산값은 소수점 둘째 자리에서 반올림(제10호)</td></tr></table>';
+ $('s-out').innerHTML=h;LAST={days:days,people:3+add};drawQ();}
+$('s-run').onclick=run;
+$('s-ex').onclick=function(){$('s-kind').value='c';$('s-who').value='biz';$('s-grade').value='2급';$('s-cls').value='1.0';$('s-area').value='12000';$('s-hh').value='';$('s-add').value='2';$('s-nosm').checked=true;run();};
+var ROWS=[['co','업체명'],['scope','점검 범위(작동/종합, 동·층)'],['report','보고서 작성·소방서 제출 대행'],['plan','이행계획서(별지 제10호) 작성 포함'],['fix','경미한 불량 현장 조치 포함'],['main','주된 점검인력(성명·자격)'],['people','투입 인원(명)'],['days','점검 일수'],['when','점검 날짜'],['price','공급가액(원)'],['vat','부가세 포함 여부'],['etc','기타 조건']];
+var Q={a:{},b:{},c:{}};
+function drawQ(){var keys=['a','b','c'];var h='<tr><th>항목</th>'+keys.map(function(k,i){return '<th>업체 '+(i+1)+'</th>';}).join('')+'</tr>';var diffOnly=$('q-diff').checked;
+ ROWS.forEach(function(r){var vals=keys.map(function(k){return Q[k][r[0]]||'';});var diff=vals.some(function(v){return v!==vals[0];});if(diffOnly&&!diff)return;h+='<tr class="'+(diff?'diff':'')+'"><td>'+r[1]+'</td>'+keys.map(function(k){var v=KIT.esc(Q[k][r[0]]||'');return '<td>'+(r[0]==='vat'?'<select data-q="'+k+'" data-r="vat"><option value=""></option><option'+(v==='별도'?' selected':'')+'>별도</option><option'+(v==='포함'?' selected':'')+'>포함</option></select>':'<input data-q="'+k+'" data-r="'+r[0]+'" value="'+v+'">')+'</td>';}).join('')+'</tr>';});
+ h+='<tr><th>부가세 포함 총액</th>'+keys.map(function(k){var p=parseFloat(String(Q[k].price||'').replace(/,/g,''));if(isNaN(p))return '<td></td>';var t=Q[k].vat==='포함'?p:Math.round(p*1.1);return '<td><b>'+t.toLocaleString()+'원</b></td>';}).join('')+'</tr>';
+ h+='<tr><th>1번 계산과 비교</th>'+keys.map(function(k){if(!LAST||!LAST.days)return '<td class="hint">1번 계산 후 표시</td>';var d=parseFloat(Q[k].days),p=parseFloat(Q[k].people);var m=[];if(!isNaN(p))m.push(p>=LAST.people?'인원 충족':'인원 부족(1단위 3명+추가 '+(LAST.people-3)+')');if(!isNaN(d))m.push(d>=LAST.days?'일수 충족':'일수 부족(최소 '+LAST.days+'일)');return '<td>'+m.join('<br>')+'</td>';}).join('')+'</tr>';
+ $('qt').innerHTML=h;}
+$('qt').addEventListener('change',function(e){var t=e.target;if(t.dataset.q){Q[t.dataset.q][t.dataset.r]=t.value;drawQ();}});
+$('q-diff').onchange=drawQ;
+$('q-save').onclick=function(){KIT.set('quotes',Q).then(function(){KIT.toast('저장했습니다');});};
+KIT.get('quotes').then(function(q){if(q)Q=q;drawQ();});
+KIT.building().then(function(b){if(b.grade)$('s-grade').value=b.grade;if(b.area)$('s-area').value=b.area;});
+})();
+</script>
+</body>
+</html>

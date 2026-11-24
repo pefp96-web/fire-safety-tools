@@ -9,12 +9,13 @@
   function db() {
     if (dbp) return dbp;
     dbp = new Promise(function (ok, no) {
-      var r = indexedDB.open(DBN, 1);
+      var r = indexedDB.open(DBN, 2);
       r.onupgradeneeded = function () {
         var d = r.result;
         if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv');
         if (!d.objectStoreNames.contains('defects')) d.createObjectStore('defects', { keyPath: 'id' });
         if (!d.objectStoreNames.contains('records')) d.createObjectStore('records', { keyPath: 'id' });
+        ['inspections', 'logs', 'buildings', 'households'].forEach(function (n) { if (!d.objectStoreNames.contains(n)) d.createObjectStore(n, { keyPath: 'id' }); });
       };
       r.onsuccess = function () { ok(r.result); };
       r.onerror = function () { no(r.error); };
@@ -26,7 +27,7 @@
       return new Promise(function (ok, no) {
         var t = d.transaction(store, mode), s = t.objectStore(store), res;
         res = fn(s);
-        t.oncomplete = function () { ok(res && res.result !== undefined ? res.result : res); };
+        t.oncomplete = function () { ok(res instanceof IDBRequest ? res.result : res); };
         t.onerror = function () { no(t.error); };
       });
     });
@@ -40,7 +41,7 @@
   K.uid = function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); };
 
   // ---------- 건물 정보 (한 번 입력하면 모든 화면이 같이 씀) ----------
-  K.BFIELDS = ['name', 'grade', 'addr', 'approval', 'comp', 'under', 'above', 'area', 'floorArea', 'dongs', 'manager', 'appointed', 'eduFirst'];
+  K.BFIELDS = ['name', 'use', 'grade', 'addr', 'approval', 'comp', 'under', 'above', 'area', 'floorArea', 'dongs', 'manager', 'appointed', 'eduFirst'];
   K.building = function () { return K.get('building').then(function (b) { return b || {}; }); };
   K.saveBuilding = function (b) { return K.set('building', b); };
 
@@ -98,8 +99,8 @@
 
   // ---------- 백업·복원 (회원가입 없이 기기 이동) ----------
   K.exportAll = function () {
-    return Promise.all([K.get('building'), K.get('calendar'), K.all('defects'), K.all('records')]).then(function (r) {
-      return { app: 'fst-kit', version: K.VERSION, exported: new Date().toISOString(), building: r[0] || {}, calendar: r[1] || {}, defects: r[2] || [], records: r[3] || [] };
+    return Promise.all([K.get('building'), K.get('calendar'), K.all('defects'), K.all('records'), K.all('inspections'), K.all('logs'), K.all('buildings'), K.all('households'), K.get('duty'), K.get('quotes')]).then(function (r) {
+      return { app: 'fst-kit', version: K.VERSION, exported: new Date().toISOString(), building: r[0] || {}, calendar: r[1] || {}, defects: r[2] || [], records: r[3] || [], inspections: r[4] || [], logs: r[5] || [], buildings: r[6] || [], households: r[7] || [], duty: r[8] || null, quotes: r[9] || null };
     });
   };
   K.importAll = function (data) {
@@ -107,9 +108,18 @@
     var jobs = [K.set('building', data.building || {}), K.set('calendar', data.calendar || {})];
     (data.defects || []).forEach(function (x) { jobs.push(K.put('defects', x)); });
     (data.records || []).forEach(function (x) { jobs.push(K.put('records', x)); });
+    ['inspections', 'logs', 'buildings', 'households'].forEach(function (n) { (data[n] || []).forEach(function (x) { jobs.push(K.put(n, x)); }); });
+    if (data.duty) jobs.push(K.set('duty', data.duty));
+    if (data.quotes) jobs.push(K.set('quotes', data.quotes));
     return Promise.all(jobs);
   };
 
+  // 파일 공유(휴대폰 공유 창: 카카오톡·메일 등). 안 되면 내려받기
+  K.shareFile = function (name, text, type, title) {
+    var f = new File([text], name, { type: type || 'text/html' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) return navigator.share({ files: [f], title: title || name }).catch(function () {});
+    K.download(name, text, type || 'text/html;charset=utf-8'); K.toast('이 기기는 바로 공유를 지원하지 않아 파일로 받았습니다'); return Promise.resolve();
+  };
   K.toast = function (msg) {
     var t = document.getElementById('toast');
     if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
