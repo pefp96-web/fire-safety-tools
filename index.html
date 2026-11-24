@@ -2,156 +2,188 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>소방 업무 자동화 도구 대시보드 | 김재환 (소방안전관리자 1급)</title>
-<meta name="description" content="소방 자체점검 서류 기한 계산기, 소화기·감지기 설치 수량 계산기, 소방도면 법령 자동 검토기, 소방계획서 자동 생성기. 화재안전기술기준(NFTC)과 소방시설법 조문 기준으로 만든 무료 도구 모음.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>소방 업무 자동화 도구 | 점검표·보고서·달력·계산기 무료 (김재환, 소방안전관리자 1급)</title>
+<meta name="description" content="자체점검 점검표 1,149개 항목·결과보고서·지적사항 대장·연간 달력 알림, 서류 기한·소화기·감지기 수량 계산기, 펌프 성능시험표, 소방도면 법령 자동 검토. 가입 없이 휴대폰에서 무료, 오프라인 사용.">
 <meta name="naver-site-verification" content="13780e88d4c6b95280acde1cc2c66269df1c4742">
 <link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/">
+<meta property="og:title" content="소방 업무 자동화 도구 (무료·가입 없음)">
+<meta property="og:description" content="점검표·보고서·지적사항·달력 알림·계산기를 휴대폰 하나로.">
+<meta property="og:image" content="https://pefp96-web.github.io/fire-safety-tools/assets/demo-poster.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#C8322B">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="kit/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preload" href="assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/ds.css">
 <script src="gc.js"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:'Pretendard','Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:#1c232b;background:#f3f4f6;line-height:1.5}
-a{color:#1f5fa8}
-.top{background:#1f2a36;color:#fff}
-.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
-.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:18px;padding-bottom:18px;flex-wrap:wrap}
-.top h1{margin:0;font-size:21px;font-weight:700}
-.top p{margin:2px 0 0;font-size:14px;color:#c9d1d9}
-.top nav a{color:#fff;font-size:14px;margin-left:16px;text-decoration:none;border-bottom:1px solid #6b7785}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0 6px}
-.stat{background:#fff;border:1px solid #d9dde2;border-radius:6px;padding:14px 16px}
-.stat .lb{font-size:13px;color:#5b6671}
-.stat .num{font-size:30px;font-weight:700;margin:2px 0;font-variant-numeric:tabular-nums}
-.stat .sub{font-size:12px;color:#7a858f}
-.note{font-size:12px;color:#6b7680;margin:0 0 18px}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-h2{font-size:17px;margin:0 0 10px}
-.tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.tool{background:#fff;border:1px solid #d9dde2;border-radius:6px;padding:16px;display:flex;flex-direction:column}
-.tool h3{margin:0 0 4px;font-size:16px}
-.tool .eff{font-size:14px;margin:0 0 8px;color:#2d3742}
-.tool ul{margin:0 0 10px;padding-left:18px;font-size:13px;color:#46515c}
-.tags{margin:0 0 12px}
-.tag{display:inline-block;font-size:12px;border:1px solid #b9c2cb;border-radius:3px;padding:1px 6px;margin:0 4px 4px 0;color:#3d4955;background:#f8f9fa}
-.tag.law{border-color:#d8a39f;color:#9a2a24;background:#fcf4f3}
-.btns{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
-.btn{display:inline-block;text-decoration:none;font-size:14px;padding:7px 12px;border-radius:4px;border:1px solid #c8322b;background:#c8322b;color:#fff}
-.btn.line{background:#fff;color:#c8322b}
-aside .box{background:#fff;border:1px solid #d9dde2;border-radius:6px;padding:16px;margin-bottom:12px}
-.who b{font-size:16px}
-.who ul{margin:8px 0 0;padding-left:18px;font-size:14px}
-.tl{list-style:none;margin:0;padding:0 0 0 2px;border-left:2px solid #c9d0d7}
-.tl li{position:relative;padding:0 0 12px 14px;font-size:14px}
-.tl li:before{content:'';position:absolute;left:-7px;top:6px;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid #1f2a36}
-.tl .d{display:block;font-size:12px;color:#6b7680}
-.cta p{font-size:14px;margin:0 0 10px}
-footer{font-size:12px;color:#6b7680;padding:18px 0 32px}
-@media (max-width:900px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:560px){.tools{grid-template-columns:1fr}.top nav a{margin:0 14px 0 0}.stat .num{font-size:24px}}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.brand img{width:28px;height:28px;border-radius:7px}
+.brand b{font-size:var(--fs-lg);letter-spacing:-.02em}
+.hero{text-align:center;padding:var(--s16) var(--s4) var(--s10);max-width:var(--wrap);margin:0 auto}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:var(--fs-sm);font-weight:600;color:var(--brand-text);background:var(--brand-soft);border-radius:var(--r-pill);padding:6px 14px;margin:0 0 var(--s5)}
+.hero h1{font-size:var(--fs-hero);font-weight:800;letter-spacing:-.035em;line-height:1.18;margin:0 auto var(--s5);max-width:15em}
+.hero h1 em{font-style:normal;color:var(--brand-text)}
+.hero .lead{font-size:clamp(17px,1.6vw,20px);color:var(--text-2);max-width:36em;margin:0 auto var(--s8);line-height:1.6}
+.hero .btns{justify-content:center;margin:0 0 var(--s3)}
+.hero .fine{font-size:var(--fs-sm);color:var(--text-3);margin:0}
+.demo{max-width:1040px;margin:0 auto;padding:0 var(--s4)}
+.frame{border:1px solid var(--line);border-radius:var(--r-xl);background:var(--surface);box-shadow:var(--shadow-lg);overflow:hidden}
+.frame .bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--g100)}
+.frame .bar i{width:10px;height:10px;border-radius:50%;background:var(--g300);display:block}
+.frame .bar span{margin-left:10px;font-size:12px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frame video{display:block;width:100%;height:auto;aspect-ratio:16/9;background:var(--g100)}
+.steps{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;list-style:none;padding:0;margin:var(--s4) 0 0;font-size:var(--fs-sm);color:var(--text-3)}
+.steps li{padding:4px 12px;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--surface)}
+.band{max-width:var(--wrap);margin:0 auto;padding:var(--s16) var(--s4) 0}
+.band>h2{font-size:clamp(24px,2.6vw,32px);margin:0 0 var(--s2)}
+.band>p.sub{color:var(--text-3);margin:0 0 var(--s6)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3)}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s5)}
+.stat .lb{font-size:var(--fs-sm);color:var(--text-3)}
+.stat .num{font-size:clamp(28px,3vw,36px);font-weight:800;letter-spacing:-.02em;margin:4px 0;font-variant-numeric:tabular-nums}
+.stat .sub{font-size:var(--fs-xs);color:var(--text-3)}
+.note{font-size:var(--fs-xs);color:var(--text-3);margin:var(--s2) 0 0}
+.tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)}
+.tool{display:flex;flex-direction:column;margin:0;transition:border-color var(--t),box-shadow var(--t)}
+.tool:hover{border-color:var(--g400);box-shadow:var(--shadow-lg)}
+.tool .cat{font-size:var(--fs-xs);font-weight:700;color:var(--brand-text);margin:0 0 6px}
+.tool h3{margin:0 0 6px;font-size:var(--fs-lg)}
+.tool .eff{font-size:var(--fs-sm);color:var(--text-2);margin:0 0 var(--s3)}
+.tool ul{margin:0 0 var(--s3);padding-left:18px;font-size:13px;color:var(--text-3)}
+.tool .btns{margin-top:auto}
+.tags{margin:0 0 var(--s3)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s6)}
+.who ul{margin:8px 0 var(--s4);padding-left:18px}
+.tl{list-style:none;margin:0;padding:0 0 0 2px;border-left:2px solid var(--line)}
+.tl li{position:relative;padding:0 0 12px 14px;font-size:var(--fs-sm)}
+.tl li:before{content:'';position:absolute;left:-6px;top:7px;width:8px;height:8px;border-radius:50%;background:var(--surface);border:2px solid var(--brand)}
+.tl .d{display:block;font-size:var(--fs-xs);color:var(--text-3)}
+.k{font:600 12px var(--font);border:1px solid var(--line-strong);border-radius:4px;padding:1px 5px}
+footer.site{border-top:1px solid var(--line);margin-top:var(--s16)}
+@media (max-width:1000px){.tools{grid-template-columns:repeat(2,minmax(0,1fr))}.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.hero{padding-top:var(--s10)}.tools,.two{grid-template-columns:1fr}.hero .btns .btn{flex:1 1 100%}header.top nav a.opt{display:none}}
+@media print{.demo,.hero .btns{display:none}}
 </style>
 </head>
-<body>
+<body id="top">
+<a class="skip" href="#main">본문 바로가기</a>
 <header class="top"><div class="wrap">
-<div>
-<h1>소방 업무 자동화 도구</h1>
-<p>점검·서류·도면 검토의 반복 업무를 법령 조문 기준으로 자동 처리합니다 · 제작 김재환</p>
-</div>
-<nav><a href="#tools">도구</a><a href="#about">제작자</a><a href="#log">개발 이력</a><a href="https://github.com/pefp96-web/fire-safety-tools">GitHub</a></nav>
+<a class="brand" href="./"><img src="assets/icon-192.png" alt="" width="28" height="28"><b>소방 업무 도구</b></a>
+<nav aria-label="주 메뉴"><a href="#tools">도구</a><a class="opt" href="#demo">시연</a><a class="opt" href="#about">제작자</a><a class="opt" href="https://github.com/pefp96-web/fire-safety-tools">GitHub</a></nav>
 </div></header>
 
-<main class="wrap">
-<section class="stats" aria-label="운영 지표">
+<main id="main" style="max-width:none;padding:0">
+<section class="hero" aria-labelledby="hero-t">
+<p class="eyebrow">소방안전관리자·점검 실무용 · 전부 0원 · 가입 없음</p>
+<h1 id="hero-t">점검부터 보고서까지,<br><em>휴대폰 하나로</em> 끝내는 소방 업무</h1>
+<p class="lead">자체점검 점검표 1,149개 항목, 결과보고서·지적사항 대장·연간 달력 알림을 법령 조문 기준으로 자동 처리합니다. 지하 기계실처럼 통신이 끊겨도 됩니다.</p>
+<div class="btns"><a class="btn lg" href="kit/" data-gc="open-kit">현장 수첩 시작하기</a><a class="btn lg sub" href="#calc">계산기 열기</a></div>
+<p class="fine">설치 없이 바로 · 입력은 이 기기에만 저장 · 크롬·엣지·사파리·삼성인터넷</p>
+</section>
+
+<section class="demo" id="demo" aria-label="시연 영상">
+<div class="frame">
+<div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>pefp96-web.github.io/fire-safety-tools/kit/</span></div>
+<video autoplay muted loop playsinline preload="metadata" poster="assets/demo-poster.webp" width="1280" height="720" aria-label="시연 타임랩스: 건물 등록, 점검표 체크와 사진, 지적사항, 결과보고서 출력, 달력 알림, 도면 검토 결과">
+<source src="assets/demo.webm" type="video/webm">
+<source src="assets/demo.mp4" type="video/mp4">
+</video>
+</div>
+<ol class="steps"><li>1 건물 등록</li><li>2 점검표 체크·사진</li><li>3 지적사항</li><li>4 결과보고서</li><li>5 달력 알림</li><li>6 도면 검토</li></ol>
+</section>
+
+<section class="band" aria-labelledby="st-t">
+<h2 id="st-t">숫자로 보는 도구</h2>
+<p class="sub">방문·사용 수는 쿠키 없는 집계로 실시간 반영합니다.</p>
+<div class="stats">
 <div class="stat"><div class="lb">방문자 수</div><div class="num" id="s-visit">-</div><div class="sub" id="s-visit-sub">GoatCounter 자동 집계</div></div>
 <div class="stat"><div class="lb">도구 사용 횟수</div><div class="num" id="s-use">-</div><div class="sub" id="s-use-sub">계산 버튼 클릭 수</div></div>
 <div class="stat"><div class="lb">검토한 도면 수</div><div class="num" id="s-draw">-</div><div class="sub" id="s-draw-sub">&nbsp;</div></div>
 <div class="stat"><div class="lb">크몽 주문 수</div><div class="num" id="s-order">-</div><div class="sub" id="s-order-sub">&nbsp;</div></div>
-</section>
+</div>
 <p class="note" id="s-note">지표 기준일: -</p>
+</section>
 
-<div class="grid">
-<section id="tools">
-<h2>도구</h2>
+<section class="band" id="tools" aria-labelledby="tl-t">
+<h2 id="tl-t">도구 모음</h2>
+<p class="sub">어디서든 <kbd class="k">Ctrl</kbd> + <kbd class="k">K</kbd> 로 바로 찾아 열 수 있습니다.</p>
 <div class="tools">
 
 <article class="tool">
-<h3>소방도면 법령 자동 검토기</h3>
-<p class="eff">PDF 평면도에서 감지기·소화기·발신기를 찾아 거리·면적 기준을 자동 판정합니다.</p>
-<ul>
-<li>공개 허가도서(공장 1층, 약 1,150㎡) 시험: 소화기 8·연기감지기 16·발신기 2개 인식</li>
-<li>발신기 수평거리 최대 23.2m(기준 25m), 소화기 보행거리 최대 16.1m(기준 20m) 판정</li>
-</ul>
-<div class="tags"><span class="tag">Python</span><span class="tag">OpenCV</span><span class="tag law">NFTC 101 2.1.1.4.2</span><span class="tag law">NFTC 203 표 2.4.3.5</span><span class="tag law">NFTC 203 2.8</span></div>
-<div class="btns"><a class="btn" href="drawing-checker/sample_result/report.html" data-gc="open-drawing-report">검토 결과 보기</a><a class="btn line kmong" href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">검토 대행 문의(크몽)</a></div>
+<p class="cat">현장 수첩</p>
+<h3>소방안전관리자 현장 수첩</h3>
+<p class="eff">점검표·보고서·기록표, 설치대상·등급 판정, 지적사항 대장, 기록부 10종, 근무표, 연간 달력을 가입 없이 휴대폰에서.</p>
+<ul><li>보유 설비만 ○×/ 체크·항목별 사진 → 별지 제9호·별표 5 인쇄</li><li>이행 기한 10일/20일, .ics 알림, 오프라인</li></ul>
+<div class="tags"><span class="tag law">소방시설법 시행규칙 제23조·별표 3</span><span class="tag law">화재예방법 시행규칙 제10조</span></div>
+<div class="btns"><a class="btn" href="kit/" data-gc="open-kit">수첩 열기</a></div>
 </article>
 
-<article class="tool">
+<article class="tool" id="calc">
+<p class="cat">계산기</p>
 <h3>자체점검 서류 기한 계산기</h3>
-<p class="eff">점검 완료일만 넣으면 결과 제출·소방서 보고·이행 완료·보관 기한을 한 번에 계산합니다.</p>
-<ul>
-<li>보고 15일은 토·공휴일 제외, 2026~2027 공휴일·대체공휴일 반영</li>
-<li>민법 기간 계산 규정 적용, 결과 인쇄</li>
-</ul>
-<div class="tags"><span class="tag">웹</span><span class="tag law">소방시설법 시행규칙 제23조</span><span class="tag law">제24조</span><span class="tag law">제25조</span></div>
-<div class="btns"><a class="btn" href="inspection-deadline/">계산기 열기</a><a class="btn line kmong" href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">검토 대행 문의(크몽)</a></div>
+<p class="eff">점검 완료일만 넣으면 결과 제출·소방서 보고·이행 완료·보관 기한을 한 번에.</p>
+<ul><li>보고 15일은 토·공휴일 제외(2026~2027 공휴일)</li><li>민법 기간 계산 적용, 결과 인쇄</li></ul>
+<div class="tags"><span class="tag law">소방시설법 시행규칙 제23~25조</span></div>
+<div class="btns"><a class="btn" href="inspection-deadline/">계산기 열기</a></div>
 </article>
 
 <article class="tool">
+<p class="cat">계산기</p>
 <h3>소화기·감지기 설치 수량 계산기</h3>
 <p class="eff">용도·바닥면적·부착높이로 소화기 능력단위와 감지기 필요 개수를 계산합니다.</p>
-<ul>
-<li>3단위 소화기 개수, 감지기 1개당 감지면적 자동 산출</li>
-<li>부착높이에 맞지 않는 감지기 종류 경고</li>
-</ul>
-<div class="tags"><span class="tag">웹</span><span class="tag law">NFTC 101 표 2.1.1.2</span><span class="tag law">NFTC 203 표 2.4.3.5</span></div>
-<div class="btns"><a class="btn" href="facility-calc/">계산기 열기</a><a class="btn line kmong" href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">검토 대행 문의(크몽)</a></div>
+<ul><li>3단위 소화기 개수, 감지기 1개당 감지면적</li><li>부착높이에 맞지 않는 감지기 경고</li></ul>
+<div class="tags"><span class="tag law">NFTC 101 표 2.1.1.2</span><span class="tag law">NFTC 203 표 2.4.3.5</span></div>
+<div class="btns"><a class="btn" href="facility-calc/">계산기 열기</a></div>
 </article>
 
 <article class="tool">
-<h3>소방안전관리자 연간 서류 자동 생성기</h3>
+<p class="cat">점검</p>
+<h3>펌프 성능시험표</h3>
+<p class="eff">체절·정격·150% 운전 측정값으로 펌프 성능을 자동 판정하고 성능곡선과 함께 A4로 인쇄합니다.</p>
+<ul><li>체절 140% 이하, 150% 운전 65% 이상 자동 판정</li><li>유량계 175% 측정 범위 안내</li></ul>
+<div class="tags"><span class="tag law">NFTC 102 2.2.1.7</span><span class="tag law">NFTC 102 2.3.7.2</span></div>
+<div class="btns"><a class="btn" href="kit/pump.html">시험표 열기</a></div>
+</article>
+
+<article class="tool">
+<p class="cat">도면</p>
+<h3>소방도면 법령 자동 검토기</h3>
+<p class="eff">PDF 평면도에서 감지기·소화기·발신기를 찾아 거리·면적 기준을 자동 판정합니다.</p>
+<ul><li>공개 허가도서(공장 1층 약 1,150㎡): 소화기 8·연기감지기 16·발신기 2개 인식</li><li>발신기 수평거리 최대 23.2m(기준 25m)</li></ul>
+<div class="tags"><span class="tag law">NFTC 101 2.1.1.4.2</span><span class="tag law">NFTC 203 2.8</span></div>
+<div class="btns"><a class="btn" href="drawing-checker/sample_result/report.html" data-gc="open-drawing-report">검토 결과 보기</a></div>
+</article>
+
+<article class="tool">
+<p class="cat">서류</p>
+<h3>연간 서류 자동 생성기</h3>
 <p class="eff">건물 정보를 한 번 넣으면 소방계획서와 연간 기록 서류를 자동 작성합니다.</p>
-<ul>
-<li>소방계획서 15개 항목, 업무수행기록표 12개월, 훈련·교육 기록부</li>
-<li>자위소방대 인원 편성 자동 배정</li>
-</ul>
-<div class="tags"><span class="tag">웹</span><span class="tag law">화재예방법 시행령 제27조</span></div>
-<div class="btns"><a class="btn" href="https://pefp96-web.github.io/sobang-docs/">생성기 열기</a><a class="btn line kmong" href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">검토 대행 문의(크몽)</a></div>
-</article>
-
-<article class="tool">
-<h3>소방안전관리자 현장 수첩</h3>
-<p class="eff">자체점검 점검표(1,149개 항목)·보고서·기록표, 설치대상·등급 판정, 지적사항 대장, 업무수행기록표, 기록부 10종, 근무표, 연간 달력을 가입 없이 휴대폰에서 씁니다. 전부 0원.</p>
-<ul>
-<li>사용승인일로 점검 달·보고 15일·기록표 게시 기한 계산, 알림 파일(.ics) 내보내기</li>
-<li>불량 사진·이행 기한 10일/20일·완료 보고 기한, 별지 제12호서식 인쇄, 지하에서도 오프라인</li>
-<li>보유 설비만 ○×/ 체크·항목별 사진 → 실시결과 보고서(별지 제9호)·자체점검기록표(별표 5)·조치결과표 인쇄·공유</li>
-<li>설치대상(시행령 별표 4)·관리등급 판정, 점검인력 배치·점검면적 계산, 날짜별 법령·NFTC 바로가기</li>
-</ul>
-<div class="tags"><span class="tag">웹·오프라인</span><span class="tag law">소방시설법 시행규칙 제23조·별표 3</span><span class="tag law">화재예방법 시행규칙 제10조</span></div>
-<div class="btns"><a class="btn" href="kit/" data-gc="open-kit">수첩 열기</a><a class="btn line kmong" href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">검토 대행 문의(크몽)</a></div>
+<ul><li>소방계획서 15개 항목, 업무수행기록표 12개월</li><li>자위소방대 인원 편성 자동 배정</li></ul>
+<div class="tags"><span class="tag law">화재예방법 시행령 제27조</span></div>
+<div class="btns"><a class="btn" href="https://pefp96-web.github.io/sobang-docs/">생성기 열기</a></div>
 </article>
 
 </div>
 </section>
 
-<aside>
-<div class="box who" id="about">
-<h2>제작자</h2>
-<b>김재환</b>
-<ul>
-<li>소방안전관리자 1급</li>
-<li>소방설비기사(전기)</li>
-<li>소방시설 점검 실무</li>
-<li>Python·OpenCV 도면 인식, 웹 계산기 개발</li>
-</ul>
-</div>
-<div class="box cta">
-<h2>검토 대행</h2>
-<p>도면·점검 사진 검토, 소방계획서 작성이 필요하면 크몽으로 문의하세요. 계산기는 무료입니다.</p>
+<section class="band" id="about" aria-labelledby="ab-t">
+<h2 id="ab-t">만든 사람·문의</h2>
+<p class="sub">현장에서 직접 쓰려고 만들었고, 매주 기능을 더합니다.</p>
+<div class="two">
+<div class="box who">
+<h3 style="margin-top:0">김재환</h3>
+<ul><li>소방안전관리자 1급</li><li>소방설비기사(전기)</li><li>소방시설 점검 실무</li><li>Python·OpenCV 도면 인식, 웹 도구 개발</li></ul>
+<p style="margin:0 0 var(--s3);color:var(--text-2)">도면·점검 사진 검토, 소방계획서 작성이 필요하면 크몽으로 문의하세요. 도구는 무료입니다.</p>
 <a class="btn kmong" href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">크몽에서 문의하기</a>
 </div>
 <div class="box" id="log">
-<h2>개발 이력</h2>
+<h3 style="margin-top:0">개발 이력</h3>
 <ol class="tl">
+<li><span class="d">2026-11-24</span>디자인 전면 개편(상위 업무 도구 10곳 실측 규칙), 첫 화면 시연 영상, Ctrl+K 검색, 삭제 실행 취소, 자동 저장 표시, 다크 모드, A4 인쇄, 펌프 성능시험표, 앱 설치(PWA)</li>
 <li><span class="d">2026-11-24</span>현장 수첩 확장: 자체점검 점검표·보고서·기록표, 설치대상·등급 판정, 기록부 10종·결재, 근무표, 세대 점검표, 인력 계산·견적 비교, 건물 목록, 날짜별 법령</li>
 <li><span class="d">2026-11-24</span>현장 수첩(달력·지적사항·업무수행기록표) 공개</li>
 <li><span class="d">2026-11-24</span>대시보드 개편, 방문·사용 집계 연결</li>
@@ -159,13 +191,12 @@ footer{font-size:12px;color:#6b7680;padding:18px 0 32px}
 <li><span class="d">2026-11-24</span>자체점검 서류 기한 계산기, 소화기·감지기 수량 계산기 공개</li>
 <li><span class="d">2026-11-09</span>소방안전관리자 연간 서류 자동 생성기 공개</li>
 </ol>
-<p class="note" style="margin:6px 0 0">매주 기능을 추가하고 여기에 기록합니다.</p>
 </div>
-</aside>
 </div>
-
-<footer>모든 결과는 참고용이며 최종 판단은 법령 원문과 관할 소방서 확인이 필요합니다. 근거: 소방시설 설치 및 관리에 관한 법률·시행규칙, 화재의 예방 및 안전관리에 관한 법률 시행령, NFTC 101, NFTC 203. 이 사이트는 개인정보를 받지 않으며 방문 수는 쿠키 없는 GoatCounter로 집계합니다.</footer>
+</section>
 </main>
+
+<footer class="site"><p>모든 결과는 참고용이며 최종 판단은 법령 원문과 관할 소방서 확인이 필요합니다. 근거: 소방시설 설치 및 관리에 관한 법률·시행규칙, 화재의 예방 및 안전관리에 관한 법률 시행령, NFTC 101·102·203. 이 사이트는 개인정보를 받지 않으며 방문 수는 쿠키 없는 GoatCounter로 집계합니다. 글꼴: Pretendard(SIL OFL).</p></footer>
 
 <script>
 (function(){
@@ -193,5 +224,11 @@ footer{font-size:12px;color:#6b7680;padding:18px 0 32px}
   });
 })();
 </script>
+<script>
+if('serviceWorker' in navigator&&location.protocol==='https:'){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+(function(){var v=document.querySelector('.demo video');if(!v)return;var mq=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)');if(mq&&mq.matches){v.removeAttribute('autoplay');v.pause();v.setAttribute('controls','');}
+if('IntersectionObserver' in window){new IntersectionObserver(function(es){es.forEach(function(e){if(mq&&mq.matches)return;if(e.isIntersecting){var p=v.play();if(p&&p.catch)p.catch(function(){});}else v.pause();});},{threshold:.2}).observe(v);}})();
+</script>
+<script src="assets/ui.js" defer></script>
 </body>
 </html>
