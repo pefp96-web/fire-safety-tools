@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방시설 자체점검 서류 기한 계산기</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#1f2933;background:#f4f5f7;font-size:15px;line-height:1.55}
+header{background:#1f2d3d;color:#fff;padding:18px 20px}
+header h1{margin:0;font-size:20px;font-weight:700}
+header p{margin:4px 0 0;font-size:13px;color:#c9d2dc}
+main{max-width:920px;margin:0 auto;padding:16px}
+section{background:#fff;border:1px solid #d9dee4;border-radius:6px;padding:16px;margin-bottom:14px}
+h2{font-size:16px;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid #b3261e;display:inline-block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}
+label.f{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
+select,input[type=date]{width:100%;padding:8px;border:1px solid #b8c0c8;border-radius:4px;font-size:15px;background:#fff}
+.radio{display:flex;gap:14px;flex-wrap:wrap;padding-top:4px}
+.radio label{font-size:14px}
+.hint{font-size:12px;color:#5f6b76;margin-top:3px}
+.btns{margin-top:14px;display:flex;gap:8px}
+button{padding:9px 18px;font-size:15px;border-radius:4px;border:1px solid #1f2d3d;background:#1f2d3d;color:#fff;cursor:pointer}
+button.sub{background:#fff;color:#1f2d3d}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border:1px solid #cfd5db;padding:8px;text-align:left;vertical-align:top}
+th{background:#eef1f4;font-weight:600}
+td.d{white-space:nowrap;font-weight:700;color:#b3261e}
+.na{color:#8a949e;font-weight:400}
+.note{font-size:13px;color:#444;margin:6px 0 0;padding-left:18px}
+.note li{margin-bottom:3px}
+.warn{background:#fff6e5;border:1px solid #e8c98a;padding:8px 10px;font-size:13px;border-radius:4px;margin-top:10px}
+footer{max-width:920px;margin:0 auto;padding:0 16px 30px;font-size:13px;color:#3c4650}
+footer .maker{font-weight:700;color:#1f2933}
+footer ul{padding-left:18px;margin:6px 0}
+@media (max-width:640px){.grid{grid-template-columns:1fr}td.d{white-space:normal}th,td{padding:6px;font-size:13px}}
+@media print{header{background:#fff;color:#000;border-bottom:2px solid #000}header p{color:#333}.no-print{display:none}body{background:#fff}section{border:none;padding:0}}
+</style>
+</head>
+<body>
+<header>
+<h1>소방시설 자체점검 서류 기한 계산기</h1>
+<p>점검 완료일을 넣으면 결과 제출·보고·이행 기한을 한 번에 계산합니다.</p>
+</header>
+<main>
+<section class="no-print">
+<h2>입력</h2>
+<div class="grid">
+<div><label class="f" for="kind">점검 종류</label>
+<select id="kind"><option value="작동점검">작동점검</option><option value="종합점검">종합점검</option></select>
+<div class="hint">작동·종합 모두 제출·보고 기한은 같습니다(시행규칙 제23조).</div></div>
+<div><label class="f" for="done">점검 완료일(점검이 끝난 날)</label>
+<input type="date" id="done"><div class="hint">2026·2027년 공휴일 반영</div></div>
+<div><span class="f" style="font-weight:600;font-size:13px">점검 주체</span>
+<div class="radio"><label><input type="radio" name="who" value="mgr" checked> 관리업자등이 점검</label><label><input type="radio" name="who" value="self"> 관계인이 스스로 점검</label></div></div>
+<div><span class="f" style="font-weight:600;font-size:13px">지적사항(불량) 유무</span>
+<div class="radio"><label><input type="radio" name="defect" value="y" checked> 있음</label><label><input type="radio" name="defect" value="n"> 없음</label></div></div>
+<div><label class="f" for="fix">이행 조치 유형</label>
+<select id="fix"><option value="10">기계·기구 수리·정비(단순 정비·부품 교체)</option><option value="20">전부 또는 일부 철거 후 새로 교체(설비 교체·공사)</option></select>
+<div class="hint">시행규칙 제23조제5항 각 호 구분</div></div>
+<div><label class="f" for="rep">실제 보고일(선택)</label>
+<input type="date" id="rep"><div class="hint">비우면 보고 기한 마지막 날에 보고한 것으로 계산</div></div>
+<div><label class="f" for="fin">실제 이행 완료일(선택)</label>
+<input type="date" id="fin"><div class="hint">비우면 이행 완료 기한 마지막 날로 계산</div></div>
+</div>
+<div class="btns"><button id="calc">계산</button><button class="sub" id="print">인쇄</button></div>
+</section>
+
+<section id="out" style="display:none">
+<h2>계산 결과</h2>
+<p id="summary" style="margin:0 0 10px;font-size:14px"></p>
+<table>
+<thead><tr><th style="width:26%">서류·의무</th><th style="width:20%">기한</th><th>계산 방법</th><th style="width:20%">근거</th></tr></thead>
+<tbody id="tb"></tbody>
+</table>
+<div id="warn"></div>
+<ul class="note">
+<li>“끝난 날부터 ○일 이내”는 첫날을 빼고 셉니다(민법 제157조, 행정기본법 제6조제1항).</li>
+<li>결과 제출(10일)·결과 보고(15일)는 공휴일·토요일을 세지 않습니다(시행규칙 제23조제3항). 일요일은 공휴일입니다(관공서의 공휴일에 관한 규정 제2조제1호).</li>
+<li>그 밖의 기간은 달력 날짜로 세고, 마지막 날이 토요일·공휴일이면 다음 날 만료로 표시했습니다(민법 제161조).</li>
+<li>이행 완료 기간은 소방본부장·소방서장이 통보한 기간이 우선이며, 규모·절차가 복잡하면 기간을 달리 정할 수 있습니다(시행규칙 제23조제5항 단서).</li>
+</ul>
+</section>
+</main>
+<footer>
+<p class="maker">제작: 김재환 (소방안전관리자 1급, 소방설비기사 전기)</p>
+<p>근거 법령(국가법령정보센터 law.go.kr에서 원문 확인)</p>
+<ul>
+<li>「소방시설 설치 및 관리에 관한 법률」 제23조(자체점검 결과의 조치 등), 제24조(점검기록표 게시 등)</li>
+<li>「소방시설 설치 및 관리에 관한 법률 시행규칙」 [시행 2026. 10. 19.] 제23조제1항~제6항, 제24조제1항, 제25조</li>
+<li>「민법」 제157조(기간의 기산점), 제160조(역에 의한 계산), 제161조(공휴일 등과 기간의 만료점)</li>
+<li>「행정기본법」 제6조제1항(행정에 관한 기간의 계산)</li>
+<li>「관공서의 공휴일에 관한 규정」 제2조, 제3조 / 공휴일 목록: 2026·2027년 월력요항 기준(노동절·제헌절 포함)</li>
+</ul>
+<p>참고용입니다. 최종 판단은 관할 소방서와 법령 원문으로 확인하세요.</p>
+</footer>
+<script>
+// 2026~2027 관공서 공휴일(일요일은 별도 처리). 대체공휴일 포함.
+var HOL={
+'2026-01-01':'1월 1일','2026-02-16':'설날 전날','2026-02-17':'설날','2026-02-18':'설날 다음 날','2026-03-01':'3·1절','2026-03-02':'대체공휴일(3·1절)',
+'2026-05-01':'노동절','2026-05-05':'어린이날','2026-05-24':'부처님 오신 날','2026-05-25':'대체공휴일(부처님 오신 날)','2026-06-03':'전국동시지방선거일',
+'2026-06-06':'현충일','2026-07-17':'제헌절','2026-08-15':'광복절','2026-08-17':'대체공휴일(광복절)','2026-09-24':'추석 전날','2026-09-25':'추석','2026-09-26':'추석 다음 날',
+'2026-10-03':'개천절','2026-10-05':'대체공휴일(개천절)','2026-10-09':'한글날','2026-12-25':'기독탄신일',
+'2027-01-01':'1월 1일','2027-02-06':'설날 전날','2027-02-07':'설날','2027-02-08':'설날 다음 날','2027-02-09':'대체공휴일(설날)','2027-03-01':'3·1절',
+'2027-05-01':'노동절','2027-05-03':'대체공휴일(노동절)','2027-05-05':'어린이날','2027-05-13':'부처님 오신 날','2027-06-06':'현충일','2027-07-17':'제헌절',
+'2027-07-19':'대체공휴일(제헌절)','2027-08-15':'광복절','2027-08-16':'대체공휴일(광복절)','2027-09-14':'추석 전날','2027-09-15':'추석','2027-09-16':'추석 다음 날',
+'2027-10-03':'개천절','2027-10-04':'대체공휴일(개천절)','2027-10-09':'한글날','2027-10-11':'대체공휴일(한글날)','2027-12-25':'기독탄신일','2027-12-27':'대체공휴일(기독탄신일)'};
+var WD=['일','월','화','수','목','금','토'];
+var outOfRange=false;
+function parse(s){var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function key(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fmt(d){return d.getFullYear()+'. '+(d.getMonth()+1)+'. '+d.getDate()+'.('+WD[d.getDay()]+')';}
+function add(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function chk(d){var y=d.getFullYear();if(y<2026||y>2027)outOfRange=true;}
+function isHol(d){chk(d);return d.getDay()===0||!!HOL[key(d)];}
+function isOff(d){return d.getDay()===6||isHol(d);} // 토요일 또는 공휴일
+// 공휴일·토요일 불산입 영업일 계산(초일 불산입)
+function bizDays(start,n){var d=new Date(start),c=0,skipped=[];while(c<n){d=add(d,1);if(isOff(d)){if(HOL[key(d)])skipped.push(fmt(d)+' '+HOL[key(d)]);}else c++;}return {date:d,skipped:skipped};}
+// 달력 기간(초일 불산입) + 민법 제161조
+function calDays(start,n){var raw=add(start,n),d=new Date(raw);while(isOff(d))d=add(d,1);return {raw:raw,date:d,moved:d.getTime()!==raw.getTime()};}
+function calTxt(r){return r.moved?fmt(r.date)+'<br><span class="na">(달력상 '+fmt(r.raw)+'이 토·공휴일)</span>':fmt(r.date);}
+function radio(n){return document.querySelector('input[name='+n+']:checked').value;}
+function row(a,b,c,d){return '<tr><td>'+a+'</td><td class="d">'+b+'</td><td>'+c+'</td><td>'+d+'</td></tr>';}
+function calc(){
+ outOfRange=false;
+ var v=document.getElementById('done').value;if(!v){alert('점검 완료일을 넣어 주세요.');return;}
+ var done=parse(v),who=radio('who'),defect=radio('defect'),fixDays=+document.getElementById('fix').value,kind=document.getElementById('kind').value;
+ var h='',na='<span class="na">해당 없음</span>';
+ // ① 관리업자등 → 관계인
+ if(who==='mgr'){var r1=bizDays(done,10);
+  h+=row('자체점검 실시결과 보고서 제출<br>(관리업자등 → 관계인)',fmt(r1.date),'점검 끝난 날 다음 날부터 10일, 토요일·공휴일 제외'+(r1.skipped.length?'<br><span class="na">제외한 공휴일: '+r1.skipped.join(', ')+'</span>':''),'시행규칙 제23조제1항·제3항');}
+ else h+=row('자체점검 실시결과 보고서 제출<br>(관리업자등 → 관계인)',na,'관계인이 스스로 점검한 경우','시행규칙 제23조제1항');
+ // ② 관계인 → 소방본부·소방서
+ var r2=bizDays(done,15);
+ var att='첨부: '+(who==='mgr'?'점검인력 배치확인서, ':'')+'자체점검 결과 이행계획서(별지 제10호서식)';
+ h+=row('자체점검 실시결과 보고<br>(관계인 → 소방본부장·소방서장)',fmt(r2.date),'점검 끝난 날 다음 날부터 15일, 토요일·공휴일 제외<br>'+att+(r2.skipped.length?'<br><span class="na">제외한 공휴일: '+r2.skipped.join(', ')+'</span>':''),'시행규칙 제23조제2항·제3항');
+ var repV=document.getElementById('rep').value,rep=repV?parse(repV):r2.date;
+ // 점검기록표 게시
+ var r25=calDays(rep,10);
+ h+=row('자체점검기록표 게시',calTxt(r25),'보고한 날('+fmt(rep)+') 다음 날부터 10일, 출입자가 쉽게 볼 수 있는 곳','시행규칙 제25조');
+ // 이행계획
+ if(defect==='y'){
+  var r3=calDays(rep,fixDays);
+  h+=row('이행계획 완료<br>('+(fixDays===10?'수리·정비':'철거 후 교체')+')',calTxt(r3),'보고일('+fmt(rep)+')부터 '+fixDays+'일. 소방서가 통보한 기간이 우선','시행규칙 제23조제5항제'+(fixDays===10?'1':'2')+'호');
+  var ext=add(r3.date,-3),extNote='';while(isOff(ext)){ext=add(ext,-1);extNote=' 그날이 토·공휴일이라 앞 평일로 당겨 표시(안전 쪽).';}
+  h+=row('이행계획 완료 연기 신청',fmt(ext)+'<br><span class="na">까지</span>','완료기간 만료일('+fmt(r3.date)+') 3일 전까지, 곤란함을 증명하는 서류 첨부(필요한 경우만).'+extNote,'시행규칙 제24조제1항');
+  var finV=document.getElementById('fin').value,fin=finV?parse(finV):r3.date;
+  var r4=calDays(fin,10);
+  h+=row('이행완료 보고<br>(관계인 → 소방본부장·소방서장)',calTxt(r4),'이행 완료한 날('+fmt(fin)+') 다음 날부터 10일<br>첨부: 이행계획 건별 전·후 사진, 소방시설공사 계약서','시행규칙 제23조제6항');
+ } else {
+  h+=row('이행계획 완료·이행완료 보고',na,'지적사항 없음','시행규칙 제23조제5항·제6항');
+ }
+ // 보관
+ var keep=new Date(done);keep.setFullYear(keep.getFullYear()+2);
+ h+=row('결과 보고서(점검표 포함) 자체 보관','~ '+fmt(keep),'점검 끝난 날부터 2년간','시행규칙 제23조제4항');
+ document.getElementById('tb').innerHTML=h;
+ document.getElementById('summary').textContent=kind+' · 점검 완료일 '+fmt(done)+' · '+(who==='mgr'?'관리업자등 점검':'관계인 자체 점검')+' · 지적사항 '+(defect==='y'?'있음':'없음');
+ document.getElementById('warn').innerHTML=outOfRange?'<div class="warn">계산 범위에 2026·2027년 밖의 날짜가 있습니다. 그 해 공휴일은 반영하지 않았으니 달력으로 다시 확인하세요(토·일요일만 반영).</div>':'';
+ document.getElementById('out').style.display='block';
+}
+document.getElementById('calc').onclick=calc;
+document.getElementById('print').onclick=function(){if(document.getElementById('out').style.display==='none')calc();window.print();};
+document.querySelectorAll('input[name=defect]').forEach(function(e){e.onchange=function(){document.getElementById('fix').disabled=radio('defect')==='n';document.getElementById('fin').disabled=radio('defect')==='n';};});
+</script>
+</body>
+</html>
