@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방 지적사항(불량) 관리대장 | 사진·이행 기한 10일·20일·완료 보고 기한 자동, 조치결과표 인쇄</title>
+<meta name="description" content="점검에서 나온 소방시설 불량을 휴대폰으로 사진과 함께 기록하면 이행 완료 기한(10일·20일), 연기 신청 마감, 이행완료 보고 기한(10일)을 계산하고 전·후 사진 조치결과표를 인쇄합니다. 무료, 가입 없음, 오프라인.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/defects.html">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+<style>
+.item{border:1px solid #d9dde2;border-radius:6px;padding:10px;margin:8px 0;background:#fff}
+.item .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.ph{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#sheet{display:none}
+@media print{#app{display:none}#sheet{display:block}#sheet table{font-size:11px}#sheet img{max-width:150px;max-height:110px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>지적사항(불량) 관리대장</h1><p>발견 → 관계인 통보 → 이행계획 → 조치(전·후 사진) → 완료 보고<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="calendar.html">달력</a><a href="record.html">기록표</a></nav>
+</div></header>
+<main id="app">
+<section class="card">
+<h2 id="f-title">불량 입력</h2>
+<input type="hidden" id="d-id">
+<div class="g3">
+<div><label class="f" for="d-found">발견일</label><input id="d-found" type="date"></div>
+<div><label class="f" for="d-kind">발견 경위</label><select id="d-kind"><option>작동점검</option><option>종합점검</option><option>월간 업무수행</option><option>소방서 화재안전조사</option><option>기타</option></select></div>
+<div><label class="f" for="d-loc">위치(동·층·실)</label><input id="d-loc" placeholder="예: 본관 B1 기계실"></div>
+<div><label class="f" for="d-eq">설비</label><input id="d-eq" list="eqs" placeholder="글자 일부만 입력"><datalist id="eqs"></datalist></div>
+<div style="grid-column:span 2"><label class="f" for="d-desc">불량 내용</label><input id="d-desc" list="descs" placeholder="설비를 고르면 자주 나오는 문구가 뜹니다"><datalist id="descs"></datalist></div>
+<div><label class="f" for="d-act">조치 구분</label><select id="d-act"><option value="10">수리·정비(보고일부터 10일)</option><option value="20">철거 후 교체(보고일부터 20일)</option><option value="0">즉시 조치(현장 시정)</option></select><div class="hint">소방시설법 시행규칙 제23조⑤</div></div>
+<div><label class="f" for="d-notice">관계인 통보일</label><input id="d-notice" type="date"><div class="hint">발견 즉시 알리고 기록(화재예방법 시행규칙 제10조②)</div></div>
+<div><label class="f" for="d-report">이행계획 보고일(소방서)</label><input id="d-report" type="date"></div>
+<div><label class="f" for="d-pre">조치 전 사진</label><input id="d-pre" type="file" accept="image/*" capture="environment"><img id="p-pre" class="photo" alt="" hidden></div>
+<div><label class="f" for="d-fix">조치 완료일</label><input id="d-fix" type="date"></div>
+<div><label class="f" for="d-fixdesc">조치 내용</label><input id="d-fixdesc" placeholder="예: 압력계 정상 소화기로 교체"></div>
+<div><label class="f" for="d-post">조치 후 사진</label><input id="d-post" type="file" accept="image/*" capture="environment"><img id="p-post" class="photo" alt="" hidden></div>
+<div><label class="f" for="d-sent">이행완료 보고일</label><input id="d-sent" type="date"></div>
+</div>
+<div id="calc" class="ok" style="display:none"></div>
+<div class="btns"><button id="d-save" data-gc="kit-defect-save">저장</button><button class="gray" id="d-new">새로 쓰기</button></div>
+</section>
+
+<section class="card">
+<div class="row" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:center">
+<h2 style="margin:0">대장 <span id="cnt"></span></h2>
+<select id="flt" style="width:auto"><option value="">전체</option><option value="open">미완료만</option><option value="late">기한 지남</option><option value="done">완료</option></select>
+</div>
+<div id="list"></div>
+<div class="btns"><button id="pr" data-gc="kit-defect-print">조치결과표 인쇄(사진 포함)</button><button class="sub" id="csv" data-gc="kit-defect-csv">엑셀용 CSV 받기</button></div>
+</section>
+<footer>근거(확인일 2026-11-24): 소방시설법 시행규칙(시행 2026.10.19.) 제23조⑤(이행 완료 기간 보고일부터 10일·20일, 소방서장이 정해 통보)·⑥(이행 완료한 날부터 10일 이내 이행완료 보고, 전·후 사진 첨부), 제24조①(연기 신청 완료기간 만료일 3일 전까지) / 화재예방법 시행규칙(시행 2026.7.1.) 제10조②. 실제 완료 기간은 관할 소방서 통보를 따르며 화면 값은 계획 안내입니다. 기간 말일이 토·공휴일이면 다음 날로 계산합니다(민법 제161조).</footer>
+</main>
+<div id="sheet"></div>
+<script>
+(function(){
+var $=function(id){return document.getElementById(id);};
+var LIB={
+'소화기':['지시압력계 적색(압력 미달)','분말소화기 내용연수 경과','안전핀 탈락·봉인 훼손','호스 파손·노즐 탈락','소화기 표지 미부착','보행거리 내 미배치','받침대 없이 바닥 방치'],
+'자동화재탐지설비 감지기':['감지기 미작동(시험 불량)','감지기 탈락·파손','감지기 도장·비닐 씌움','설치 높이에 맞지 않는 종류'],
+'수신기':['예비전원 시험 불량','화재표시등 점등 불량','경계구역 일람도 미비치','주경종·지구경종 정지 상태','스위치 정상 위치 아님'],
+'발신기':['표시등 소등','누름스위치 작동 불량','응답램프 불량'],
+'유도등':['점등 불량','예비전원(배터리) 불량','유도등 앞 장애물','3선식 배선 점등 확인 불가'],
+'비상조명등':['점등 불량','예비전원 불량'],
+'옥내소화전':['호스 꼬임·노즐 탈락','위치표시등 소등','함 앞 적치물','방수압력 미달'],
+'스프링클러설비':['헤드 도장·변형','헤드 살수 장애물','알람밸브 압력스위치 불량','시험밸브 개방 시 경보 불량','헤드 누수'],
+'소화펌프':['자동기동 불량','압력챔버 압력스위치 설정 불량','성능시험배관 유량계 불량','감시제어반 수동 상태'],
+'방화문':['자동폐쇄장치 불량','도어스토퍼 설치(상시 개방)','방화문 앞 적치물'],
+'피난통로·계단':['피난통로 적치물','비상구 잠금','피난안내도 미게시'],
+'제연설비':['댐퍼 작동 불량','배출기 기동 불량'],
+'가스계소화설비':['약제량 부족','기동용기 솔레노이드 안전핀 미체결','방출표시등 불량'],
+'비상방송설비':['스피커 음량 불량','층별 방송 불량'],
+'기타':['']};
+$('eqs').innerHTML=Object.keys(LIB).map(function(k){return '<option value="'+k+'">';}).join('');
+function fillDesc(){var l=LIB[$('d-eq').value]||[].concat.apply([],Object.values(LIB));$('descs').innerHTML=l.filter(Boolean).map(function(k){return '<option value="'+KIT.esc(k)+'">';}).join('');}
+$('d-eq').oninput=fillDesc;fillDesc();
+var cur={pre:'',post:''};
+function setImg(which,src){var im=$('p-'+which);if(src){im.src=src;im.hidden=false;}else{im.hidden=true;im.removeAttribute('src');}}
+['pre','post'].forEach(function(w){$('d-'+w).onchange=function(e){var f=e.target.files[0];if(!f)return;KIT.shrink(f).then(function(d){cur[w]=d;setImg(w,d);});};});
+var FIELDS=['found','kind','loc','eq','desc','act','notice','report','fix','fixdesc','sent'];
+function deadlines(x){var o={},rep=KIT.parse(x.report),fix=KIT.parse(x.fix),act=+x.act;
+ if(rep&&act){o.due=KIT.deadline(rep,act);o.delay=KIT.add(o.due,-3);}
+ if(fix&&act)o.doneRep=KIT.deadline(fix,10);
+ o.state=x.sent?'완료 보고함':fix?(act?'조치 완료·보고 대기':'조치 완료'):'미조치';
+ o.late=false;var t=KIT.today();
+ if(!fix&&o.due&&o.due<t)o.late=true;
+ if(fix&&act&&!x.sent&&o.doneRep<t)o.late=true;
+ return o;}
+function read(){var x={id:$('d-id').value||KIT.uid()};FIELDS.forEach(function(k){x[k]=$('d-'+k).value.trim();});x.pre=cur.pre;x.post=cur.post;return x;}
+function showCalc(){var x=read(),o=deadlines(x),s=[];
+ if(o.due)s.push('이행 완료 기한(계획): <b>'+KIT.fmt(o.due)+'</b>');
+ if(o.delay)s.push('연기 신청 마감(만료일 3일 전): '+KIT.fmt(o.delay));
+ if(o.doneRep)s.push('이행완료 보고 기한: <b>'+KIT.fmt(o.doneRep)+'</b> (전·후 사진 첨부)');
+ $('calc').style.display=s.length?'block':'none';$('calc').innerHTML=s.join('<br>');}
+FIELDS.forEach(function(k){$('d-'+k).addEventListener('change',showCalc);});
+function clear(){$('d-id').value='';FIELDS.forEach(function(k){$('d-'+k).value='';});$('d-kind').value='작동점검';$('d-act').value='10';$('d-found').value=KIT.key(new Date());cur={pre:'',post:''};setImg('pre');setImg('post');$('d-pre').value='';$('d-post').value='';$('f-title').textContent='불량 입력';showCalc();}
+$('d-new').onclick=clear;
+$('d-save').onclick=function(){var x=read();if(!x.desc&&!x.eq){KIT.toast('설비나 불량 내용을 적어 주세요');return;}KIT.put('defects',x).then(function(){KIT.toast('저장했습니다');clear();load();});};
+var ALL=[];
+function load(){return KIT.all('defects').then(function(a){ALL=a.sort(function(p,q){return (p.found||'')<(q.found||'')?1:-1;});draw();});}
+function draw(){var f=$('flt').value;var rows=ALL.filter(function(x){var o=deadlines(x);if(f==='open')return !x.fix;if(f==='late')return o.late;if(f==='done')return !!x.fix;return true;});
+ var open=ALL.filter(function(x){return !x.fix;}).length,late=ALL.filter(function(x){return deadlines(x).late;}).length;
+ $('cnt').textContent='('+ALL.length+'건 · 미조치 '+open+' · 기한 지남 '+late+')';
+ $('list').innerHTML=rows.map(function(x){var o=deadlines(x);
+  return '<div class="item"><div class="row"><div><b>'+KIT.esc(x.eq||'설비 미기재')+'</b> · '+KIT.esc(x.desc)+'<div class="hint">'+KIT.esc(x.loc)+' · 발견 '+KIT.esc(x.found)+' · '+KIT.esc(x.kind)+'</div></div><div>'+
+  '<span class="pill '+(o.late?'red':x.fix?'green':'blue')+'">'+(o.late?'기한 지남 · ':'')+o.state+'</span></div></div>'+
+  '<div class="hint">'+(o.due?'이행 기한 '+KIT.fmt(o.due)+' · ':'')+(o.doneRep?'완료 보고 기한 '+KIT.fmt(o.doneRep):'')+'</div>'+
+  '<div class="ph">'+(x.pre?'<img class="photo" src="'+x.pre+'" alt="조치 전">':'')+(x.post?'<img class="photo" src="'+x.post+'" alt="조치 후">':'')+'</div>'+
+  '<div class="btns"><button class="sm sub" data-e="'+x.id+'">고치기</button><button class="sm gray" data-x="'+x.id+'">지우기</button></div></div>';}).join('')||'<p class="hint">기록이 없습니다.</p>';}
+$('flt').onchange=draw;
+$('list').onclick=function(e){var id=e.target.getAttribute('data-e'),xid=e.target.getAttribute('data-x');
+ if(id){var x=ALL.find(function(y){return y.id===id;});$('d-id').value=x.id;FIELDS.forEach(function(k){$('d-'+k).value=x[k]||'';});cur={pre:x.pre||'',post:x.post||''};setImg('pre',cur.pre);setImg('post',cur.post);fillDesc();showCalc();$('f-title').textContent='불량 고치기';scrollTo(0,0);}
+ if(xid&&confirm('이 지적사항을 지울까요?'))KIT.del('defects',xid).then(load);};
+$('pr').onclick=function(){KIT.building().then(function(b){
+ var h='<h2 style="text-align:center">소방시설 지적사항 조치결과표</h2><p>대상물: '+KIT.esc(b.name||'')+' ('+KIT.esc(b.grade||'')+') · 소재지: '+KIT.esc(b.addr||'')+' · 소방안전관리자: '+KIT.esc(b.manager||'')+' · 출력일: '+KIT.fmt(new Date())+'</p>';
+ h+='<table><tr><th>번호</th><th>발견일·경위</th><th>위치</th><th>설비·불량 내용</th><th>조치 구분·이행 기한</th><th>조치일·조치 내용</th><th>조치 전</th><th>조치 후</th><th>상태</th></tr>';
+ ALL.slice().reverse().forEach(function(x,i){var o=deadlines(x);h+='<tr><td>'+(i+1)+'</td><td>'+KIT.esc(x.found)+'<br>'+KIT.esc(x.kind)+'</td><td>'+KIT.esc(x.loc)+'</td><td>'+KIT.esc(x.eq)+'<br>'+KIT.esc(x.desc)+'</td><td>'+(x.act==='20'?'철거·교체':x.act==='10'?'수리·정비':'즉시 조치')+'<br>'+(o.due?KIT.fmt(o.due):'')+'</td><td>'+KIT.esc(x.fix)+'<br>'+KIT.esc(x.fixdesc)+'</td><td>'+(x.pre?'<img src="'+x.pre+'">':'')+'</td><td>'+(x.post?'<img src="'+x.post+'">':'')+'</td><td>'+o.state+'</td></tr>';});
+ h+='</table><p style="font-size:11px">근거: 소방시설법 시행규칙 제23조⑤⑥ · 화재예방법 시행규칙 제10조② · 소방안전관리자 확인: ____________ (서명)</p>';
+ $('sheet').innerHTML=h;setTimeout(print,300);});};
+$('csv').onclick=function(){var H=['발견일','경위','위치','설비','불량 내용','조치 구분','관계인 통보일','이행계획 보고일','이행 완료 기한','조치 완료일','조치 내용','이행완료 보고 기한','이행완료 보고일','상태','전 사진','후 사진'];
+ var q=function(s){return '"'+String(s==null?'':s).replace(/"/g,'""')+'"';};
+ var lines=[H.map(q).join(',')].concat(ALL.map(function(x){var o=deadlines(x);return [x.found,x.kind,x.loc,x.eq,x.desc,x.act==='20'?'철거·교체(20일)':x.act==='10'?'수리·정비(10일)':'즉시',x.notice,x.report,o.due?KIT.key(o.due):'',x.fix,x.fixdesc,o.doneRep?KIT.key(o.doneRep):'',x.sent,o.state,x.pre?'있음':'',x.post?'있음':''].map(q).join(',');}));
+ KIT.download('소방_지적사항대장_'+KIT.key(new Date())+'.csv','\ufeff'+lines.join('\r\n'),'text/csv;charset=utf-8');};
+// 기록표에서 넘어온 불량
+var P=new URLSearchParams(location.search);
+clear();
+if(P.get('desc')||P.get('eq')){$('d-eq').value=P.get('eq')||'';$('d-desc').value=P.get('desc')||'';$('d-loc').value=P.get('loc')||'';if(P.get('found'))$('d-found').value=P.get('found');$('d-kind').value='월간 업무수행';fillDesc();KIT.toast('업무수행기록표의 불량을 불러왔습니다. 사진을 붙이고 저장하세요');}
+load();
+window.__kitDeadlines=deadlines;
+})();
+</script>
+</body>
+</html>

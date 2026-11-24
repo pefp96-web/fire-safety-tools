@@ -1,0 +1,11 @@
+{
+  "name": "소방안전관리자 현장 수첩",
+  "short_name": "소방 수첩",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#1f2a36",
+  "lang": "ko",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방안전관리자 연간 법정 업무 달력 + 휴대폰 알림(.ics) | 작동·종합점검 시기, 보고 기한, 훈련·교육</title>
+<meta name="description" content="사용승인일만 넣으면 작동점검·종합점검 달, 결과 보고 15일(토·공휴일 제외), 기록표 게시, 업무수행기록표 매월, 소방훈련·교육, 실무교육 2년 기한을 한 해 달력으로 만들고 휴대폰 캘린더 알림 파일로 내려받습니다.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/calendar.html">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>연간 법정 업무 달력</h1><p>점검·보고·훈련·교육·기록 일정을 한 번에, 휴대폰 알림까지<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="defects.html">지적사항</a><a href="record.html">기록표</a></nav>
+</div></header>
+<main>
+<section class="card noprint">
+<h2>입력</h2>
+<div class="g3">
+<div><label class="f" for="c-year">연도</label><select id="c-year"></select></div>
+<div><label class="f" for="c-approval">사용승인일</label><input id="c-approval" type="date"><div class="hint">건축물관리대장 기재일</div></div>
+<div><label class="f" for="c-comp">종합점검 대상</label><select id="c-comp"><option value="n">아니오(작동점검만)</option><option value="y">예</option></select></div>
+<div><label class="f" for="c-grade">등급</label><select id="c-grade"><option value="">선택</option><option>특급</option><option>1급</option><option>2급</option><option>3급</option></select></div>
+<div><label class="f" for="c-drill">소방훈련·교육 실시 월</label><select id="c-drill"></select><div class="hint">자위소방대 소집·점검과 같은 날 병행 가능(화재예방법 시행규칙 제11조⑥)</div></div>
+<div><label class="f" for="c-evac">피난유도 안내정보 제공 방법</label><select id="c-evac"><option value="edu">연 2회 피난안내 교육</option><option value="bc">분기별 1회 이상 피난안내방송</option><option value="map">층마다 피난안내도 게시</option><option value="video">피난안내영상 제공</option></select><div class="hint">제35조①, 피난유도 안내정보 제공 대상만 해당</div></div>
+<div><label class="f" for="c-done">점검 완료(예정)일 직접 지정</label><input id="c-done" type="date"><div class="hint">비우면 점검 달 말일에 끝난다고 보고 보고 기한을 계산</div></div>
+<div><label class="f" for="c-edu">최초 실무교육 수료일</label><input id="c-edu" type="date"></div>
+<div><label class="f" for="c-appointed">선임일</label><input id="c-appointed" type="date"></div>
+</div>
+<div class="btns"><button id="c-make" data-gc="kit-calendar-make">달력 만들기</button><button class="sub" id="c-ics" data-gc="kit-calendar-ics">휴대폰 알림 파일(.ics) 받기</button><button class="gray" onclick="print()">인쇄</button></div>
+<p class="hint">.ics 파일을 열면 구글 캘린더·아이폰 캘린더·삼성 캘린더에 일정이 들어가고, 점검은 한 달 전·당월 1일 오전 9시·7일 전, 기한은 7일 전·하루 전에 알림이 옵니다.</p>
+</section>
+<div id="warn"></div>
+<section class="card"><h2 id="t-title">일정</h2><div class="mgrid" id="grid"></div></section>
+<section class="card"><h2>일정 목록</h2><table id="list"><thead><tr><th>날짜</th><th>할 일</th><th>근거</th><th>남은 날</th></tr></thead><tbody></tbody></table></section>
+<footer>
+<p>근거(확인일 2026-11-24, 법제처 국가법령정보센터): 소방시설법 시행규칙(시행 2026.10.19.) 별표 3 제2호라목·제3호다목·라목(점검 시기·횟수), 제22조(면제·연기 신청), 제23조①②③(보고 10일·15일, 토·공휴일 불산입), 제25조(기록표 게시 10일) / 화재예방법 시행규칙(시행 2026.7.1.) 제10조, 제11조⑤, 제29조③, 제35조①, 제36조①④, 제37조.</p>
+<p>참고용입니다. 면제·연기 승인, 학교 특례, 증축·여러 동 기준일 등은 반영하지 않으므로 관할 소방서와 원문으로 확인하세요. 토·공휴일 계산은 2026~2027년 관공서 공휴일 목록을 씁니다.</p>
+</footer>
+</main>
+<script>
+(function(){
+var $=function(id){return document.getElementById(id);};
+var ys=$('c-year'),now=new Date();
+for(var y=2026;y<=2027;y++){var o=document.createElement('option');o.value=y;o.textContent=y+'년';ys.appendChild(o);}
+ys.value=Math.min(2027,Math.max(2026,now.getFullYear()));
+for(var m=1;m<=12;m++){var o2=document.createElement('option');o2.value=m;o2.textContent=m+'월';$('c-drill').appendChild(o2);}
+$('c-drill').value=11;
+var EV=[];
+KIT.building().then(function(b){if(b.approval)$('c-approval').value=b.approval;if(b.comp)$('c-comp').value=b.comp;if(b.grade)$('c-grade').value=b.grade;if(b.eduFirst)$('c-edu').value=b.eduFirst;if(b.appointed)$('c-appointed').value=b.appointed;
+ return KIT.get('calendar');}).then(function(c){c=c||{};if(c.drill)$('c-drill').value=c.drill;if(c.evac)$('c-evac').value=c.evac;if(c.done)$('c-done').value=c.done;if($('c-approval').value)make();});
+
+function ev(date,title,law,kind,alarm){EV.push({d:date,t:title,law:law,k:kind||'',alarm:alarm||'due'});}
+function make(){
+ EV=[];var Y=+ys.value,warns=[];
+ var ap=KIT.parse($('c-approval').value),comp=$('c-comp').value==='y',grade=$('c-grade').value;
+ var done=KIT.parse($('c-done').value);
+ KIT.set('calendar',{drill:$('c-drill').value,evac:$('c-evac').value,done:$('c-done').value});
+ if(!grade)warns.push('등급을 고르지 않았습니다. 특급은 종합점검이 반기 1회라 일정이 달라집니다.');
+ if(!ap){warns.push('사용승인일이 없어 점검 일정을 만들 수 없습니다(건축물관리대장에서 확인).');}
+ else{
+  var m=ap.getMonth();
+  if(Y<=ap.getFullYear())warns.push('사용승인 연도('+ap.getFullYear()+')에는 정기 작동·종합점검 대신 최초점검(사용할 수 있게 된 날부터 60일 이내) 대상인지 확인하세요. 정기점검은 다음 해부터입니다(별표 3).');
+  function insp(month,label,law){
+   var mm=((month%12)+12)%12;
+   var start=new Date(Y,mm,1),end=KIT.lastDay(Y,mm);
+   ev(start,label+' 실시 기간 시작('+(mm+1)+'월 중)',law,'insp','insp');
+   ev(end,label+' 실시 만료(이 날까지 끝내기)',law,'insp','due');
+   ev(KIT.add(end,-3),label+' 면제·연기 신청 마감(만료일 3일 전까지)','소방시설법 시행규칙 제22조①','sub','due');
+   var fin=(done&&done.getFullYear()===Y&&done.getMonth()===mm)?done:end;
+   var r10=KIT.bizDeadline(fin,10),r15=KIT.bizDeadline(fin,15);
+   if(!KIT.inHolRange(r15))warns.push('보고 기한이 공휴일 목록 범위(2026~2027)를 넘어 토·일만 제외했습니다.');
+   ev(r10,label+' 결과보고서 관계인 제출 기한(관리업자 등, 완료일 '+KIT.fmt(fin)+' 기준 10일)','소방시설법 시행규칙 제23조①③','rep','due');
+   ev(r15,label+' 소방서 결과 보고 기한(이행계획서 첨부, 15일·토·공휴일 제외)','소방시설법 시행규칙 제23조②③','rep','due');
+   ev(KIT.add(r15,10),label+' 자체점검기록표 게시 기한(보고 마감일에 보고했을 때, 보고일부터 10일)','소방시설법 시행규칙 제25조','rep','due');
+  }
+  if(grade==='특급'){insp(m,'종합점검(1차)','별표 3 제3호다목1)·라목2)');insp((m+6)%12,'종합점검(2차, 반기 1회)','별표 3 제3호다목1)');warns.push('특급은 종합점검 반기 1회입니다. 2차 시기는 관할 소방서와 확인하세요(작동점검 대상에서 제외, 별표 3 제2호가목).');}
+  else if(comp){insp(m,'종합점검','별표 3 제3호라목2)');insp((m+6)%12,'작동점검(종합점검 받은 달부터 6개월이 되는 달)','별표 3 제2호라목1)');}
+  else insp(m,'작동점검','별표 3 제2호라목2)');
+ }
+ for(var i=0;i<12;i++)ev(KIT.lastDay(Y,i),'업무수행기록표 작성(월 1회 이상, 2년 보관)','화재예방법 시행규칙 제10조①③','rec','due');
+ var dm=+$('c-drill').value-1;
+ ev(new Date(Y,dm,1),'소방훈련·교육 실시 달(연 1회 이상) + 자위소방대 소집·점검','화재예방법 시행규칙 제36조①, 제11조⑤','drill','insp');
+ ev(KIT.lastDay(Y,dm),'훈련·교육 결과 기록부(별지 제28호) 작성, 2년 보관','제36조④','drill','due');
+ ev(KIT.add(KIT.lastDay(Y,dm),30),'영 제38조 대상이면 훈련·교육 결과서(별지 제29호) 제출 기한(실시일부터 30일, 말일 실시 가정)','제37조','drill','due');
+ var evac=$('c-evac').value;
+ if(evac==='edu'){[dm,(dm+6)%12].forEach(function(x,j){ev(new Date(Y,x,1),'피난안내 교육('+(j+1)+'/2회)','제35조①1호','evac','insp');});}
+ else if(evac==='bc'){[2,5,8,11].forEach(function(x){ev(KIT.lastDay(Y,x),'피난안내방송(분기 1회 이상) 이번 분기 마감','제35조①2호','evac','due');});}
+ else if(evac==='map')ev(new Date(Y,0,2),'층별 피난안내도 게시 상태 확인','제35조①3호','evac','insp');
+ else ev(new Date(Y,0,2),'피난안내영상 송출 상태 확인','제35조①4호','evac','insp');
+ var edu=KIT.parse($('c-edu').value),apt=KIT.parse($('c-appointed').value);
+ if(edu){for(var k=1;k<=10;k++){var dl=KIT.add(new Date(edu.getFullYear()+2*k,edu.getMonth(),edu.getDate()),-1);if(dl.getFullYear()===Y)ev(dl,'소방안전관리자 실무교육 이수 기한(2년마다, 최초 수료일 기준)','화재예방법 시행규칙 제29조③','edu','due');}}
+ else if(apt){var d6=new Date(apt.getFullYear(),apt.getMonth()+6,apt.getDate());if(d6.getFullYear()===Y)ev(d6,'선임 후 첫 실무교육 이수 기한(선임일부터 6개월 이내)','제29조③','edu','due');warns.push('최초 실무교육 수료일이 없어 2년 주기 기한은 만들지 않았습니다.');}
+ else warns.push('선임일·실무교육 수료일이 없어 실무교육 기한을 넣지 못했습니다.');
+ EV.sort(function(a,b){return a.d-b.d;});
+ render(Y,warns);
+}
+function render(Y,warns){
+ $('warn').innerHTML=warns.map(function(w){return '<div class="warn">'+KIT.esc(w)+'</div>';}).join('')||'<div class="ok">입력이 빠진 일정이 없습니다.</div>';
+ $('t-title').textContent=Y+'년 일정 ('+EV.length+'건)';
+ var g='';for(var i=0;i<12;i++){var items=EV.filter(function(e){return e.d.getMonth()===i&&e.k!=='rec';});
+  g+='<div class="mon"><b>'+(i+1)+'월</b>'+items.map(function(e){var c=e.k==='insp'?'red':e.k==='rep'?'blue':e.k==='drill'||e.k==='evac'?'green':'';return '<div><span class="pill '+c+'">'+e.d.getDate()+'일</span>'+KIT.esc(e.t.replace(/\(.*$/,''))+'</div>';}).join('')+'<div class="hint">+ 업무수행기록표</div></div>';}
+ $('grid').innerHTML=g;
+ $('list').querySelector('tbody').innerHTML=EV.map(function(e){var n=KIT.daysLeft(e.d);return '<tr><td>'+KIT.fmt(e.d)+'</td><td>'+KIT.esc(e.t)+'</td><td class="law">'+KIT.esc(e.law)+'</td><td>'+(n<0?'지남':n===0?'오늘':'D-'+n)+'</td></tr>';}).join('');
+}
+// ---------- .ics (RFC 5545) ----------
+function fold(line){var out=[],cur='',bytes=0,enc=new TextEncoder();for(var ch of line){var b=enc.encode(ch).length;if(bytes+b>73){out.push(cur);cur=' '+ch;bytes=1+b;}else{cur+=ch;bytes+=b;}}out.push(cur);return out.join('\r\n');}
+function icsEsc(s){return s.replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');}
+function dstr(d){return KIT.key(d).replace(/-/g,'');}
+function ics(){
+ var stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+Z$/,'Z');
+ var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//pefp96-web//fire-safety-kit//KO','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:소방안전관리 법정 업무'];
+ EV.forEach(function(e,i){
+  L.push('BEGIN:VEVENT','UID:fstkit-'+dstr(e.d)+'-'+i+'@pefp96-web.github.io','DTSTAMP:'+stamp,'DTSTART;VALUE=DATE:'+dstr(e.d),'DTEND;VALUE=DATE:'+dstr(KIT.add(e.d,1)),'SUMMARY:'+icsEsc('[소방] '+e.t),'DESCRIPTION:'+icsEsc('근거: '+e.law+'\n만든 곳: https://pefp96-web.github.io/fire-safety-tools/kit/calendar.html'),'TRANSP:TRANSPARENT');
+  var al=e.alarm==='insp'?['-P30D','PT9H','-P7D']:e.k==='rec'?['-P3D']:['-P7D','-P1D'];
+  al.forEach(function(t){L.push('BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(e.t),'TRIGGER:'+t,'END:VALARM');});
+  L.push('END:VEVENT');
+ });
+ L.push('END:VCALENDAR');
+ return L.map(fold).join('\r\n')+'\r\n';
+}
+window.__kitICS=ics;window.__kitEV=function(){return EV;};
+$('c-make').onclick=make;
+$('c-ics').onclick=function(){if(!EV.length)make();if(!EV.length)return;KIT.download('소방_법정업무_'+ys.value+'.ics',ics(),'text/calendar;charset=utf-8');KIT.toast('알림 파일을 받았습니다. 열어서 캘린더에 추가하세요');};
+})();
+</script>
+</body>
+</html>

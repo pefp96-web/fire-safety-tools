@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방안전관리자 업무 수행 기록표 작성기 (별지 제12호서식, 월 1회) | 휴대폰 작성·A4 인쇄·빠진 달 알림</title>
+<meta name="description" content="화재예방법 시행규칙 제10조 별지 제12호서식 소방안전관리자 업무 수행 기록표를 휴대폰으로 매달 작성하고 A4로 인쇄합니다. 수신기·제어반·펌프 중점 확인 문구, 빠진 달 표시, 불량은 지적사항 대장으로 연결. 무료·가입 없음.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/record.html">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+<style>
+.it{border:1px solid #d9dde2;border-radius:6px;padding:10px;margin:8px 0}
+.chips button{margin:3px 4px 0 0}
+.res{display:flex;gap:14px;margin:6px 0}
+.res label{font-size:15px}
+.res input{width:auto}
+.months{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.months div{border:1px solid #d9dde2;border-radius:4px;padding:6px;text-align:center;font-size:13px;background:#fff}
+.months .has{background:#eef8f0;border-color:#9fd0ab}
+.months .miss{background:#fcf4f3;border-color:#d8a39f}
+#sheet{display:none}
+#sheet table td,#sheet table th{border:1px solid #000;padding:5px;font-size:11.5px}
+@media print{#app{display:none}#sheet{display:block}@page{size:A4;margin:14mm}}
+@media (max-width:700px){.months{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>업무 수행 기록표 (별지 제12호서식)</h1><p>월 1회 이상 작성 · 2년 보관 · 휴대폰으로 쓰고 A4로 인쇄<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="calendar.html">달력</a><a href="defects.html">지적사항</a></nav>
+</div></header>
+<main id="app">
+<section class="card"><h2>작성 현황 <span id="yy"></span></h2><div class="months" id="months"></div><p class="hint">빨간 칸은 기록이 없는 지난 달입니다(제10조① 월 1회 이상).</p></section>
+<section class="card">
+<h2 id="f-title">새 기록</h2>
+<input type="hidden" id="r-id">
+<div class="g3">
+<div><label class="f" for="r-date">수행일자</label><input id="r-date" type="date"></div>
+<div><label class="f" for="r-who">수행자</label><input id="r-who"></div>
+<div><label class="f">대상물</label><div id="bld" class="hint" style="font-size:14px"></div><a class="hint" href="./#b-name">건물 정보 고치기</a></div>
+</div>
+<div id="items"></div>
+<h3>불량사항 개선보고</h3>
+<div class="g3">
+<div><label class="f" for="r-rdate">보고일시</label><input id="r-rdate" type="datetime-local"></div>
+<div><label class="f" for="r-rway">보고방법</label><select id="r-rway"><option value="">선택</option><option>대면</option><option>서면</option><option>정보통신</option></select></div>
+<div><label class="f" for="r-rto">보고받은 사람</label><input id="r-rto" placeholder="관계인 성명"></div>
+<div><label class="f" for="r-how">조치방법</label><select id="r-how"><option value="">선택</option><option>이전</option><option>제거</option><option>수리ㆍ교체</option><option>기타</option></select></div>
+</div>
+<div class="btns"><button id="r-save" data-gc="kit-record-save">저장</button><button class="sub" id="r-print" data-gc="kit-record-print">A4 인쇄</button><button class="gray" id="r-new">새로 쓰기</button><button class="gray" id="r-copy">지난 기록 불러와 쓰기</button></div>
+<div id="tod" class="hint"></div>
+</section>
+<section class="card"><h2>저장된 기록</h2><table><thead><tr><th>수행일자</th><th>결과</th><th></th></tr></thead><tbody id="list"></tbody></table></section>
+<footer>근거(확인일 2026-11-24): 화재의 예방 및 안전관리에 관한 법률 시행규칙(시행 2026.7.1.) 제10조①(별지 제12호서식, 월 1회 이상)·②(보수·정비 필요 사항 지체 없이 관계인에게 알리고 기록)·③(작성한 날부터 2년 보관), 별지 제12호서식 작성요령(수신기·제어반·가압송수장치 중점 확인). 참고용이며 서식 원본은 법제처 국가법령정보센터에서 확인하세요.</footer>
+</main>
+<div id="sheet"></div>
+<script>
+(function(){
+var $=function(id){return document.getElementById(id);};
+var ITEMS=[
+ {k:'fire',n:'소방시설',q:['수신기 정상 감시 상태·스위치 위치 확인','수신기 예비전원·화재표시 시험','감시제어반 자동 상태 확인','소화펌프(가압송수장치) 압력·기동 확인','소화기 압력계·배치 확인','유도등·비상조명등 점등 확인','옥내소화전함·스프링클러 헤드 외관 확인']},
+ {k:'evac',n:'피난방화시설',q:['피난통로·계단 적치물 없음','비상구·옥상 출입문 개방 가능 확인','방화문 자동폐쇄·상시 닫힘 확인','방화셔터 하강 장애물 없음','피난안내도 게시 상태']},
+ {k:'hot',n:'화기취급감독',q:['용접·용단 등 화기작업 없음','화기작업 시 감독·소화기 비치 확인','주방·보일러실 화기 사용 상태 확인','흡연구역 외 흡연 흔적 없음']},
+ {k:'etc',n:'기타사항',q:['전기 문어발·과열 흔적 없음','가연물 적치 상태 확인','자위소방대 비상연락망 최신화']}
+];
+$('items').innerHTML=ITEMS.map(function(it){return '<div class="it"><b>'+it.n+'</b>'+
+ '<div class="chips">'+it.q.map(function(q){return '<button type="button" class="sm gray" data-k="'+it.k+'">'+q+'</button>';}).join('')+'</div>'+
+ '<label class="f" for="c-'+it.k+'" style="margin-top:6px">확인내용</label><textarea id="c-'+it.k+'"></textarea>'+
+ '<div class="res"><label><input type="radio" name="g-'+it.k+'" value="양호" checked> 양호</label><label><input type="radio" name="g-'+it.k+'" value="불량"> 불량</label></div>'+
+ '<label class="f" for="a-'+it.k+'">조치사항</label><input id="a-'+it.k+'">'+
+ '<div class="btns" style="margin-top:6px"><button type="button" class="sm sub" data-send="'+it.k+'">불량을 지적사항 대장으로 보내기</button></div></div>';}).join('');
+$('items').onclick=function(e){var k=e.target.getAttribute('data-k');if(k){var t=$('c-'+k);t.value=(t.value?t.value+'\n':'')+e.target.textContent;}
+ var s=e.target.getAttribute('data-send');if(s){var it=ITEMS.find(function(x){return x.k===s;});var desc=($('a-'+s).value||$('c-'+s).value.split('\n').pop()||'').trim();
+  location.href='defects.html?'+new URLSearchParams({eq:it.n==='소방시설'?'':it.n,desc:desc,found:$('r-date').value}).toString();}};
+var B={};
+function bldText(){return [B.name,B.grade&&B.grade+' 대상물',B.addr].filter(Boolean).join(' · ')||'건물 정보 없음';}
+function read(){var r={id:$('r-id').value||KIT.uid(),date:$('r-date').value,who:$('r-who').value.trim(),rdate:$('r-rdate').value,rway:$('r-rway').value,rto:$('r-rto').value.trim(),how:$('r-how').value,items:{}};
+ ITEMS.forEach(function(it){r.items[it.k]={c:$('c-'+it.k).value.trim(),g:document.querySelector('input[name="g-'+it.k+'"]:checked').value,a:$('a-'+it.k).value.trim()};});return r;}
+function fill(r,keepDate){if(!keepDate){$('r-id').value=r.id||'';$('r-date').value=r.date||'';}$('r-who').value=r.who||B.manager||'';$('r-rdate').value=keepDate?'':(r.rdate||'');$('r-rway').value=r.rway||'';$('r-rto').value=r.rto||'';$('r-how').value=keepDate?'':(r.how||'');
+ ITEMS.forEach(function(it){var x=(r.items||{})[it.k]||{};$('c-'+it.k).value=x.c||'';document.querySelector('input[name="g-'+it.k+'"][value="'+(keepDate?'양호':(x.g||'양호'))+'"]').checked=true;$('a-'+it.k).value=keepDate?'':(x.a||'');});}
+function blank(){fill({date:KIT.key(new Date()),who:B.manager||''});$('r-id').value='';$('r-date').value=KIT.key(new Date());$('f-title').textContent='새 기록';}
+var ALL=[];
+function load(){return KIT.all('records').then(function(a){ALL=a.sort(function(p,q){return p.date<q.date?1:-1;});draw();});}
+function draw(){
+ var Y=new Date().getFullYear(),M=new Date().getMonth();$('yy').textContent=Y+'년';var h='';
+ for(var i=0;i<12;i++){var key=Y+'-'+String(i+1).padStart(2,'0');var n=ALL.filter(function(r){return (r.date||'').slice(0,7)===key;}).length;
+  h+='<div class="'+(n?'has':i<M?'miss':'')+'">'+(i+1)+'월<br>'+(n?n+'건':i<M?'없음':i===M?'이번 달':'-')+'</div>';}
+ $('months').innerHTML=h;
+ var miss=0;for(var j=0;j<M;j++){var kk=Y+'-'+String(j+1).padStart(2,'0');if(!ALL.some(function(r){return (r.date||'').slice(0,7)===kk;}))miss++;}
+ $('tod').textContent=miss?'올해 지난 달 중 '+miss+'개월 기록이 없습니다.':'';
+ $('list').innerHTML=ALL.map(function(r){var bad=ITEMS.filter(function(it){return r.items[it.k]&&r.items[it.k].g==='불량';}).map(function(it){return it.n;});
+  return '<tr><td>'+KIT.esc(r.date)+'</td><td>'+(bad.length?'<span class="pill red">불량: '+bad.join(', ')+'</span>':'<span class="pill green">모두 양호</span>')+'</td><td><button class="sm sub" data-e="'+r.id+'">열기</button> <button class="sm gray" data-x="'+r.id+'">지우기</button></td></tr>';}).join('')||'<tr><td colspan="3" class="hint">저장된 기록이 없습니다.</td></tr>';}
+$('list').onclick=function(e){var id=e.target.getAttribute('data-e'),x=e.target.getAttribute('data-x');
+ if(id){fill(ALL.find(function(r){return r.id===id;}));$('f-title').textContent='기록 고치기';scrollTo(0,300);}
+ if(x&&confirm('이 기록을 지울까요?'))KIT.del('records',x).then(load);};
+$('r-save').onclick=function(){var r=read();if(!r.date){KIT.toast('수행일자를 넣어 주세요');return;}
+ var bad=ITEMS.some(function(it){return r.items[it.k].g==='불량';});
+ if(bad&&!r.rto)KIT.toast('불량이 있으면 관계인에게 알리고 보고받은 사람을 적으세요(제10조②)');
+ KIT.put('records',r).then(function(){$('r-id').value=r.id;if(!(bad&&!r.rto))KIT.toast('저장했습니다');load();});};
+$('r-new').onclick=blank;
+$('r-copy').onclick=function(){if(!ALL.length){KIT.toast('불러올 기록이 없습니다');return;}fill(ALL[0],true);$('r-id').value='';$('r-date').value=KIT.key(new Date());$('f-title').textContent='새 기록(지난 확인내용 불러옴)';};
+function chk(v,opts){return opts.map(function(o){return '['+(v===o?'√':'&nbsp;&nbsp;')+'] '+o;}).join(' ');}
+$('r-print').onclick=function(){var r=read(),d=r.date?r.date.split('-'):['','',''];
+ var rd=r.rdate?r.rdate.replace('T',' '):'';
+ var h='<p style="font-size:10px;margin:0">■ 화재의 예방 및 안전관리에 관한 법률 시행규칙 [별지 제12호서식]</p><h2 style="text-align:center;margin:6px 0 10px">소방안전관리자 업무 수행 기록표</h2>'+
+ '<table style="width:100%;border-collapse:collapse"><tr><th style="width:18%">수행일자</th><td>'+d[0]+'. '+d[1]+'. '+d[2]+'.</td><th style="width:14%">수행자</th><td>'+KIT.esc(r.who)+' (서명)</td></tr>'+
+ '<tr><th rowspan="3">소방안전<br>관리대상물</th><th>상호</th><td colspan="2">'+KIT.esc(B.name||'')+'</td></tr>'+
+ '<tr><th>등급</th><td colspan="2">'+chk(B.grade,['특급','1급','2급','3급'])+'</td></tr>'+
+ '<tr><th>소재지</th><td colspan="2">'+KIT.esc(B.addr||'')+'</td></tr></table>'+
+ '<table style="width:100%;border-collapse:collapse;margin-top:-1px"><tr><th>지하층</th><th>지상층</th><th>연면적(㎡)</th><th>바닥면적(㎡)</th><th>동수</th></tr><tr><td>'+KIT.esc(B.under||'')+'</td><td>'+KIT.esc(B.above||'')+'</td><td>'+KIT.esc(B.area||'')+'</td><td>'+KIT.esc(B.floorArea||'')+'</td><td>'+KIT.esc(B.dongs||'')+'</td></tr></table>'+
+ '<table style="width:100%;border-collapse:collapse;margin-top:-1px"><tr><th style="width:16%">항 목</th><th>확인내용</th><th style="width:14%">확인결과</th><th style="width:22%">조치사항</th></tr>'+
+ ITEMS.map(function(it){var x=r.items[it.k];return '<tr><th>'+it.n+'</th><td style="white-space:pre-line;height:70px">'+KIT.esc(x.c)+'</td><td>['+(x.g==='양호'?'√':'&nbsp;&nbsp;')+'] 양호<br>['+(x.g==='불량'?'√':'&nbsp;&nbsp;')+'] 불량</td><td>'+KIT.esc(x.a)+'</td></tr>';}).join('')+
+ '<tr><th rowspan="2">불량사항<br>개선보고</th><td colspan="3">보고일시: '+KIT.esc(rd)+' &nbsp; 보고방법: '+chk(r.rway,['대면','서면','정보통신'])+' &nbsp; 보고받은 사람: '+KIT.esc(r.rto)+'</td></tr>'+
+ '<tr><td colspan="3">조치방법: '+chk(r.how,['이전','제거','수리ㆍ교체','기타'])+'</td></tr></table>'+
+ '<p style="font-size:10px">※ 작성요령 1. 소방안전관리업무를 수행한 날을 포함하여 월 1회 이상 작성 2. 당해연도 소방계획서 및 소방시설등 점검표에 따른 점검항목을 참고하여 작성 3. 대상물 특성에 따라 기타사항에 추가항목 작성 4. 경보설비의 수신기, 소화설비의 제어반 및 가압송수장치(펌프 등)를 중점적으로 확인하여 작성</p>';
+ $('sheet').innerHTML=h;setTimeout(print,200);};
+KIT.building().then(function(b){B=b;$('bld').textContent=bldText();blank();return load();});
+window.__kitRecordRead=read;
+})();
+</script>
+</body>
+</html>

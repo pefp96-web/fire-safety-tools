@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방안전관리자 현장 수첩 (무료·가입 없음·오프라인) | 연간 일정·지적사항 대장·업무수행기록표</title>
+<meta name="description" content="2·3급 소방안전관리자용 무료 현장 수첩. 연간 법정 업무 달력과 휴대폰 알림 파일, 지적사항 관리대장(사진·이행 기한), 업무수행기록표(별지 제12호서식) 작성·인쇄. 회원가입 없이 기기에 저장, 지하에서도 오프라인 사용.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f2a36">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>소방안전관리자 현장 수첩</h1><p>무료 · 회원가입 없음 · 이 기기에만 저장 · 지하에서도 오프라인 사용<span id="net" class="net"></span></p></div>
+<nav><a href="../">도구 모음</a><a href="calendar.html">달력</a><a href="defects.html">지적사항</a><a href="record.html">기록표</a></nav>
+</div></header>
+<main>
+<div class="big">
+<a href="calendar.html" data-gc="kit-open-calendar"><b>① 연간 법정 업무 달력</b><span>사용승인일만 넣으면 점검·보고·훈련·교육·기록표 일정이 나오고, 휴대폰 캘린더 알림 파일(.ics)로 받습니다.</span></a>
+<a href="defects.html" data-gc="kit-open-defects"><b>② 지적사항 관리대장</b><span>불량을 사진과 함께 적으면 이행 완료·완료 보고 기한을 계산하고 조치결과표를 인쇄합니다.</span></a>
+<a href="record.html" data-gc="kit-open-record"><b>③ 업무수행기록표</b><span>화재예방법 시행규칙 별지 제12호서식을 휴대폰으로 매달 작성하고 A4로 인쇄합니다. 빠진 달을 알려 줍니다.</span></a>
+<a href="#backup"><b>④ 백업·기기 옮기기</b><span>가입 없이 파일 하나로 전부 저장·복원합니다. 사무실 PC ↔ 휴대폰 이동도 이 파일로.</span></a>
+</div>
+
+<section class="card" style="margin-top:14px">
+<h2>건물 정보 (한 번 입력하면 모든 화면이 같이 씁니다)</h2>
+<div class="g3">
+<div><label class="f" for="b-name">상호(건물명)</label><input id="b-name"></div>
+<div><label class="f" for="b-grade">소방안전관리대상물 등급</label><select id="b-grade"><option value="">선택</option><option>특급</option><option>1급</option><option>2급</option><option>3급</option></select></div>
+<div><label class="f" for="b-addr">소재지</label><input id="b-addr"></div>
+<div><label class="f" for="b-approval">사용승인일</label><input id="b-approval" type="date"><div class="hint">건축물관리대장 기재일(등기부와 다르면 대장 기준, 시행규칙 별표 3)</div></div>
+<div><label class="f" for="b-comp">종합점검 대상</label><select id="b-comp"><option value="">선택</option><option value="y">예(스프링클러 설치 등)</option><option value="n">아니오(작동점검만)</option></select><div class="hint">별표 3 제3호가목</div></div>
+<div><label class="f" for="b-dongs">동수</label><input id="b-dongs" inputmode="numeric"></div>
+<div><label class="f" for="b-under">지하층</label><input id="b-under" inputmode="numeric"></div>
+<div><label class="f" for="b-above">지상층</label><input id="b-above" inputmode="numeric"></div>
+<div><label class="f" for="b-area">연면적(㎡)</label><input id="b-area" inputmode="decimal"></div>
+<div><label class="f" for="b-floorArea">바닥면적(㎡)</label><input id="b-floorArea" inputmode="decimal"></div>
+<div><label class="f" for="b-manager">소방안전관리자</label><input id="b-manager"></div>
+<div><label class="f" for="b-appointed">선임일</label><input id="b-appointed" type="date"></div>
+<div><label class="f" for="b-eduFirst">최초 실무교육 수료일</label><input id="b-eduFirst" type="date"><div class="hint">없으면 비워 두세요(선임 후 6개월 이내 이수)</div></div>
+</div>
+<div class="btns"><button id="b-save" data-gc="kit-save-building">저장</button></div>
+</section>
+
+<section class="card" id="backup">
+<h2>백업·복원</h2>
+<p style="margin:0 0 8px;font-size:14px">자료는 서버로 가지 않고 이 브라우저에만 저장됩니다. 브라우저 기록을 지우거나 기기를 바꾸기 전에 백업 파일을 받아 두세요.</p>
+<div class="btns">
+<button id="bk-out" data-gc="kit-backup">백업 파일 받기</button>
+<label class="btn sub" for="bk-in">백업 파일 불러오기</label><input id="bk-in" type="file" accept=".json,application/json" style="display:none">
+<button class="gray" id="bk-share">카카오톡 등으로 보내기</button>
+</div>
+<p class="hint" id="bk-msg"></p>
+</section>
+
+<section class="card">
+<h2>기준 법령 (확인일 2026-11-24, 법제처 국가법령정보센터 원문)</h2>
+<table>
+<tr><th>법령</th><th>현재 시행 판</th><th>수첩에 쓴 조항</th></tr>
+<tr><td>소방시설 설치 및 관리에 관한 법률 시행규칙</td><td>시행 2026. 10. 19. (행정안전부령 제653호)</td><td>제22조(면제·연기 신청 만료일 3일 전), 제23조(보고 10일·15일, 이행 10일·20일, 완료 보고 10일), 제24조(연기 신청), 제25조(기록표 게시 10일, 2025.12.1 개정), 별표 3(점검 시기, 2025.12.1 개정)</td></tr>
+<tr><td>화재의 예방 및 안전관리에 관한 법률 시행규칙</td><td>시행 2026. 7. 1. (행정안전부령 제628호)</td><td>제10조(업무수행기록 월 1회·2년 보관, 별지 제12호서식), 제11조⑤(자위소방대 연 1회), 제29조(실무교육 6개월·2년, 2025.6.26 개정), 제35조(피난유도 안내), 제36조(훈련·교육 연 1회, 기록 2년), 제37조(결과서 30일)</td></tr>
+</table>
+<p class="hint">법령이 바뀌면 이 표의 시행일과 확인일을 먼저 고칩니다. 참고용이며 최종 판단은 원문과 관할 소방서 확인이 필요합니다.</p>
+</section>
+<footer>제작 김재환(소방안전관리자 1급) · <a href="https://kmong.com/gig/846805" data-gc="kmong-click" target="_blank" rel="noopener">서류 작성·검토 대행(크몽)</a> · 개인정보를 받지 않으며 방문 수는 쿠키 없는 GoatCounter로 집계합니다.</footer>
+</main>
+<script>
+(function(){
+  var F=KIT.BFIELDS;
+  KIT.building().then(function(b){F.forEach(function(k){var el=document.getElementById('b-'+k);if(el&&b[k]!=null)el.value=b[k];});});
+  document.getElementById('b-save').onclick=function(){var b={};F.forEach(function(k){var el=document.getElementById('b-'+k);if(el)b[k]=el.value.trim();});KIT.saveBuilding(b).then(function(){KIT.toast('건물 정보를 저장했습니다');});};
+  function fname(){return '소방수첩_백업_'+KIT.key(new Date())+'.json';}
+  document.getElementById('bk-out').onclick=function(){KIT.exportAll().then(function(d){KIT.download(fname(),JSON.stringify(d),'application/json');document.getElementById('bk-msg').textContent='지적사항 '+d.defects.length+'건, 기록표 '+d.records.length+'건을 백업했습니다.';});};
+  document.getElementById('bk-in').onchange=function(e){var f=e.target.files[0];if(!f)return;f.text().then(function(t){return KIT.importAll(JSON.parse(t));}).then(function(){KIT.toast('불러왔습니다');setTimeout(function(){location.reload();},800);}).catch(function(err){document.getElementById('bk-msg').textContent='불러오기 실패: '+err.message;});};
+  document.getElementById('bk-share').onclick=function(){KIT.exportAll().then(function(d){var file=new File([JSON.stringify(d)],fname(),{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:'소방 수첩 백업'}).catch(function(){});}else{KIT.download(fname(),JSON.stringify(d),'application/json');KIT.toast('이 기기는 바로 보내기를 지원하지 않아 파일로 받았습니다');}});};
+})();
+</script>
+</body>
+</html>
