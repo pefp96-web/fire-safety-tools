@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>김재환 | 소방안전관리 업무 자동화 도구</title>
+<style>
+body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;margin:0;color:#1d1d1d;background:#f6f6f4}
+header{background:#1f2a36;color:#fff;padding:32px 20px}
+header div,main{max-width:960px;margin:0 auto}
+h1{margin:0 0 8px;font-size:26px}
+header p{margin:4px 0;color:#d6dbe0}
+main{padding:24px 20px 48px}
+.card{background:#fff;border:1px solid #ddd;border-radius:6px;padding:20px;margin-bottom:16px}
+.card h2{margin:0 0 6px;font-size:19px}
+.tag{display:inline-block;font-size:12px;border:1px solid #b9c2cb;border-radius:3px;padding:1px 6px;margin-right:4px;color:#44515e}
+.card ul{margin:10px 0 12px;padding-left:20px}
+.card li{margin:3px 0;font-size:15px}
+a.btn{display:inline-block;background:#c8322b;color:#fff;text-decoration:none;padding:7px 14px;border-radius:4px;font-size:14px;margin-right:6px}
+a.sub{color:#1f5fa8;font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+td,th{border:1px solid #ccc;padding:6px 8px;text-align:left}
+th{background:#eef0f2}
+footer{font-size:12px;color:#666;max-width:960px;margin:0 auto;padding:0 20px 30px}
+</style>
+</head>
+<body>
+<header><div>
+<h1>소방안전관리 업무 자동화 도구</h1>
+<p>김재환 · 소방안전관리자 1급 · 소방설비기사(전기)</p>
+<p>점검·서류·도면 검토에서 반복되는 일을 법령 기준대로 자동 처리하도록 직접 만든 도구 모음입니다.</p>
+</div></header>
+<main>
+
+<div class="card">
+<h2>1. 소방도면 법령 자동 검토기</h2>
+<span class="tag">Python</span><span class="tag">OpenCV</span><span class="tag">NFTC 101·203</span>
+<ul>
+<li>PDF 평면도의 범례 기호를 자동 추출해 감지기·소화기·발신기 위치를 찾고, 축척으로 거리·면적을 계산해 기준과 비교</li>
+<li>공개 허가도서(공장 증축 1층, 약 1,150㎡) 시험: 소화기 8개·연기감지기 16개·발신기 2개 위치를 눈 검수와 같게 인식</li>
+<li>발신기 수평거리 최대 23.2m(기준 25m), 소화기 이동거리 최대 16.1m(기준 20m) 자동 판정, 계통도 주기와 평면도 불일치 1건 발견</li>
+</ul>
+<a class="btn" href="drawing-checker/sample_result/report.html">검토 결과 보기</a>
+<a class="sub" href="drawing-checker/README.md">설명·코드</a>
+</div>
+
+<div class="card">
+<h2>2. 자체점검 서류 기한 계산기</h2>
+<span class="tag">웹</span><span class="tag">소방시설법 시행규칙 제23조·제24조·제25조</span>
+<ul>
+<li>점검 완료일만 넣으면 결과 제출(10일)·소방서 보고(15일, 토·공휴일 제외)·이행 완료(10일/20일)·이행완료 보고·연기 신청·보관(2년) 기한을 한 번에 계산</li>
+<li>2026~2027 공휴일·대체공휴일 반영, 민법 기간 계산 규정 적용, 결과 인쇄</li>
+</ul>
+<a class="btn" href="inspection-deadline/">계산기 열기</a>
+</div>
+
+<div class="card">
+<h2>3. 소화기·감지기 설치 수량 계산기</h2>
+<span class="tag">웹</span><span class="tag">NFTC 101 표 2.1.1.2</span><span class="tag">NFTC 203 표 2.4.3.5</span>
+<ul>
+<li>용도·바닥면적·내화 여부로 소화기 능력단위와 3단위 소화기 개수 계산</li>
+<li>감지기 종류·부착높이·구조로 1개당 감지면적과 필요 개수 계산, 높이에 맞지 않는 감지기 종류 경고</li>
+</ul>
+<a class="btn" href="facility-calc/">계산기 열기</a>
+</div>
+
+<div class="card">
+<h2>4. 소방안전관리자 연간 서류 자동 생성기</h2>
+<span class="tag">웹</span><span class="tag">화재예방법 시행령 제27조</span>
+<ul>
+<li>건물 정보를 한 번 넣으면 소방계획서(15개 항목), 업무수행기록표 12개월, 훈련·교육 기록부, 자체점검기록표를 자동 작성</li>
+<li>자위소방대 인원 편성(지휘·통보연락·초기소화·피난유도·응급구조) 자동 배정</li>
+</ul>
+<a class="btn" href="https://pefp96-web.github.io/sobang-docs/">생성기 열기</a>
+</div>
+
+<h2 style="font-size:18px">개발 이력</h2>
+<table>
+<tr><th>날짜</th><th>내용</th></tr>
+<tr><td>2026-11-24</td><td>도면 검토기 v0.1(공개 도면 시험), 자체점검 기한 계산기, 소화기·감지기 수량 계산기 공개</td></tr>
+<tr><td>2026-11-09</td><td>소방안전관리자 연간 서류 자동 생성기 공개</td></tr>
+</table>
+</main>
+<footer>모든 결과는 참고용이며 최종 판단은 법령 원문과 관할 소방서 확인이 필요합니다. 근거 법령: 소방시설 설치 및 관리에 관한 법률·시행규칙, 화재의 예방 및 안전관리에 관한 법률 시행령, NFTC 101, NFTC 203.</footer>
+</body>
+</html>
