@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소화기·감지기 설치 수량 계산기</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#1f2933;background:#f4f5f7;font-size:15px;line-height:1.55}
+header{background:#1f2d3d;color:#fff;padding:18px 20px}
+header h1{margin:0;font-size:20px}
+header p{margin:4px 0 0;font-size:13px;color:#c9d2dc}
+main{max-width:920px;margin:0 auto;padding:16px}
+section{background:#fff;border:1px solid #d9dee4;border-radius:6px;padding:16px;margin-bottom:14px}
+h2{font-size:16px;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid #b3261e;display:inline-block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}
+label.f{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
+select,input[type=number]{width:100%;padding:8px;border:1px solid #b8c0c8;border-radius:4px;font-size:15px;background:#fff}
+.chk{font-size:14px;padding-top:4px}
+.hint{font-size:12px;color:#5f6b76;margin-top:3px}
+button{margin-top:14px;padding:9px 18px;font-size:15px;border-radius:4px;border:1px solid #1f2d3d;background:#1f2d3d;color:#fff;cursor:pointer}
+button.sub{background:#fff;color:#1f2d3d}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px}
+th,td{border:1px solid #cfd5db;padding:8px;text-align:left;vertical-align:top}
+th{background:#eef1f4;width:34%;font-weight:600}
+td b{color:#b3261e;font-size:16px}
+.err{background:#fdecea;border:1px solid #e2a29c;padding:9px 10px;border-radius:4px;margin-top:14px;font-size:14px}
+.note{font-size:13px;color:#444;margin:10px 0 0;padding-left:18px}
+.note li{margin-bottom:3px}
+footer{max-width:920px;margin:0 auto;padding:0 16px 30px;font-size:13px;color:#3c4650}
+footer .maker{font-weight:700;color:#1f2933}
+footer ul{padding-left:18px;margin:6px 0}
+@media (max-width:640px){.grid{grid-template-columns:1fr}th{width:40%}th,td{padding:6px;font-size:13px}}
+@media print{header{background:#fff;color:#000;border-bottom:2px solid #000}header p{color:#333}button{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<header>
+<h1>소화기·감지기 설치 수량 계산기</h1>
+<p>NFTC 101·NFTC 203 표의 수치로 최소 설치 수량을 계산합니다.</p>
+</header>
+<main>
+<section>
+<h2>소화기 (NFTC 101)</h2>
+<div class="grid">
+<div><label class="f" for="use">특정소방대상물 용도(표 2.1.1.2)</label>
+<select id="use">
+<option value="30">1. 위락시설</option>
+<option value="50">2. 공연장·집회장·관람장·문화재·장례식장 및 의료시설</option>
+<option value="100" selected>3. 근린생활·판매·운수·숙박·노유자·전시장·공동주택·업무·방송통신·공장·창고·항공기 및 자동차 관련 시설·관광휴게시설</option>
+<option value="200">4. 그 밖의 것</option>
+</select></div>
+<div><label class="f" for="area1">해당 용도 바닥면적(㎡)</label><input type="number" id="area1" min="0" step="0.01" value="1000"></div>
+<div style="grid-column:1/-1"><label class="chk"><input type="checkbox" id="fr1"> 주요구조부가 내화구조이고, 벽 및 반자의 실내에 면하는 부분이 불연재료·준불연재료 또는 난연재료임</label>
+<div class="hint">해당하면 표의 바닥면적 2배를 기준면적으로 합니다(표 2.1.1.2 비고).</div></div>
+</div>
+<button id="b1">소화기 계산</button>
+<div id="r1"></div>
+</section>
+
+<section>
+<h2>감지기 (NFTC 203)</h2>
+<div class="grid">
+<div><label class="f" for="det">감지기 종류</label>
+<select id="det">
+<option value="rd1">차동식 스포트형 1종</option>
+<option value="rd2">차동식 스포트형 2종</option>
+<option value="fs">정온식 스포트형 특종</option>
+<option value="f1">정온식 스포트형 1종</option>
+<option value="s1">연기감지기 광전식 스포트형 1종</option>
+<option value="s2">연기감지기 광전식 스포트형 2종</option>
+</select></div>
+<div><label class="f" for="h">부착 높이(m)</label><input type="number" id="h" min="0" step="0.01" value="3.5"></div>
+<div><label class="f" for="area2">감지구역 바닥면적(㎡)</label><input type="number" id="area2" min="0" step="0.01" value="150"></div>
+<div><label class="chk"><input type="checkbox" id="fr2" checked> 주요구조부가 내화구조로 된 특정소방대상물 또는 그 부분</label>
+<div class="hint">열감지기만 구분(연기감지기는 구분 없음)</div></div>
+</div>
+<button id="b2">감지기 계산</button> <button class="sub" onclick="window.print()">인쇄</button>
+<div id="r2"></div>
+</section>
+</main>
+<footer>
+<p class="maker">제작: 김재환 (소방안전관리자 1급, 소방설비기사 전기)</p>
+<p>근거 기준(국가법령정보센터 law.go.kr 행정규칙 원문 확인)</p>
+<ul>
+<li>소화기구 및 자동소화장치의 화재안전기술기준(NFTC 101) [시행 2024. 7. 25., 국립소방연구원공고 제2024-48호] 1.7.1.2, 2.1.1.2(표 2.1.1.2·비고), 2.1.1.3, 2.1.1.4.1, 2.1.1.4.2, 2.1.1.5</li>
+<li>자동화재탐지설비 및 시각경보장치의 화재안전기술기준(NFTC 203) [시행 2026. 3. 1., 국립소방연구원공고 제2026-10호] 2.4.1(표 2.4.1), 2.4.3.5(표 2.4.3.5), 2.4.3.10.1(표 2.4.3.10.1), 2.4.3.10.2</li>
+</ul>
+<p>참고용입니다. 최종 판단은 관할 소방서와 기준 원문으로 확인하세요.</p>
+</footer>
+<script>
+var USE={30:'위락시설',50:'공연장·집회장·관람장·문화재·장례식장 및 의료시설',100:'근린생활시설 등(표 3호)',200:'그 밖의 것'};
+function n2(x){return Math.round(x*100)/100;}
+document.getElementById('b1').onclick=function(){
+ var base=+document.getElementById('use').value,a=+document.getElementById('area1').value,fr=document.getElementById('fr1').checked,o=document.getElementById('r1');
+ if(!(a>0)){o.innerHTML='<div class="err">바닥면적을 0보다 크게 넣어 주세요.</div>';return;}
+ var std=fr?base*2:base,u=Math.ceil(n2(a/std)),c=Math.ceil(u/3);
+ o.innerHTML='<table>'+
+ '<tr><th>용도·기준면적</th><td>'+USE[base]+': 바닥면적 '+base+'㎡마다 1단위'+(fr?' → 내화·불연 등 해당, 2배 적용 <b>'+std+'㎡</b>마다 1단위':'')+'<br><span class="hint">NFTC 101 표 2.1.1.2'+(fr?' 및 비고':'')+'</span></td></tr>'+
+ '<tr><th>필요 능력단위</th><td>'+a+'㎡ ÷ '+std+'㎡ = '+n2(a/std)+' → <b>'+u+'단위</b> 이상</td></tr>'+
+ '<tr><th>3단위 소화기 기준 최소 개수</th><td>'+u+'단위 ÷ 3단위 = '+n2(u/3)+' → <b>'+c+'개</b> 이상</td></tr>'+
+ '<tr><th>배치 조건(개수를 늘려야 할 수 있음)</th><td>각 층마다 설치, 2 이상의 거실로 구획된 층은 바닥면적 33㎡ 이상 거실마다 추가 배치(2.1.1.4.1)<br>각 부분에서 소화기까지 보행거리: 소형 20m 이내, 대형 30m 이내(2.1.1.4.2)</td></tr>'+
+ '</table><ul class="note"><li>소형소화기: 능력단위 1단위 이상이고 대형 미만. 대형소화기: A급 10단위·B급 20단위 이상(1.7.1.2).</li>'+
+ '<li>보일러실·주방 등 부속용도는 표 2.1.1.3에 따라 따로 추가합니다(이 계산에 미포함).</li>'+
+ '<li>2단위 이상 설치 대상은 간이소화용구 능력단위가 전체의 1/2을 넘으면 안 됩니다(노유자시설 제외, 2.1.1.5).</li></ul>';
+};
+// NFTC 203 표 2.4.3.5 (단위 ㎡) [내화, 기타]
+var HEAT={rd1:{n:'차동식 스포트형 1종',lt4:[90,50],lt8:[45,30]},rd2:{n:'차동식 스포트형 2종',lt4:[70,40],lt8:[35,25]},
+ fs:{n:'정온식 스포트형 특종',lt4:[70,40],lt8:[35,25]},f1:{n:'정온식 스포트형 1종',lt4:[60,30],lt8:[30,15]}};
+document.getElementById('b2').onclick=function(){
+ var t=document.getElementById('det').value,h=+document.getElementById('h').value,a=+document.getElementById('area2').value,fr=document.getElementById('fr2').checked,o=document.getElementById('r2');
+ if(!(a>0)||!(h>0)){o.innerHTML='<div class="err">부착 높이와 바닥면적을 0보다 크게 넣어 주세요.</div>';return;}
+ var per,name,src,rowH,extra='';
+ if(HEAT[t]){
+  name=HEAT[t].n;
+  if(h>=8){o.innerHTML='<div class="err">부착 높이 '+h+'m: 8m 이상에는 '+name+'를 설치할 수 없습니다(표 2.4.1에서 8m 이상 열감지기는 차동식 분포형만 해당). 다른 감지기를 고르세요.</div>';return;}
+  var col=h<4?'lt4':'lt8';per=HEAT[t][col][fr?0:1];rowH=h<4?'4m 미만':'4m 이상 8m 미만';
+  src='NFTC 203 2.4.3.5, 표 2.4.3.5 ('+rowH+', '+(fr?'주요구조부 내화구조':'기타 구조')+')';
+ } else {
+  var cls=t==='s1'?'1종':'2종';name='광전식 스포트형 '+cls;
+  if(h>=20){o.innerHTML='<div class="err">부착 높이 20m 이상에는 광전식 스포트형을 쓸 수 없습니다(표 2.4.1: 불꽃감지기, 광전식 분리형·공기흡입형 중 아날로그방식).</div>';return;}
+  if(t==='s2'&&h>=15){o.innerHTML='<div class="err">부착 높이 15m 이상 20m 미만에는 광전식 1종만 설치할 수 있습니다(표 2.4.1).</div>';return;}
+  per=h<4?150:75;rowH=h<4?'4m 미만':'4m 이상 20m 미만';
+  src='NFTC 203 2.4.3.10.1, 표 2.4.3.10.1 ('+rowH+', 1종 및 2종)';
+  extra='<li>복도·통로는 보행거리 30m마다, 계단·경사로는 수직거리 15m마다 1개 이상(2.4.3.10.2).</li><li>벽 또는 보로부터 0.6m 이상 떨어진 곳에 설치(2.4.3.10.5).</li>';
+ }
+ var c=Math.ceil(n2(a/per));
+ o.innerHTML='<table>'+
+ '<tr><th>감지기·부착 높이</th><td>'+name+' / '+h+'m ('+rowH+') — 표 2.4.1 설치 가능</td></tr>'+
+ '<tr><th>1개당 감지면적</th><td><b>'+per+'㎡</b><br><span class="hint">'+src+'</span></td></tr>'+
+ '<tr><th>필요 개수(감지구역 1개 기준)</th><td>'+a+'㎡ ÷ '+per+'㎡ = '+n2(a/per)+' → <b>'+c+'개</b> 이상</td></tr>'+
+ '</table><ul class="note"><li>감지구역마다 따로 계산해 더합니다. 보·실 구획이 있으면 실제 배치 개수가 늘 수 있습니다.</li>'+extra+'</ul>';
+};
+document.getElementById('b1').click();document.getElementById('b2').click();
+</script>
+</body>
+</html>
