@@ -57,7 +57,7 @@ header.top nav a:hover{background:var(--g100);color:var(--text)}
 
 /* 본문 틀 */
 main,.wrap{max-width:var(--wrap);margin:0 auto;padding:var(--s4)}
-section.card,main>section:not(.hero):not(.stats):not(.band),aside .box,.tool{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s5);margin-bottom:var(--s4);box-shadow:var(--shadow)}
+section.card,main>section:not(.hero):not(.stats):not(.band):not(.demo),aside .box,.tool{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s5);margin-bottom:var(--s4);box-shadow:var(--shadow)}
 .g2,.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3) var(--s4)}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3) var(--s4)}
 
@@ -130,7 +130,7 @@ footer table{font-size:var(--fs-xs)}
 .cmdk li[aria-selected=true]{background:var(--brand-soft);color:var(--brand-text)}
 .cmdk .foot{border-top:1px solid var(--line);padding:8px 14px;font-size:12px;color:var(--text-3)}
 
-@media (max-width:700px){.g2,.g3,.big,.grid2{grid-template-columns:1fr}.mgrid{grid-template-columns:repeat(2,1fr)}main{padding:var(--s3)}section.card,main>section:not(.hero):not(.stats):not(.band){padding:var(--s4)}header.top .kbd kbd{display:none}header.top,body>header:not(.hero){position:static}}
+@media (max-width:700px){.g2,.g3,.big,.grid2{grid-template-columns:1fr}.mgrid{grid-template-columns:repeat(2,1fr)}main{padding:var(--s3)}section.card,main>section:not(.hero):not(.stats):not(.band):not(.demo){padding:var(--s4)}header.top .kbd kbd{display:none}header.top,body>header:not(.hero){position:static}}
 
 /* 인쇄: A4, 여백 15mm, 표·카드가 쪽 중간에서 잘리지 않게 */
 @page{size:A4;margin:15mm 12mm}
