@@ -4,42 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>소화기·감지기 설치 수량 계산기</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#1f2933;background:#f4f5f7;font-size:15px;line-height:1.55}
-header{background:#1f2d3d;color:#fff;padding:18px 20px}
-header h1{margin:0;font-size:20px}
-header p{margin:4px 0 0;font-size:13px;color:#c9d2dc}
-main{max-width:920px;margin:0 auto;padding:16px}
-section{background:#fff;border:1px solid #d9dee4;border-radius:6px;padding:16px;margin-bottom:14px}
-h2{font-size:16px;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid #b3261e;display:inline-block}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}
-label.f{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
-select,input[type=number]{width:100%;padding:8px;border:1px solid #b8c0c8;border-radius:4px;font-size:15px;background:#fff}
-.chk{font-size:14px;padding-top:4px}
-.hint{font-size:12px;color:#5f6b76;margin-top:3px}
-button{margin-top:14px;padding:9px 18px;font-size:15px;border-radius:4px;border:1px solid #1f2d3d;background:#1f2d3d;color:#fff;cursor:pointer}
-button.sub{background:#fff;color:#1f2d3d}
-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px}
-th,td{border:1px solid #cfd5db;padding:8px;text-align:left;vertical-align:top}
-th{background:#eef1f4;width:34%;font-weight:600}
-td b{color:#b3261e;font-size:16px}
-.err{background:#fdecea;border:1px solid #e2a29c;padding:9px 10px;border-radius:4px;margin-top:14px;font-size:14px}
-.note{font-size:13px;color:#444;margin:10px 0 0;padding-left:18px}
-.note li{margin-bottom:3px}
-footer{max-width:920px;margin:0 auto;padding:0 16px 30px;font-size:13px;color:#3c4650}
-footer .maker{font-weight:700;color:#1f2933}
-footer ul{padding-left:18px;margin:6px 0}
-@media (max-width:640px){.grid{grid-template-columns:1fr}th{width:40%}th,td{padding:6px;font-size:13px}}
-@media print{header{background:#fff;color:#000;border-bottom:2px solid #000}header p{color:#333}button{display:none}body{background:#fff}}
-</style>
+<meta name="theme-color" content="#C8322B">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/ds.css">
+<link rel="manifest" href="../manifest.webmanifest">
+<style>.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}.chk{font-size:14px;padding-top:4px}th{width:34%}.note{font-size:13px;color:var(--text-2);margin:10px 0 0;padding-left:18px}.note li{margin-bottom:3px}footer .maker{font-weight:700;color:var(--text)}footer ul{padding-left:18px;margin:6px 0}@media (max-width:640px){.grid{grid-template-columns:1fr}th{width:40%}}</style>
 <script src="../gc.js"></script>
 </head>
 <body>
-<header>
+<header class="top"><div class="in"><div>
 <h1>소화기·감지기 설치 수량 계산기</h1>
 <p>NFTC 101·NFTC 203 표의 수치로 최소 설치 수량을 계산합니다.</p>
-</header>
+</div><nav><a href="../">대시보드</a><a href="../kit/">현장 수첩</a></nav></div></header>
 <main>
 <section>
 <h2>소화기 (NFTC 101)</h2>
@@ -134,5 +110,6 @@ document.getElementById('b2').onclick=function(){
 };
 document.getElementById('b1').click();document.getElementById('b2').click();
 </script>
+<script src="../assets/ui.js" defer></script>
 </body>
 </html>
