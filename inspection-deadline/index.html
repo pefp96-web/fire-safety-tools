@@ -4,45 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>소방시설 자체점검 서류 기한 계산기</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#1f2933;background:#f4f5f7;font-size:15px;line-height:1.55}
-header{background:#1f2d3d;color:#fff;padding:18px 20px}
-header h1{margin:0;font-size:20px;font-weight:700}
-header p{margin:4px 0 0;font-size:13px;color:#c9d2dc}
-main{max-width:920px;margin:0 auto;padding:16px}
-section{background:#fff;border:1px solid #d9dee4;border-radius:6px;padding:16px;margin-bottom:14px}
-h2{font-size:16px;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid #b3261e;display:inline-block}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}
-label.f{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
-select,input[type=date]{width:100%;padding:8px;border:1px solid #b8c0c8;border-radius:4px;font-size:15px;background:#fff}
-.radio{display:flex;gap:14px;flex-wrap:wrap;padding-top:4px}
-.radio label{font-size:14px}
-.hint{font-size:12px;color:#5f6b76;margin-top:3px}
-.btns{margin-top:14px;display:flex;gap:8px}
-button{padding:9px 18px;font-size:15px;border-radius:4px;border:1px solid #1f2d3d;background:#1f2d3d;color:#fff;cursor:pointer}
-button.sub{background:#fff;color:#1f2d3d}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{border:1px solid #cfd5db;padding:8px;text-align:left;vertical-align:top}
-th{background:#eef1f4;font-weight:600}
-td.d{white-space:nowrap;font-weight:700;color:#b3261e}
-.na{color:#8a949e;font-weight:400}
-.note{font-size:13px;color:#444;margin:6px 0 0;padding-left:18px}
-.note li{margin-bottom:3px}
-.warn{background:#fff6e5;border:1px solid #e8c98a;padding:8px 10px;font-size:13px;border-radius:4px;margin-top:10px}
-footer{max-width:920px;margin:0 auto;padding:0 16px 30px;font-size:13px;color:#3c4650}
-footer .maker{font-weight:700;color:#1f2933}
-footer ul{padding-left:18px;margin:6px 0}
-@media (max-width:640px){.grid{grid-template-columns:1fr}td.d{white-space:normal}th,td{padding:6px;font-size:13px}}
-@media print{header{background:#fff;color:#000;border-bottom:2px solid #000}header p{color:#333}.no-print{display:none}body{background:#fff}section{border:none;padding:0}}
-</style>
+<meta name="theme-color" content="#C8322B">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/ds.css">
+<link rel="manifest" href="../manifest.webmanifest">
+<style>.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}.radio{display:flex;gap:14px;flex-wrap:wrap;padding-top:4px}.radio label{font-size:14px}td.d{white-space:nowrap;font-weight:700;color:var(--brand-text)}.na{color:var(--text-3);font-weight:400}.note{font-size:13px;color:var(--text-2);margin:6px 0 0;padding-left:18px}.note li{margin-bottom:3px}footer .maker{font-weight:700;color:var(--text)}footer ul{padding-left:18px;margin:6px 0}@media (max-width:640px){.grid{grid-template-columns:1fr}td.d{white-space:normal}}@media print{.no-print{display:none}}</style>
 <script src="../gc.js"></script>
 </head>
 <body>
-<header>
+<header class="top"><div class="in"><div>
 <h1>소방시설 자체점검 서류 기한 계산기</h1>
 <p>점검 완료일을 넣으면 결과 제출·보고·이행 기한을 한 번에 계산합니다.</p>
-</header>
+</div><nav><a href="../">대시보드</a><a href="../kit/">현장 수첩</a></nav></div></header>
 <main>
 <section class="no-print">
 <h2>입력</h2>
@@ -163,5 +136,6 @@ document.getElementById('calc').onclick=calc;
 document.getElementById('print').onclick=function(){if(document.getElementById('out').style.display==='none')calc();window.print();};
 document.querySelectorAll('input[name=defect]').forEach(function(e){e.onchange=function(){document.getElementById('fix').disabled=radio('defect')==='n';document.getElementById('fin').disabled=radio('defect')==='n';};});
 </script>
+<script src="../assets/ui.js" defer></script>
 </body>
 </html>
