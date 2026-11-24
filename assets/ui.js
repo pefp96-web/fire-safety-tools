@@ -78,7 +78,7 @@
 
   // 머리 막대에 검색 단추
   function addBtn() {
-    var h = document.querySelector('header.top nav, header.top .in, header.top .wrap, body>header');
+    var h = document.querySelector('header.top nav') || document.querySelector('header.top .in, header.top .wrap, body>header');
     if (!h || h.querySelector('.kbd')) return;
     var b = el('button', { type: 'button', class: 'kbd', 'aria-label': '빠른 이동 열기 (Ctrl+K)' });
     b.innerHTML = '<span class="t">검색·이동</span> <kbd>Ctrl</kbd><kbd>K</kbd>';
