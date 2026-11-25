@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>의견 보내기·개인정보 안내·반영 기록 | 소방 업무 자동화 도구</title>
+<meta name="description" content="소방 현장 수첩·계산기 후기, 오류 신고, 기능 요청을 로그인 없이 보내는 구글 설문과 개인정보 수집 안내, 받은 의견 반영 기록.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/feedback.html">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#C8322B">
+<link rel="icon" href="kit/icon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/ds.css">
+<script src="gc.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>의견 보내기</h1><p>무료 · 회원가입 없음</p></div>
+<nav><a href="./">도구 모음</a><a href="kit/">현장 수첩</a></nav>
+</div></header>
+<main><section class="card">
+<h2>의견 보내기</h2>
+<p>후기, 오류 신고, 기능 요청을 구글 설문으로 받습니다. 로그인하지 않아도 되고, 별점·내용만 적어도 됩니다.</p>
+<div class="btns"><a class="btn" id="go" target="_blank" rel="noopener" data-gc="feedback-open">의견 보내기(구글 설문)</a></div>
+</section>
+<section class="card" id="privacy">
+<h2>개인정보 수집 안내</h2>
+<table>
+<tr><th>받는 항목</th><td>의견 종류, 별점, 내용, 보낸 화면(자동), 이름(선택), 연락처(선택)</td></tr>
+<tr><th>쓰는 곳</th><td>오류 고치기·기능 추가, 답변 연락(연락처를 적은 경우만)</td></tr>
+<tr><th>보관 기간</th><td>반영을 마친 뒤 1년 안에 삭제</td></tr>
+<tr><th>저장 위치</th><td>제작자 구글 계정의 구글 설문·스프레드시트(구글 서버)</td></tr>
+<tr><th>거부할 권리</th><td>이름·연락처는 선택이며 비워 두면 수집하지 않습니다. 비워도 의견은 그대로 받습니다.</td></tr>
+<tr><th>보내지 않는 것</th><td>수첩에 저장한 건물·점검·사진 자료는 설문으로 전송되지 않습니다(기기 안에만 있음).</td></tr>
+</table>
+<p class="hint">삭제 요청: 설문에 '내 의견 삭제 요청'과 보낸 날짜를 적어 보내 주세요.</p>
+</section>
+<section class="card">
+<h2>받은 의견 반영 기록</h2>
+<div id="log"><p class="hint">아직 반영한 의견이 없습니다. 첫 의견을 보내 주세요.</p></div>
+</section>
+<footer>제작 김재환(소방안전관리자 1급)</footer>
+</main>
+<script>
+(function(){
+var F='https://docs.google.com/forms/d/e/1FAIpQLSclhgEM4yGzquJzb3NtVbfydJB8YqKhOaRvF_Sd7-Hc0nrhvw/viewform';
+var ref=document.referrer&&document.referrer.indexOf(location.host)>=0?new URL(document.referrer).pathname.replace(/^\/fire-safety-tools/,''):'/feedback.html';
+document.getElementById('go').href=F+'?usp=pp_url&entry.945022373='+encodeURIComponent(ref);
+fetch('data.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){var L=d.feedback_log||[];if(L.length)document.getElementById('log').innerHTML='<ul>'+L.map(function(x){var e=function(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};return '<li>'+e(x.date)+' · '+e(x.text)+'</li>';}).join('')+'</ul>';}).catch(function(){});
+})();
+</script>
+<script src="assets/ui.js" defer></script>
+</body>
+</html>
