@@ -147,3 +147,23 @@ footer table{font-size:var(--fs-xs)}
   .pagebreak{break-before:page;page-break-before:always}
   a{color:#000;text-decoration:none}
 }
+
+/* 2026-11-25: 한눈에 보기 타일, 음성 단추, 의견 링크, 길안내, QR 라벨 */
+.gls{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2)}
+@media (max-width:640px){.gls{grid-template-columns:repeat(2,1fr)}}
+.gl{display:flex;flex-direction:column;gap:2px;padding:var(--s3);border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--text);text-decoration:none}
+.gl b{font-size:var(--fs-2xl);line-height:1.2;font-variant-numeric:tabular-nums}
+.gl span{font-size:var(--fs-sm);color:var(--text-2)}
+.gl.ok{border-color:var(--line)}.gl.warn{background:var(--warn-soft);border-color:var(--warn)}.gl.bad{background:var(--brand-soft);border-color:var(--brand)}
+.gl.bad b{color:var(--brand-text)}.gl.warn b{color:var(--warn)}
+ul.soon{margin:var(--s2) 0 0;padding-left:18px;font-size:var(--fs-sm)}
+button.mic{min-height:36px;padding:0 12px;margin:4px 0 8px;font-size:var(--fs-sm);background:var(--surface);color:var(--text-2);border-color:var(--line-strong)}
+.fb-link{margin:var(--s3) 0 0;font-size:var(--fs-sm)}
+.navl{font-size:var(--fs-sm);white-space:normal}.navl a{margin:0 2px}
+.pill.rep{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
+.chk-list li{margin:4px 0}.chk-list .err{color:var(--brand-text);font-weight:600}.chk-list .warn{color:var(--warn)}
+.labels{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.label{border:1px dashed #999;padding:6px;text-align:center;break-inside:avoid;background:#fff;color:#000}
+.label svg,.label img{width:120px;height:120px}
+.label b{display:block;font-size:13px}.label small{display:block;font-size:11px}
+@media print{.labels{grid-template-columns:repeat(3,1fr)}.label{border:1px dashed #666}}

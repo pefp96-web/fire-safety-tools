@@ -21,6 +21,13 @@
     ['야간 비화재보 대응 카드', 'kit/alarm-card.html', '수첩'],
     ['선임 첫 30일 할 일·실무교육 기한', 'kit/start30.html', '수첩'],
     ['화재안전조사 대비 점검·과태료 표', 'kit/audit.html', '수첩'],
+    ['출력 전 누락 검사', 'kit/check.html', '수첩'],
+    ['관계인 공유 보고서·확인 서명', 'kit/share.html', '수첩'],
+    ['수리비 견적서(단가표)', 'kit/quote.html', '수첩'],
+    ['설비 QR 라벨·스캔·설비 이력', 'kit/equip.html', '수첩'],
+    ['엑셀·한글 표 붙여넣기 불러오기', 'kit/import.html', '수첩'],
+    ['앱 설치 안내(안드로이드·아이폰)', 'install.html', '안내'],
+    ['의견 보내기(후기·오류 신고·기능 요청)', 'feedback.html', '안내'],
     ['다중이용업소 안전시설 체크·방염 면적', 'kit/multiuse.html', '수첩'],
     ['점검 면제·연기·업체 교체 예외 안내', 'inspection-deadline/#exc', '계산기'],
     ['부속용도 추가 소화기·옥내소화전 수원 계산', 'facility-calc/#water', '계산기'],
@@ -138,4 +145,57 @@
   function boot() { addBtn(); wrapKit(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
   window.addEventListener('load', wrapKit);
+})();
+
+/* 2026-11-25 추가: 모든 화면 '의견 보내기', 음성 메모(브라우저 음성 인식), 수첩 인쇄 전 누락 검사 */
+(function () {
+  var me = document.currentScript && document.currentScript.src;
+  var ROOT = me ? me.replace(/assets\/ui\.js.*$/, '') : '/fire-safety-tools/';
+  var FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSclhgEM4yGzquJzb3NtVbfydJB8YqKhOaRvF_Sd7-Hc0nrhvw/viewform';
+  function fb() {
+    if (document.querySelector('.fb-link')) return;
+    var page = location.pathname.replace(/^\/fire-safety-tools/, '') || '/';
+    var url = FORM + '?usp=pp_url&entry.945022373=' + encodeURIComponent(page);
+    var p = document.createElement('p'); p.className = 'fb-link noprint';
+    p.innerHTML = '<a href="' + url + '" target="_blank" rel="noopener" data-gc="feedback-open">의견 보내기</a> (후기·오류 신고·기능 요청, 로그인 없음, 이름·연락처는 선택) · <a href="' + ROOT + 'feedback.html">개인정보 안내·반영 기록</a> · <a href="' + ROOT + 'install.html">앱 설치</a>';
+    var f = document.querySelector('footer'); if (f) f.appendChild(p); else document.body.appendChild(p);
+  }
+  // 음성 메모: 글 칸 옆 마이크 단추. 크롬(안드로이드·PC)·사파리(아이폰 14.5+)에서 됨, 대부분 인터넷 필요
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  function mic(t) {
+    if (t.dataset.mic) return; t.dataset.mic = 1;
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'mic noprint'; b.textContent = '말로 입력(음성)'; b.setAttribute('aria-label', '음성으로 입력');
+    b.onclick = function () {
+      if (!SR) { alert('이 브라우저는 음성 인식을 지원하지 않습니다.\n대신 휴대폰 키보드의 마이크 단추(구글 키보드·삼성 키보드·아이폰 키보드)를 눌러 말하면 같은 칸에 글자로 들어갑니다.\n지원: 안드로이드 크롬, PC 크롬·엣지, 아이폰 사파리(인터넷 연결 필요).'); return; }
+      if (!navigator.onLine) { alert('음성 인식은 인터넷이 필요한 기기가 많습니다. 지금 오프라인이라 휴대폰 키보드의 마이크 단추를 써 주세요.'); return; }
+      var r = new SR(); r.lang = 'ko-KR'; r.interimResults = false; r.maxAlternatives = 1;
+      b.textContent = '● 듣는 중… (말이 끝나면 자동 입력)'; b.disabled = true;
+      r.onresult = function (e) { var s = e.results[0][0].transcript; t.value = (t.value ? t.value.replace(/\s*$/, ' ') : '') + s; t.dispatchEvent(new Event('input', { bubbles: true })); t.dispatchEvent(new Event('change', { bubbles: true })); };
+      r.onerror = function (e) { alert('음성 인식 실패: ' + (e.error === 'not-allowed' ? '마이크 권한을 허용해 주세요' : e.error === 'network' ? '인터넷 연결이 필요합니다' : e.error)); };
+      r.onend = function () { b.textContent = '말로 입력(음성)'; b.disabled = false; };
+      try { r.start(); } catch (err) { r.onend(); }
+    };
+    t.insertAdjacentElement('afterend', b);
+  }
+  function mics() {
+    if (!/\/kit\//.test(location.pathname)) return;
+    [].forEach.call(document.querySelectorAll('textarea:not([readonly]), input[data-voice], #d-desc, #d-fixdesc, #d-loc, #e-note'), mic);
+  }
+  // 수첩 인쇄 전 누락 검사: 빨간 항목이 있으면 인쇄 전에 알려 줌
+  function guard() {
+    var K = window.KIT; if (!K || !K.audit || window.__pg) return; window.__pg = 1;
+    var path = location.pathname, scope = /defects/.test(path) ? 'defects' : /inspect/.test(path) ? 'inspect' : /record/.test(path) ? 'record' : null;
+    if (!scope) return;
+    var orig = window.print.bind(window);
+    window.print = function () {
+      K.audit(scope).then(function (a) {
+        var bad = a.filter(function (x) { return x.lv === 'err'; }), warn = a.filter(function (x) { return x.lv !== 'err'; });
+        if (!bad.length && !warn.length) return orig();
+        var msg = '출력 전 누락 검사: 빨강 ' + bad.length + '건 · 노랑 ' + warn.length + '건\n\n' + bad.concat(warn).slice(0, 10).map(function (x) { return (x.lv === 'err' ? '■ ' : '□ ') + x.where + ': ' + x.msg; }).join('\n') + (a.length > 10 ? '\n… 외 ' + (a.length - 10) + '건 (전체는 수첩 > 출력 전 누락 검사)' : '') + '\n\n그래도 인쇄할까요?';
+        if (confirm(msg)) orig();
+      }).catch(function () { orig(); });
+    };
+  }
+  function boot() { fb(); mics(); guard(); setTimeout(mics, 1500); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
