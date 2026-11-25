@@ -1,0 +1,73 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>가닥수·결선 연습 | 소방설비기사 전기 실기 암기 세트</title><meta name="description" content="P형 수신기 간선 가닥수 계산·연습, 감지기 개수 계산기, 코드로 그린 송배선식·유도등 3선식·경계구역 도해."><link rel="stylesheet" href="style.css"><link rel="icon" href="../kit/icon.svg" type="image/svg+xml"></head>
+<body data-page="wiring"><main>
+<section class="card"><h1>가닥수·결선 연습</h1><p class="hint">법령이 정한 것은 송배선식(NFTC 203 2.8.1.4), 종단저항(2.8.1.3), 공통선 7회로 이하(2.8.1.7), 11층 이상 구분 경보(2.5.1.2)입니다. 경종선·표시등선·응답선을 세는 방식은 실기 결선 관례이며, 문제에 조건이 주어지면 문제 조건을 따릅니다.</p></section>
+
+<section class="card"><h2>1. 간선 가닥수 계산기 (P형 발신기세트)</h2>
+<div class="row"><label>회로 수 <input id="wn" type="number" min="1" value="5" style="width:90px"></label>
+<label>경보 <select id="wm"><option value="all">일제 경보</option><option value="zone">구분 경보(11층 이상)</option></select></label>
+<label>층 수(구분일 때 경종선) <input id="wf" type="number" min="1" value="11" style="width:90px"></label></div>
+<div id="wout" class="tw" style="margin-top:10px"></div></section>
+
+<section class="card"><h2>2. 가닥수 연습 (무작위 문제)</h2><p id="pq"></p>
+<div class="row"><input id="pa" inputmode="numeric" placeholder="가닥수" style="width:140px"><button class="btn" id="pchk">채점</button><button class="btn g" id="pnew">다음 문제</button></div><div id="pf"></div></section>
+
+<section class="card"><h2>3. 감지기 개수 계산기</h2>
+<div class="row"><select id="dt"></select><select id="dh"><option>4m 미만</option><option>4~8m</option><option>8~15m</option></select><select id="ds"><option>내화</option><option>기타</option></select>
+<label>바닥면적 <input id="da" type="number" value="280" style="width:110px"> ㎡</label></div><div id="dout"></div>
+<p class="hint">근거: NFTC 203 표 2.4.3.5(스포트형 열감지기), 표 2.4.3.10.1(연기감지기, 구조 구분 없음), 표 2.4.1(부착높이별 쓸 수 있는 감지기). 4~8m는 '4 m 이상 8 m 미만'.</p></section>
+
+<section class="card"><h2>4. 그림으로 보는 결선</h2>
+<h3>① 송배선식 감지기 회로와 종단저항</h3>
+<svg viewBox="0 0 860 250" width="100%" role="img" aria-label="송배선식 감지기 회로 도해">
+ <rect x="10" y="60" width="130" height="120" rx="10" fill="#1d1d1f"/><text x="75" y="115" fill="#fff" font-size="22" text-anchor="middle" font-weight="700">수신기</text><text x="75" y="145" fill="#fff" font-size="15" text-anchor="middle">도통시험</text>
+ <line x1="140" y1="95" x2="760" y2="95" stroke="#c8322b" stroke-width="4"/><line x1="140" y1="150" x2="760" y2="150" stroke="#1d1d1f" stroke-width="4"/>
+ <text x="150" y="85" font-size="16" fill="#c8322b">회로선</text><text x="150" y="175" font-size="16">공통선</text>
+ <g font-size="17" text-anchor="middle"><circle cx="300" cy="122" r="34" fill="#fff6c2" stroke="#1d1d1f" stroke-width="3"/><text x="300" y="128">감지기1</text>
+ <circle cx="460" cy="122" r="34" fill="#fff6c2" stroke="#1d1d1f" stroke-width="3"/><text x="460" y="128">감지기2</text>
+ <circle cx="620" cy="122" r="34" fill="#fff6c2" stroke="#1d1d1f" stroke-width="3"/><text x="620" y="128">감지기3</text></g>
+ <rect x="745" y="95" width="30" height="55" fill="#fff" stroke="#1d1d1f" stroke-width="3"/><text x="790" y="128" font-size="16">종단저항</text>
+ <text x="430" y="225" font-size="17" text-anchor="middle">감지기마다 들어가고 나오는 단자로 이어 가고(T분기 금지), 끝에 종단저항 → 선이 끊기면 수신기 도통시험에 단선 표시</text>
+</svg>
+<p class="hint">NFTC 203 2.8.1.4 송배선식, 2.8.1.3 종단저항(전용함 높이 1.5 m 이내, 종단감지기면 기판·외부에 표시).</p>
+
+<h3>② 평면도 가닥수: 왕복 구간 4가닥, 루프 구간 2가닥</h3>
+<svg viewBox="0 0 860 300" width="100%" role="img" aria-label="왕복 배선과 루프 배선의 가닥수 비교">
+ <text x="210" y="28" font-size="18" text-anchor="middle" font-weight="700">(가) 한 줄로 갔다가 되돌아옴</text>
+ <rect x="20" y="110" width="70" height="60" rx="6" fill="#1d1d1f"/><text x="55" y="146" fill="#fff" font-size="15" text-anchor="middle">발신기함</text>
+ <g stroke="#1d1d1f" stroke-width="3"><line x1="90" y1="140" x2="390" y2="140"/></g>
+ <g font-size="15" text-anchor="middle"><circle cx="170" cy="140" r="18" fill="#fff6c2" stroke="#1d1d1f" stroke-width="2"/><circle cx="270" cy="140" r="18" fill="#fff6c2" stroke="#1d1d1f" stroke-width="2"/><circle cx="370" cy="140" r="18" fill="#fff6c2" stroke="#1d1d1f" stroke-width="2"/>
+ <text x="130" y="122" fill="#c8322b" font-weight="700">4</text><text x="220" y="122" fill="#c8322b" font-weight="700">4</text><text x="320" y="122" fill="#c8322b" font-weight="700">4</text></g>
+ <text x="210" y="205" font-size="15" text-anchor="middle">종단저항이 발신기함 안에 있으면 끝까지 갔다가 같은 길로 돌아오므로</text><text x="210" y="226" font-size="15" text-anchor="middle">한 배관에 가는 선 2 + 오는 선 2 = 4가닥</text>
+ <text x="640" y="28" font-size="18" text-anchor="middle" font-weight="700">(나) 한 바퀴 돌아 돌아옴(루프)</text>
+ <rect x="480" y="110" width="70" height="60" rx="6" fill="#1d1d1f"/><text x="515" y="146" fill="#fff" font-size="15" text-anchor="middle">발신기함</text>
+ <g stroke="#1d1d1f" stroke-width="3" fill="none"><polyline points="550,130 620,70 760,70 820,140 760,210 620,210 550,150"/></g>
+ <g font-size="15" text-anchor="middle"><circle cx="690" cy="70" r="18" fill="#fff6c2" stroke="#1d1d1f" stroke-width="2"/><circle cx="820" cy="140" r="18" fill="#fff6c2" stroke="#1d1d1f" stroke-width="2"/><circle cx="690" cy="210" r="18" fill="#fff6c2" stroke="#1d1d1f" stroke-width="2"/>
+ <text x="600" y="88" fill="#c8322b" font-weight="700">2</text><text x="790" y="92" fill="#c8322b" font-weight="700">2</text><text x="790" y="196" fill="#c8322b" font-weight="700">2</text><text x="600" y="200" fill="#c8322b" font-weight="700">2</text></g>
+ <text x="660" y="262" font-size="15" text-anchor="middle">가는 길과 오는 길이 다른 배관이라 각 구간 2가닥</text>
+</svg>
+<p class="hint">실기 평면도 문제에서 흔히 쓰는 관례입니다. 종단저항 위치·배관 경로가 문제에 주어지면 그 조건으로 다시 셉니다.</p>
+
+<h3>③ 유도등 3선식 배선과 자동 점등</h3>
+<svg viewBox="0 0 860 270" width="100%" role="img" aria-label="유도등 3선식 결선 도해">
+ <rect x="10" y="70" width="120" height="130" rx="8" fill="#1d1d1f"/><text x="70" y="130" fill="#fff" font-size="18" text-anchor="middle">분전반</text><text x="70" y="155" fill="#fff" font-size="14" text-anchor="middle">(전용 회로)</text>
+ <line x1="130" y1="90" x2="700" y2="90" stroke="#1d1d1f" stroke-width="4"/><text x="150" y="80" font-size="16">공통선</text>
+ <line x1="130" y1="135" x2="700" y2="135" stroke="#c8322b" stroke-width="4"/><text x="150" y="125" font-size="16" fill="#c8322b">충전선(항상 연결, 배터리 충전)</text>
+ <line x1="130" y1="180" x2="330" y2="180" stroke="#1f8a4c" stroke-width="4"/><line x1="410" y1="180" x2="700" y2="180" stroke="#1f8a4c" stroke-width="4"/><text x="150" y="208" font-size="16" fill="#1f8a4c">점등선</text>
+ <rect x="330" y="162" width="80" height="36" rx="6" fill="#fff" stroke="#1f8a4c" stroke-width="3"/><text x="370" y="186" font-size="15" text-anchor="middle">점멸기</text>
+ <path d="M330 180 L330 240 L410 240 L410 180" fill="none" stroke="#1f8a4c" stroke-width="3" stroke-dasharray="6 5"/><text x="370" y="262" font-size="14" text-anchor="middle">자동 점등 접점</text>
+ <rect x="700" y="70" width="140" height="130" rx="10" fill="#e8f5ec" stroke="#1f8a4c" stroke-width="3"/><text x="770" y="128" font-size="18" text-anchor="middle" font-weight="700">유도등</text><text x="770" y="152" font-size="14" text-anchor="middle">(내장 축전지)</text>
+ <text x="520" y="232" font-size="14">자동 점등: 감지기·발신기 작동, 정전·단선,</text><text x="520" y="250" font-size="14">방재실 수동, 자동소화설비 작동 (2.7.4)</text>
+</svg>
+<p class="hint">NFTC 303 2.7.3.2(점멸기 설치 허용 장소, 3선식 상시 충전), 2.7.3.3(3선식은 내화·내열배선), 2.7.4(자동 점등 다섯 경우). 선 이름은 이해를 돕기 위한 설명이고 법령 용어는 '3선식 배선'입니다.</p>
+
+<h3>④ 경계구역 나누기 예 (1,500 ㎡ 한 층)</h3>
+<svg viewBox="0 0 860 230" width="100%" role="img" aria-label="경계구역 나누기 도해">
+ <rect x="40" y="30" width="600" height="150" fill="#fff" stroke="#1d1d1f" stroke-width="3"/>
+ <line x1="240" y1="30" x2="240" y2="180" stroke="#c8322b" stroke-width="3" stroke-dasharray="8 6"/><line x1="440" y1="30" x2="440" y2="180" stroke="#c8322b" stroke-width="3" stroke-dasharray="8 6"/>
+ <g font-size="18" text-anchor="middle" font-weight="700"><text x="140" y="110">구역 1 · 500 ㎡</text><text x="340" y="110">구역 2 · 500 ㎡</text><text x="540" y="110">구역 3 · 500 ㎡</text></g>
+ <text x="340" y="210" font-size="16" text-anchor="middle">가로 60 m × 세로 25 m = 1,500 ㎡ → 600 ㎡ 이하·한 변 50 m 이하로 나누면 최소 3구역</text>
+ <text x="660" y="60" font-size="15">· 계단·엘리베이터</text><text x="660" y="82" font-size="15">  승강로는 별도 구역</text><text x="660" y="104" font-size="15">  (2.1.2)</text>
+</svg>
+<p class="hint">NFTC 203 2.1.1.3(600 ㎡ 이하, 한 변 50 m 이하), 2.1.2(계단 등 별도 경계구역).</p>
+</section>
+<script src="data.js"></script><script src="app.js"></script></body></html>
