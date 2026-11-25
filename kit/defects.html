@@ -112,7 +112,7 @@ function deadlines(x){var o={},rep=KIT.parse(x.report),fix=KIT.parse(x.fix),act=
  if(!fix&&o.due&&o.due<t)o.late=true;
  if(fix&&act&&!x.sent&&o.doneRep<t)o.late=true;
  return o;}
-function read(){var x={id:$('d-id').value||KIT.uid()};FIELDS.forEach(function(k){x[k]=$('d-'+k).value.trim();});x.pre=cur.pre;x.post=cur.post;return x;}
+function read(){var x={id:$('d-id').value||KIT.uid()};FIELDS.forEach(function(k){x[k]=$('d-'+k).value.trim();});x.pre=cur.pre;x.post=cur.post;if(cur.equip)x.equip=cur.equip;if(cur.src)x.src=cur.src;return x;}
 function showCalc(){var x=read(),o=deadlines(x),s=[];
  if(o.due)s.push('이행 완료 기한(계획): <b>'+KIT.fmt(o.due)+'</b>');
  if(o.delay)s.push('연기 신청 마감(만료일 3일 전): '+KIT.fmt(o.delay));
@@ -124,18 +124,18 @@ $('d-new').onclick=clear;
 $('d-save').onclick=function(){var x=read();if(!x.desc&&!x.eq){KIT.toast('설비나 불량 내용을 적어 주세요');return;}KIT.put('defects',x).then(function(){KIT.toast('저장했습니다');clear();load();});};
 var ALL=[];
 function load(){return KIT.all('defects').then(function(a){ALL=a.sort(function(p,q){return (p.found||'')<(q.found||'')?1:-1;});draw();});}
-function draw(){var f=$('flt').value;var rows=ALL.filter(function(x){var o=deadlines(x);if(f==='open')return !x.fix;if(f==='late')return o.late;if(f==='done')return !!x.fix;return true;});
+function draw(){var f=$('flt').value,REP=KIT.repeats(ALL);var rows=ALL.filter(function(x){var o=deadlines(x);if(f==='open')return !x.fix;if(f==='late')return o.late;if(f==='done')return !!x.fix;return true;});
  var open=ALL.filter(function(x){return !x.fix;}).length,late=ALL.filter(function(x){return deadlines(x).late;}).length;
  $('cnt').textContent='('+ALL.length+'건 · 미조치 '+open+' · 기한 지남 '+late+')';
  $('list').innerHTML=rows.map(function(x){var o=deadlines(x);
-  return '<div class="item"><div class="row"><div><b>'+KIT.esc(x.eq||'설비 미기재')+'</b> · '+KIT.esc(x.desc)+'<div class="hint">'+KIT.esc(x.loc)+' · 발견 '+KIT.esc(x.found)+' · '+KIT.esc(x.kind)+'</div></div><div>'+
+  return '<div class="item"><div class="row"><div><b>'+KIT.esc(x.eq||'설비 미기재')+'</b> · '+KIT.esc(x.desc)+(REP[x.id]>1?' <span class="pill rep" title="같은 설비·같은 불량이 전에도 나옴">반복 '+REP[x.id]+'회째</span>':'')+(x.equip?' <a class="hint" href="equip.html#id='+x.equip+'">설비 이력</a>':'')+'<div class="hint">'+KIT.esc(x.loc)+' · 발견 '+KIT.esc(x.found)+' · '+KIT.esc(x.kind)+'</div></div><div>'+
   '<span class="pill '+(o.late?'red':x.fix?'green':'blue')+'">'+(o.late?'기한 지남 · ':'')+o.state+'</span></div></div>'+
   '<div class="hint">'+(o.due?'이행 기한 '+KIT.fmt(o.due)+' · ':'')+(o.doneRep?'완료 보고 기한 '+KIT.fmt(o.doneRep):'')+'</div>'+
   '<div class="ph">'+(x.pre?'<img class="photo" src="'+x.pre+'" alt="조치 전">':'')+(x.post?'<img class="photo" src="'+x.post+'" alt="조치 후">':'')+'</div>'+
   '<div class="btns"><button class="sm sub" data-e="'+x.id+'">고치기</button><button class="sm gray" data-x="'+x.id+'">지우기</button></div></div>';}).join('')||'<p class="hint">기록이 없습니다.</p>';}
 $('flt').onchange=draw;
 $('list').onclick=function(e){var id=e.target.getAttribute('data-e'),xid=e.target.getAttribute('data-x');
- if(id){var x=ALL.find(function(y){return y.id===id;});$('d-id').value=x.id;FIELDS.forEach(function(k){$('d-'+k).value=x[k]||'';});cur={pre:x.pre||'',post:x.post||''};setImg('pre',cur.pre);setImg('post',cur.post);fillDesc();showCalc();$('f-title').textContent='불량 고치기';scrollTo(0,0);}
+ if(id){var x=ALL.find(function(y){return y.id===id;});$('d-id').value=x.id;FIELDS.forEach(function(k){$('d-'+k).value=x[k]||'';});cur={pre:x.pre||'',post:x.post||'',equip:x.equip||'',src:x.src||''};setImg('pre',cur.pre);setImg('post',cur.post);fillDesc();showCalc();$('f-title').textContent='불량 고치기';scrollTo(0,0);}
  if(xid&&confirm('이 지적사항을 지울까요?'))KIT.del('defects',xid).then(load);};
 $('pr').onclick=function(){KIT.building().then(function(b){
  var h='<h2 style="text-align:center">소방시설 지적사항 조치결과표</h2><p>대상물: '+KIT.esc(b.name||'')+' ('+KIT.esc(b.grade||'')+') · 소재지: '+KIT.esc(b.addr||'')+' · 소방안전관리자: '+KIT.esc(b.manager||'')+' · 출력일: '+KIT.fmt(new Date())+'</p>';
@@ -151,7 +151,7 @@ $('csv').onclick=function(){var H=['발견일','경위','위치','설비','불�
 var P=new URLSearchParams(location.search);
 clear();
 if(P.get('desc')||P.get('eq')){$('d-eq').value=P.get('eq')||'';$('d-desc').value=P.get('desc')||'';$('d-loc').value=P.get('loc')||'';if(P.get('found'))$('d-found').value=P.get('found');$('d-kind').value='월간 업무수행';fillDesc();KIT.toast('업무수행기록표의 불량을 불러왔습니다. 사진을 붙이고 저장하세요');}
-load();
+load();(function(){var q=new URLSearchParams(location.search);if(!q.get('eq')&&!q.get('loc'))return;if(q.get('eq'))$('d-eq').value=q.get('eq');if(q.get('loc'))$('d-loc').value=q.get('loc');if(q.get('equip')){cur.equip=q.get('equip');$('d-kind').value='작동점검';}fillDesc();$('f-title').textContent='불량 입력 (설비 QR에서 옴)';})();
 window.__kitDeadlines=deadlines;
 })();
 </script>

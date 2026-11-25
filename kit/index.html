@@ -21,6 +21,11 @@
 </div></header>
 <main>
 <div class="ok" style="margin-top:0"><b>전부 무료(0원)</b> · 회원가입·승인·로그인 없음 · 자료는 이 기기에만 저장 · 한 번 열면 지하에서도 오프라인으로 열림 · 서류는 A4 인쇄·PDF 저장</div>
+<section class="card" id="glance" style="margin-top:12px">
+<h2>오늘 한눈에 보기</h2>
+<div id="gl"><p class="hint">불러오는 중…</p></div>
+<div class="btns"><a class="btn sub" href="check.html">출력 전 누락 검사</a><a class="btn sub" href="share.html">관계인 공유 보고서</a><a class="btn sub" href="equip.html">설비 QR</a></div>
+</section>
 <h2 style="margin:12px 0 8px">자주 쓰는 4가지</h2>
 <div class="big">
 <a href="inspect.html" data-gc="kit-open-inspect"><b>① 자체점검 점검표</b><span>건물에 있는 설비 항목만 ○×/로 체크, 항목별 사진. 점검표·실시결과 보고서·기록표·조치결과표 출력.</span></a>
@@ -29,12 +34,13 @@
 <a href="calendar.html" data-gc="kit-open-calendar"><b>④ 연간 법정 업무 달력</b><span>사용승인일만 넣으면 점검·보고·훈련·교육 일정과 휴대폰 알림 파일(.ics).</span></a>
 </div>
 <section class="card" id="all" style="margin-top:14px">
-<h2>전체 기능 (18가지, 모두 무료)</h2>
+<h2>전체 기능 (24가지, 모두 무료)</h2>
 <table>
 <tr><th>시작 전</th><td><a href="judge.html">설치대상·관리등급 판정</a> · <a href="buildings.html">건물 목록(여러 건물·알림·건축물대장 도우미)</a> · <a href="law.html">날짜별 법령·NFTC·점검항목 검색</a> · <a href="qna.html">질의회신 찾기(소방청 657건)</a> · <a href="start30.html">선임 첫 30일 할 일</a> · <a href="multiuse.html">다중이용업소 안전시설 체크</a></td></tr>
-<tr><th>점검</th><td><a href="inspect.html">자체점검 점검표·보고서·기록표</a> · <a href="defects.html">지적사항 관리대장</a> · <a href="staff.html">점검인력·점검면적 계산·일정 배치</a> · <a href="pump.html">펌프 성능시험표</a> · <a href="household.html">아파트 세대 점검표(입주민 공유용)</a> · <a href="audit.html">화재안전조사 대비 점검·과태료 표</a></td></tr>
+<tr><th>점검</th><td><a href="inspect.html">자체점검 점검표·보고서·기록표</a> · <a href="defects.html">지적사항 관리대장</a> · <a href="staff.html">점검인력·점검면적 계산·일정 배치</a> · <a href="pump.html">펌프 성능시험표</a> · <a href="household.html">아파트 세대 점검표(입주민 공유용)</a> · <a href="audit.html">화재안전조사 대비 점검·과태료 표</a> · <a href="equip.html">설비 QR 라벨·카메라 스캔·설비 이력</a></td></tr>
+<tr><th>출력·공유</th><td><a href="check.html">출력 전 누락 검사</a> · <a href="share.html">관계인 공유 보고서(읽기 전용 파일)·확인 서명</a> · <a href="quote.html">수리비 견적서(불량별 단가)</a></td></tr>
 <tr><th>매달·상시</th><td><a href="record.html">업무수행기록표</a> · <a href="logs.html">기록부 10종(훈련·교육, 자위소방대, 외관점검표, 자체점검 기록부, 화재·비화재보, 화기취급, 공사·정비, 피해복구, 홍보, 협의회) + 결재 서명</a> · <a href="alarm-card.html">야간 비화재보 대응 카드</a> · <a href="duty.html">근무·당직표</a> · <a href="calendar.html">연간 달력·알림</a></td></tr>
-<tr><th>자료</th><td><a href="#backup">백업·기기 옮기기</a></td></tr>
+<tr><th>자료</th><td><a href="#backup">백업·기기 옮기기</a> · <a href="import.html">엑셀·한글 표 붙여넣기 불러오기</a> · <a href="../install.html">앱 설치(안드로이드·아이폰)</a></td></tr>
 </table>
 </section><section class="card" style="margin-top:14px">
 <h2>건물 정보 (한 번 입력하면 모든 화면이 같이 씁니다)</h2>
@@ -55,6 +61,20 @@
 <div><label class="f" for="b-eduFirst">최초 실무교육 수료일</label><input id="b-eduFirst" type="date"><div class="hint">없으면 비워 두세요(선임 후 6개월 이내 이수)</div></div>
 </div>
 <div class="btns"><button id="b-save" data-gc="kit-save-building">저장</button></div>
+</section>
+
+<section class="card" id="photo-set">
+<h2>사진 설정</h2>
+<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="stamp" style="width:auto"> 사진에 찍은 날짜·시각·건물명 넣기 (지적사항·점검표·기록부 사진 모두)</label>
+<p class="hint">시각은 사진 파일 시각(바로 찍으면 지금 시각)입니다. 이미 저장된 사진은 바뀌지 않습니다.</p>
+</section>
+
+<section class="card" id="feedback">
+<h2>의견 보내기</h2>
+<p style="margin:0 0 8px;font-size:14px">후기·오류 신고·기능 요청을 구글 설문으로 받습니다. 로그인 없이 보낼 수 있고 이름·연락처는 선택입니다. 수첩에 저장한 자료는 전송되지 않습니다.</p>
+<div class="btns"><a class="btn" id="fb-go" target="_blank" rel="noopener" data-gc="feedback-open">의견 보내기</a><a class="btn sub" href="../feedback.html">개인정보 안내</a></div>
+<h3 style="margin:14px 0 6px">받은 의견 반영 기록</h3>
+<div id="fb-log"><p class="hint">아직 반영한 의견이 없습니다.</p></div>
 </section>
 
 <section class="card" id="backup">
@@ -81,6 +101,10 @@
 </main>
 <script>
 (function(){
+  KIT.glance(document.getElementById('gl'));
+  var st=document.getElementById('stamp');st.checked=KIT.stampOn();st.onchange=function(){try{localStorage.setItem('fst-stamp',st.checked?'1':'0');}catch(e){}KIT.toast(st.checked?'사진 도장을 켰습니다':'사진 도장을 껐습니다');};
+  document.getElementById('fb-go').href=KIT.feedbackUrl('/kit/');
+  fetch('../data.json',{cache:'no-cache'}).then(function(r){return r.json();}).then(function(d){var L=d.feedback_log||[];if(L.length)document.getElementById('fb-log').innerHTML='<ul>'+L.map(function(x){return '<li>'+KIT.esc(x.date)+' · '+KIT.esc(x.text)+'</li>';}).join('')+'</ul>';}).catch(function(){});
   var F=KIT.BFIELDS;
   KIT.building().then(function(b){F.forEach(function(k){var el=document.getElementById('b-'+k);if(el&&b[k]!=null)el.value=b[k];});});
   document.getElementById('b-save').onclick=function(){KIT.building().then(function(b){F.forEach(function(k){var el=document.getElementById('b-'+k);if(el)b[k]=el.value.trim();});if(!b.id)b.id=KIT.uid();return KIT.saveBuilding(b);}).then(function(){KIT.toast('건물 정보를 저장했습니다');});};

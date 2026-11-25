@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>출력 전 누락 검사 | 소방 점검 서류 빈 칸·사진·서명·기한 확인 (무료)</title>
+<meta name="description" content="지적사항·자체점검 점검표·업무수행기록표를 인쇄하기 전에 빈 칸, 사진 없는 불량, 작성자 없음, 지난 기한을 한 화면에서 경고합니다. 무료, 가입 없음.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/check.html">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#C8322B">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>출력 전 누락 검사</h1><p>무료 · 회원가입 없음 · 이 기기에만 저장<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="../">도구 모음</a></nav>
+</div></header>
+<main><section class="card">
+<h2>출력 전 누락 검사</h2>
+<p class="hint">인쇄·소방서 제출 전에 빈 칸, 사진 없는 불량, 서명·작성자 없음, 지난 기한을 한 화면에서 봅니다. 빨강은 반려·과태료로 이어질 수 있는 것, 노랑은 확인 권장. 지적사항·점검표·기록표 화면에서 인쇄 단추를 누르면 같은 검사가 먼저 뜹니다.</p>
+<div class="btns"><button id="run">다시 검사</button></div>
+<div id="sum" style="margin-top:10px"></div>
+<div id="out"></div>
+</section>
+<footer>검사 기준: 소방시설법 시행규칙 제23조(보고 15일·이행완료 보고 10일, 전·후 사진 첨부), 화재예방법 시행규칙 제10조(업무수행기록 월 1회 이상). 법정 서식 요건 전체가 아니라 자주 빠지는 칸을 고른 것입니다. 참고용 · 제작 김재환</footer>
+</main>
+<script>
+(function(){
+function run(){KIT.audit('all').then(function(a){
+ var e=a.filter(function(x){return x.lv==='err';}),w=a.filter(function(x){return x.lv!=='err';});
+ document.getElementById('sum').innerHTML='<div class="gls"><div class="gl '+(e.length?'bad':'ok')+'"><b>'+e.length+'</b><span>빨강(꼭 고칠 것)</span></div><div class="gl '+(w.length?'warn':'ok')+'"><b>'+w.length+'</b><span>노랑(확인 권장)</span></div><div class="gl ok"><b>'+(a.length?'확인 필요':'통과')+'</b><span>출력 가능 여부</span></div></div>';
+ var g={};a.forEach(function(x){(g[x.where]=g[x.where]||[]).push(x);});
+ document.getElementById('out').innerHTML=Object.keys(g).map(function(k){return '<h3>'+KIT.esc(k)+' ('+g[k].length+')</h3><ul class="chk-list">'+g[k].map(function(x){return '<li class="'+x.lv+'">'+(x.lv==='err'?'■ ':'□ ')+KIT.esc(x.msg)+' <a href="'+x.link+'">고치러 가기</a></li>';}).join('')+'</ul>';}).join('')||'<p class="ok">빠진 것이 없습니다. 출력해도 됩니다.</p>';
+});}
+document.getElementById('run').onclick=run;run();
+})();
+</script>
+<script src="../assets/ui.js" defer></script>
+</body>
+</html>

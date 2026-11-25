@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>엑셀·한글 표 불러오기 | 지적사항·설비·건물 목록 붙여넣기 (무료)</title>
+<meta name="description" content="예전 엑셀·한글·구글 시트 표를 복사해 붙여 넣거나 CSV 파일을 올리면 지적사항·설비 목록·건물 목록으로 들어갑니다. 칸 자동 짝짓기, 날짜 형식 자동 변환, 무료, 가입 없음.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/import.html">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#C8322B">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>표 붙여넣기 불러오기</h1><p>무료 · 회원가입 없음 · 이 기기에만 저장<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="../">도구 모음</a></nav>
+</div></header>
+<main><section class="card">
+<h2>엑셀·한글 표 붙여넣기 불러오기</h2>
+<p class="hint">엑셀·한글·구글 시트에서 표를 드래그해 복사(Ctrl+C)한 뒤 아래 칸에 붙여 넣으세요(Ctrl+V). CSV 파일도 됩니다. 첫 줄이 제목 줄이면 칸을 자동으로 짝짓습니다. 들여오기 전에 미리보기로 확인합니다.</p>
+<div class="g3">
+<div><label class="f" for="tg">어디로 넣을까요</label><select id="tg"><option value="defects">지적사항(불량)</option><option value="equips">설비 목록(QR)</option><option value="buildings">건물 목록</option></select></div>
+<div><label class="f" for="hd">첫 줄</label><select id="hd"><option value="y">제목 줄임</option><option value="n">바로 자료</option></select></div>
+<div><label class="f" for="csv">CSV 파일</label><input type="file" id="csv" accept=".csv,.txt,text/csv"></div>
+</div>
+<textarea id="src" rows="8" placeholder="여기에 붙여 넣기&#10;예) 발견일	위치	설비	불량 내용	조치일&#10;2026-10-02	지하1층	소화기	지시압력계 적색	2026-10-10"></textarea>
+<div class="btns"><button id="go">미리보기</button><button class="sub" id="sample">예시 넣기</button></div>
+<div id="map"></div>
+<div id="pv"></div>
+<div class="btns"><button id="imp" disabled>들여오기</button></div>
+<p class="hint" id="msg"></p>
+</section>
+<footer>붙여넣기는 이 기기 안에서만 처리되며 서버로 보내지 않습니다. 한글(HWP) 표는 표 전체 선택 후 복사하면 칸이 탭으로 나뉘어 붙습니다. 날짜는 2026-10-02, 2026.10.2, 26/10/02, 2026년 10월 2일 형식을 읽습니다. · 제작 김재환</footer>
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);},E=KIT.esc,ROWS=[],COLS=[];
+var T={defects:[['found','발견일',/발견|점검일|일자|날짜/],['loc','위치',/위치|장소|층/],['eq','설비',/설비|시설|구분/],['desc','불량 내용',/불량|지적|내용|사항/],['kind','점검 구분',/종류|점검구분|작동|종합/],['act','이행 기간(일)',/기간|이행/],['report','소방서 보고일',/보고/],['fix','조치일',/조치일|완료일|조치 ?일/],['fixdesc','조치 내용',/조치내용|조치 내용|조치사항|비고/]],
+ equips:[['name','설비 이름',/설비|이름|명칭|품명/],['loc','위치',/위치|장소|층/],['memo','메모',/메모|제조|비고|규격/]],
+ buildings:[['name','건물명',/건물|상호|명칭|대상물/],['addr','소재지',/주소|소재/],['use','주용도',/용도/],['grade','등급',/등급/],['approval','사용승인일',/승인/],['comp','종합점검 대상(예/아니오)',/종합/],['area','연면적',/연면적|면적/],['manager','소방안전관리자',/관리자|담당/],['tel','연락처',/전화|연락/]]};
+function parse(t){t=t.replace(/\r/g,'').replace(/\n+$/,'');var tab=t.indexOf('\t')>=0,out=[];
+ if(tab)return t.split('\n').map(function(l){return l.split('\t').map(function(c){return c.trim();});});
+ // CSV (따옴표 처리)
+ var row=[],cur='',q=false;for(var i=0;i<t.length;i++){var ch=t[i];if(q){if(ch==='"'&&t[i+1]==='"'){cur+='"';i++;}else if(ch==='"')q=false;else cur+=ch;}else if(ch==='"')q=true;else if(ch===','){row.push(cur.trim());cur='';}else if(ch==='\n'){row.push(cur.trim());out.push(row);row=[];cur='';}else cur+=ch;}
+ row.push(cur.trim());out.push(row);return out;}
+function day(s){if(!s)return '';s=String(s).trim();var m=s.match(/(\d{2,4})\s*[\.\-\/년]\s*(\d{1,2})\s*[\.\-\/월]\s*(\d{1,2})/);if(!m){if(/^\d{5}$/.test(s)){var d=new Date(Date.UTC(1899,11,30)+(+s)*86400000);return KIT.key(new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));}return '';}var y=+m[1];if(y<100)y+=2000;return y+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');}
+function preview(){var all=parse($('src').value).filter(function(r){return r.some(function(c){return c;});});if(!all.length){$('msg').textContent='붙여 넣은 내용이 없습니다.';return;}
+ var head=$('hd').value==='y'?all.shift():null,n=Math.max.apply(null,all.map(function(r){return r.length;}).concat([head?head.length:0])),F=T[$('tg').value];ROWS=all;
+ COLS=F.map(function(f,fi){var idx=-1;if(head)head.forEach(function(h,i){if(idx<0&&f[2].test(h.replace(/\s/g,'')))idx=i;});if(idx<0&&!head&&fi<n)idx=fi;return idx;});
+ $('map').innerHTML='<h3>칸 짝짓기</h3><div class="g3">'+F.map(function(f,fi){return '<div><label class="f">'+f[1]+'</label><select data-f="'+fi+'"><option value="-1">(없음)</option>'+Array.from({length:n},function(_,i){return '<option value="'+i+'" '+(COLS[fi]===i?'selected':'')+'>'+(i+1)+'번째 칸'+(head&&head[i]?' · '+E(head[i]):'')+'</option>';}).join('')+'</select></div>';}).join('')+'</div>';
+ draw();}
+function rec(r){var F=T[$('tg').value],x={};F.forEach(function(f,fi){var v=COLS[fi]>=0?(r[COLS[fi]]||''):'';if(/found|report|fix$|approval/.test(f[0]))v=day(v)||v;x[f[0]]=v;});return x;}
+function draw(){var F=T[$('tg').value];$('pv').innerHTML='<h3>미리보기 ('+ROWS.length+'줄, 처음 5줄)</h3><table><tr>'+F.map(function(f){return '<th>'+f[1]+'</th>';}).join('')+'</tr>'+ROWS.slice(0,5).map(function(r){var x=rec(r);return '<tr>'+F.map(function(f){return '<td>'+E(x[f[0]])+'</td>';}).join('')+'</tr>';}).join('')+'</table>';$('imp').disabled=!ROWS.length;$('msg').textContent='';}
+$('map').onchange=function(e){var fi=e.target.getAttribute('data-f');if(fi!=null){COLS[+fi]=+e.target.value;draw();}};
+$('go').onclick=preview;$('tg').onchange=preview;$('hd').onchange=preview;
+$('csv').onchange=function(e){var f=e.target.files[0];if(!f)return;f.arrayBuffer().then(function(b){var t=new TextDecoder('utf-8').decode(b);if(t.indexOf('\ufffd')>=0){try{t=new TextDecoder('euc-kr').decode(b);}catch(x){}}$('src').value=t;preview();});};
+$('sample').onclick=function(){$('tg').value='defects';$('hd').value='y';$('src').value='발견일\t위치\t설비\t불량 내용\t조치일\t조치 내용\n2026.10.2\t지하1층 주차장\t소화기\t지시압력계 적색(압력 미달)\t2026.10.10\t소화기 교체\n2026-11-03\t3층 복도\t유도등\t예비전원(배터리) 불량\t\t';preview();};
+$('imp').onclick=function(){var tg=$('tg').value,L=ROWS.map(rec).filter(function(x){return Object.keys(x).some(function(k){return x[k];});}),jobs;
+ if(tg==='defects')jobs=Promise.all(L.map(function(x){var d={id:KIT.uid(),found:x.found||KIT.key(new Date()),kind:x.kind||'작동점검',loc:x.loc,eq:x.eq,desc:x.desc,act:x.act?String(+x.act||10):'',notice:'',report:x.report||'',fix:x.fix||'',fixdesc:x.fixdesc||'',sent:'',pre:'',post:'',src:'import'};return KIT.put('defects',d);}));
+ else if(tg==='equips')jobs=KIT.get('equips').then(function(EQ){EQ=EQ||[];L.forEach(function(x){if(x.name)EQ.push({id:KIT.uid(),name:x.name,loc:x.loc||'',memo:x.memo||'',created:KIT.key(new Date()),checks:[]});});return KIT.set('equips',EQ);});
+ else jobs=Promise.all(L.filter(function(x){return x.name;}).map(function(x){x.id=KIT.uid();x.comp=/예|y|o|대상/i.test(x.comp||'')?'y':(x.comp?'n':'');return KIT.put('buildings',x);}));
+ jobs.then(function(){$('msg').innerHTML=L.length+'줄을 들여왔습니다. <a href="'+(tg==='defects'?'defects.html':tg==='equips'?'equip.html':'buildings.html')+'">확인하러 가기</a>';$('imp').disabled=true;KIT.toast('들여왔습니다');});};
+})();
+</script>
+<script src="../assets/ui.js" defer></script>
+</body>
+</html>

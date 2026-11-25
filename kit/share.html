@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>관계인 공유 보고서·확인 서명 | 소방 점검 결과·지적사항 읽기 전용 파일 (무료)</title>
+<meta name="description" content="자체점검 결과와 지적사항(전·후 사진, 이행 기한)을 관계인에게 보내는 읽기 전용 HTML 파일 하나로 만들고, 관계인이 손가락으로 확인 서명한 확인본을 받습니다. 무료, 가입·서버 없음.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/share.html">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#C8322B">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>관계인 공유 보고서</h1><p>무료 · 회원가입 없음 · 이 기기에만 저장<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="../">도구 모음</a></nav>
+</div></header>
+<main><section class="card">
+<h2>관계인 공유 보고서 (읽기 전용 파일 1개)</h2>
+<p class="hint">건물 정보·최근 자체점검 결과·지적사항(조치 전·후 사진, 기한)을 HTML 파일 하나로 만듭니다. 관계인은 앱 설치·가입 없이 휴대폰에서 열어 보고, 파일 안 서명 칸에 손가락으로 서명하면 서명된 확인본을 저장해 되돌려 보낼 수 있습니다. 내용은 고칠 수 없습니다(읽기 전용).</p>
+<div class="g3">
+<div><label class="f" for="o-to">받는 관계인(소유자·관리자)</label><input id="o-to" placeholder="예: 홍길동 대표"></div>
+<div><label class="f" for="o-scope">지적사항 범위</label><select id="o-scope"><option value="open">미조치·보고 대기만</option><option value="all">전체</option></select></div>
+<div><label class="f" for="o-ph">사진 넣기</label><select id="o-ph"><option value="y">넣기(파일 커짐)</option><option value="n">빼기</option></select></div>
+</div>
+<div><label class="f" for="o-msg">전하는 말</label><textarea id="o-msg" rows="2" placeholder="예: 아래 불량은 소방시설법 시행규칙 제23조에 따라 이행 기한 안에 조치가 필요합니다."></textarea></div>
+<div class="btns"><button id="mk">보고서 만들기</button><button class="sub" id="dl">파일 받기</button><button class="sub" id="sh">카카오톡 등으로 보내기</button><button class="gray" id="pr">인쇄·PDF</button></div>
+<p class="hint" id="info"></p>
+<iframe id="pv" title="보고서 미리보기" style="width:100%;height:70vh;border:1px solid var(--line);border-radius:8px;background:#fff;display:none"></iframe>
+</section>
+<footer>근거: 소방시설법 시행규칙 제23조(자체점검 결과 관계인 통보·이행계획·이행완료 보고), 화재예방법 시행규칙 제10조②(보수·정비 필요 사항 지체 없이 관계인에게 알림). 서명은 확인 표시용이며 전자서명법상 공인 전자서명은 아닙니다. · 제작 김재환</footer>
+</main>
+<script src="checklist-data.js"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);},E=KIT.esc,HTML='',NAME='';
+var NM={};(window.CHECKLIST||[]).forEach(function(s){s.u.forEach(function(u){u.i.forEach(function(it){NM[it[0]]=[s.name,it[1]];});});});
+function build(){return Promise.all([KIT.building(),KIT.all('defects'),KIT.all('inspections')]).then(function(r){
+ var b=r[0],D=r[1],I=r[2],ph=$('o-ph').value==='y',sc=$('o-scope').value,rep=KIT.repeats(D);
+ var L=D.filter(function(x){return sc==='all'||!x.fix||(x.act&&!x.sent);}).sort(function(p,q){return (p.found||'').localeCompare(q.found||'');});
+ var cur=I.slice().sort(function(a,c){return (c.s||'').localeCompare(a.s||'');})[0];
+ var bad=[];if(cur){Object.keys(cur.res||{}).forEach(function(k){if(cur.res[k]==='x')bad.push([k,(NM[k]||['',''])[0],(NM[k]||['',k])[1],(cur.memo||{})[k]||'']);});}
+ var today=KIT.key(new Date());NAME='관계인보고서_'+(b.name||'건물')+'_'+today+'.html';
+ var css='body{font-family:-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;max-width:860px;margin:0 auto;padding:16px;color:#191F28;line-height:1.55}h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;border-bottom:2px solid #C8322B;padding-bottom:4px;margin-top:24px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #ccc;padding:5px;vertical-align:top;text-align:left}th{background:#f3f4f6}.late{color:#B02A24;font-weight:700}.ok{color:#17703F}img{max-width:150px;max-height:120px;display:block;margin:2px 0}.sig{border:2px dashed #999;border-radius:8px;width:100%;max-width:520px;height:170px;touch-action:none;background:#fff}.box{border:1px solid #ccc;border-radius:8px;padding:12px;margin-top:12px}button{font-size:15px;padding:10px 14px;margin:4px 4px 0 0;border-radius:6px;border:1px solid #C8322B;background:#C8322B;color:#fff}button.s{background:#fff;color:#B02A24}.ro{font-size:12px;color:#5E6876}@media print{.np{display:none}}';
+ var h='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+E(b.name||'')+' 소방시설 점검·조치 보고서</title><style>'+css+'</style></head><body>';
+ h+='<h1>소방시설 점검·조치 보고서</h1><p class="ro">읽기 전용 · 작성 '+E(today)+' · 소방안전관리자 현장 수첩(pefp96-web.github.io/fire-safety-tools/kit/)으로 만듦</p>';
+ h+='<table><tr><th>대상물</th><td>'+E(b.name)+' ('+E(b.grade||'-')+')</td><th>소재지</th><td>'+E(b.addr)+'</td></tr><tr><th>소방안전관리자</th><td>'+E(b.manager)+'</td><th>받는 관계인</th><td>'+E($('o-to').value)+'</td></tr></table>';
+ if($('o-msg').value.trim())h+='<div class="box">'+E($('o-msg').value).replace(/\n/g,'<br>')+'</div>';
+ if(cur){var n=Object.keys(cur.res||{}).length;h+='<h2>최근 자체점검 결과</h2><p>'+E(cur.kind||'')+' · '+E(cur.s||'')+(cur.e&&cur.e!==cur.s?' ~ '+E(cur.e):'')+' · 확인한 항목 '+n+'개 중 불량 '+bad.length+'개</p>';
+  if(bad.length)h+='<table><tr><th>번호</th><th>설비</th><th>점검 항목</th><th>불량 내용</th></tr>'+bad.map(function(x){return '<tr><td>'+E(x[0])+'</td><td>'+E(x[1])+'</td><td>'+E(x[2])+'</td><td>'+E(x[3])+'</td></tr>';}).join('')+'</table>';}
+ h+='<h2>지적사항 ('+L.length+'건)</h2>';
+ h+=L.length?'<table><tr><th>#</th><th>설비·위치</th><th>불량 내용</th><th>상태·기한</th>'+(ph?'<th>조치 전</th><th>조치 후</th>':'')+'</tr>'+L.map(function(x,i){var o=KIT.defDue(x),st=x.sent?'완료 보고함':x.fix?'조치 완료('+E(x.fix)+')':'미조치';
+  return '<tr><td>'+(i+1)+'</td><td>'+E(x.eq)+'<br>'+E(x.loc)+'</td><td>'+E(x.desc)+(rep[x.id]>1?' <b class="late">[반복 '+rep[x.id]+'회째]</b>':'')+(x.fixdesc?'<br><span class="ok">조치: '+E(x.fixdesc)+'</span>':'')+'</td><td class="'+(o.late?'late':'')+'">'+st+(o.due?'<br>이행 기한 '+KIT.fmt(o.due):'')+(o.doneRep&&!x.sent?'<br>완료 보고 기한 '+KIT.fmt(o.doneRep):'')+(o.late?'<br>기한 지남':'')+'</td>'+(ph?'<td>'+(x.pre?'<img src="'+x.pre+'" alt="조치 전">':'')+'</td><td>'+(x.post?'<img src="'+x.post+'" alt="조치 후">':'')+'</td>':'')+'</tr>';}).join('')+'</table>':'<p>해당 지적사항이 없습니다.</p>';
+ h+='<h2>관계인 확인</h2><div class="box" id="sb"><p>위 점검 결과와 지적사항(이행 기한 포함)을 통보받아 확인했습니다.</p><p>확인자 성명: <input id="sn" style="font-size:16px;padding:6px;width:180px"> 확인일: <span id="sd"></span></p><canvas class="sig" id="sg" width="520" height="170"></canvas><div class="np"><button class="s" id="sc">서명 지우기</button><button id="sv">서명한 확인본 저장</button><button class="s" onclick="print()">인쇄·PDF</button></div><p class="ro np">손가락이나 마우스로 위 칸에 서명한 뒤 \'서명한 확인본 저장\'을 누르면 서명이 들어간 파일이 저장됩니다. 그 파일을 소방안전관리자에게 다시 보내 주세요.</p></div>';
+ h+='<scr'+'ipt>(function(){var c=document.getElementById("sg");if(!c)return;var g=c.getContext("2d"),d=false,n=0;g.lineWidth=2.5;g.lineCap="round";g.strokeStyle="#111";var t=new Date();document.getElementById("sd").textContent=t.getFullYear()+". "+(t.getMonth()+1)+". "+t.getDate()+".";function p(e){var r=c.getBoundingClientRect();return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height];}c.onpointerdown=function(e){d=true;var q=p(e);g.beginPath();g.moveTo(q[0],q[1]);c.setPointerCapture(e.pointerId);};c.onpointermove=function(e){if(!d)return;var q=p(e);g.lineTo(q[0],q[1]);g.stroke();n++;};c.onpointerup=function(){d=false;};document.getElementById("sc").onclick=function(){g.clearRect(0,0,c.width,c.height);n=0;};document.getElementById("sv").onclick=function(){var nm=document.getElementById("sn").value.trim();if(!nm||n<3){alert("성명을 적고 서명해 주세요.");return;}var im=document.createElement("img");im.src=c.toDataURL("image/png");im.alt="관계인 서명";im.style.maxWidth="260px";im.style.maxHeight="90px";c.replaceWith(im);var s=document.createElement("span");s.textContent=nm;document.getElementById("sn").replaceWith(s);document.querySelectorAll(".np").forEach(function(x){x.remove();});document.querySelectorAll("script").forEach(function(x){x.remove();});var html="<!doctype html>"+document.documentElement.outerHTML;var b=new Blob([html],{type:"text/html"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=document.title.replace(/\\s+/g,"_")+"_확인서명.html";document.body.appendChild(a);a.click();};})();</scr'+'ipt></body></html>';
+ HTML=h;$('pv').style.display='block';$('pv').srcdoc=h;$('info').textContent='지적사항 '+L.length+'건, 점검 불량 '+bad.length+'개 · 파일 크기 약 '+Math.round(h.length/1024)+'KB · 아래는 미리보기(관계인이 보는 화면)';return h;});}
+$('mk').onclick=build;
+$('dl').onclick=function(){(HTML?Promise.resolve():build()).then(function(){KIT.download(NAME,HTML,'text/html;charset=utf-8');});};
+$('sh').onclick=function(){(HTML?Promise.resolve():build()).then(function(){KIT.shareFile(NAME,HTML,'text/html','소방시설 점검·조치 보고서');});};
+$('pr').onclick=function(){(HTML?Promise.resolve():build()).then(function(){var w=$('pv').contentWindow;w.focus();w.print();});};
+})();
+</script>
+<script src="../assets/ui.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>소방 수리비 견적서 | 불량별 단가표로 합계·부가세·관계인 승인 칸 (무료)</title>
+<meta name="description" content="지적사항(불량)마다 내 단가표에서 품목을 골라 수량·금액·부가세 합계를 내고 관계인 승인 칸이 있는 견적서를 A4로 인쇄합니다. 무료, 가입 없음.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/quote.html">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#C8322B">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>수리비 견적서</h1><p>무료 · 회원가입 없음 · 이 기기에만 저장<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="../">도구 모음</a></nav>
+</div></header>
+<main><style>#qsheet{display:none}@media print{#app,header.top,footer,.fb-link{display:none}#qsheet{display:block}#qsheet table{font-size:12px}}</style>
+<div id="app">
+<section class="card">
+<h2>1. 단가표 (내 기준 금액, 이 기기에 저장)</h2>
+<p class="hint">법정 단가는 없습니다. 거래처 견적·자재값을 보고 직접 넣으세요. 품목 이름에 설비명(예: 소화기, 감지기, 유도등)이 들어가면 불량과 자동으로 짝지어집니다.</p>
+<table id="pt"></table>
+<div class="btns"><button class="sub" id="p-add">품목 추가</button><button id="p-save">단가표 저장</button></div>
+</section>
+<section class="card">
+<h2>2. 견적할 불량 고르기</h2>
+<div class="g3"><div><label class="f" for="q-to">받는 곳(관계인)</label><input id="q-to"></div><div><label class="f" for="q-from">견적 낸 곳(업체·관리자)</label><input id="q-from"></div><div><label class="f" for="q-vat">부가세</label><select id="q-vat"><option value="10">10% 별도 추가</option><option value="0">포함(추가 없음)</option></select></div></div>
+<table id="qt"></table>
+<p id="q-sum" style="font-size:18px;font-weight:700;margin:10px 0"></p>
+<div class="btns"><button id="q-print">견적서 인쇄·PDF</button><button class="sub" id="q-extra">불량 말고 품목 직접 추가</button></div>
+</section>
+</div>
+<div id="qsheet"></div>
+<footer>견적서는 법정 서식이 아닙니다. 금액은 사용자가 넣은 단가로 계산하며 실제 계약 금액은 당사자 합의로 정합니다. · 제작 김재환</footer>
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);},E=KIT.esc,P=[],ROWS=[],EXTRA=[];
+var DEF=['소화기 교체(분말 3.3kg)','소화기 압력 재충전','감지기 교체(차동식)','감지기 교체(연기식)','유도등 교체','유도등·비상조명등 배터리 교체','수신기 예비전원 배터리 교체','옥내소화전 호스 교체','스프링클러 헤드 교체','방화문 자동폐쇄장치(도어클로저) 교체','발신기 교체','점검 출장비'];
+function drawP(){$('pt').innerHTML='<tr><th>품목</th><th>단위</th><th>단가(원)</th><th></th></tr>'+P.map(function(p,i){return '<tr><td><input data-i="'+i+'" data-k="n" value="'+E(p.n)+'"></td><td style="width:70px"><input data-i="'+i+'" data-k="u" value="'+E(p.u)+'"></td><td style="width:130px"><input data-i="'+i+'" data-k="p" inputmode="numeric" value="'+(p.p||'')+'"></td><td><button class="sm gray" data-x="'+i+'">빼기</button></td></tr>';}).join('');}
+$('pt').oninput=function(e){var i=e.target.getAttribute('data-i');if(i==null)return;var k=e.target.getAttribute('data-k');P[i][k]=k==='p'?+e.target.value.replace(/[^0-9]/g,''):e.target.value;drawQ();};
+$('pt').onclick=function(e){var x=e.target.getAttribute('data-x');if(x!=null){P.splice(+x,1);drawP();drawQ();}};
+$('p-add').onclick=function(){P.push({n:'',u:'개',p:0});drawP();};
+$('p-save').onclick=function(){KIT.set('prices',P).then(function(){KIT.toast('단가표를 저장했습니다');});};
+function nz(s){return String(s||'').replace(/\s+/g,'');}
+function guess(d){var t=nz(d.eq)+nz(d.desc),best=-1,bs=0;P.forEach(function(p,i){var w=nz(p.n).replace(/\(.*\)/,'');var key=w.slice(0,3);var s=(t.indexOf(w.slice(0,2))>=0?1:0)+(t.indexOf(key)>=0?1:0)+(/배터리|예비전원/.test(t)&&/배터리/.test(p.n)?2:0);if(s>bs){bs=s;best=i;}});return best;}
+function money(n){return (Math.round(n)||0).toLocaleString('ko-KR');}
+function drawQ(){var tot=0;
+ $('qt').innerHTML='<tr><th>견적</th><th>불량</th><th>품목</th><th>수량</th><th>단가</th><th>금액</th></tr>'+ROWS.concat(EXTRA).map(function(r,i){var p=P[r.pi]||{},amt=r.on?(r.qty||0)*(r.price!=null?r.price:(p.p||0)):0;tot+=amt;
+  return '<tr><td><input type="checkbox" data-q="'+i+'" data-k="on" '+(r.on?'checked':'')+' style="width:auto"></td><td>'+E(r.label)+'</td><td><select data-q="'+i+'" data-k="pi"><option value="-1">고르기</option>'+P.map(function(p,j){return '<option value="'+j+'" '+(r.pi===j?'selected':'')+'>'+E(p.n)+'</option>';}).join('')+'</select></td><td style="width:70px"><input data-q="'+i+'" data-k="qty" inputmode="numeric" value="'+(r.qty||'')+'"></td><td style="width:110px"><input data-q="'+i+'" data-k="price" inputmode="numeric" placeholder="'+(p.p||0)+'" value="'+(r.price!=null?r.price:'')+'"></td><td style="text-align:right">'+money(amt)+'</td></tr>';}).join('');
+ var vat=+$('q-vat').value?tot*0.1:0;$('q-sum').textContent='공급가 '+money(tot)+'원'+(vat?' + 부가세 '+money(vat)+'원':'')+' = 합계 '+money(tot+vat)+'원';return {tot:tot,vat:vat};}
+$('qt').onchange=function(e){var i=e.target.getAttribute('data-q');if(i==null)return;var r=ROWS.concat(EXTRA)[+i],k=e.target.getAttribute('data-k');if(k==='on')r.on=e.target.checked;else if(k==='pi'){r.pi=+e.target.value;r.price=null;}else if(k==='qty')r.qty=+e.target.value||0;else if(k==='price')r.price=e.target.value===''?null:+e.target.value.replace(/[^0-9]/g,'');drawQ();};
+$('q-vat').onchange=drawQ;
+$('q-extra').onclick=function(){EXTRA.push({label:'(직접 추가)',pi:-1,qty:1,on:true,price:null});drawQ();};
+$('q-print').onclick=function(){var s=drawQ();KIT.building().then(function(b){var L=ROWS.concat(EXTRA).filter(function(r){return r.on;});
+ var h='<h2 style="text-align:center">소방시설 수리 견적서</h2><p>견적일: '+KIT.fmt(new Date())+' · 대상물: '+E(b.name||'')+' · 소재지: '+E(b.addr||'')+'</p><p>받는 곳: '+E($('q-to').value)+' 귀하 · 견적 낸 곳: '+E($('q-from').value||b.manager||'')+'</p>';
+ h+='<table><tr><th>#</th><th>불량(위치)</th><th>품목</th><th>수량</th><th>단가</th><th>금액</th></tr>'+L.map(function(r,i){var p=P[r.pi]||{},u=r.price!=null?r.price:(p.p||0);return '<tr><td>'+(i+1)+'</td><td>'+E(r.label)+'</td><td>'+E(p.n||'')+'</td><td>'+(r.qty||0)+' '+E(p.u||'')+'</td><td style="text-align:right">'+money(u)+'</td><td style="text-align:right">'+money(u*(r.qty||0))+'</td></tr>';}).join('')+'<tr><th colspan="5">공급가</th><td style="text-align:right">'+money(s.tot)+'</td></tr>'+(s.vat?'<tr><th colspan="5">부가세(10%)</th><td style="text-align:right">'+money(s.vat)+'</td></tr>':'')+'<tr><th colspan="5">합계</th><td style="text-align:right"><b>'+money(s.tot+s.vat)+'</b></td></tr></table>';
+ h+='<table style="margin-top:16px"><tr><th style="width:25%">관계인 승인</th><td>위 견적 금액으로 수리를 승인합니다.<br><br>성명: ____________________ (서명) &nbsp; 날짜: ______. ___. ___.</td></tr></table>';
+ $('qsheet').innerHTML=h;window.print();});};
+Promise.all([KIT.get('prices'),KIT.all('defects')]).then(function(r){P=r[0]&&r[0].length?r[0]:DEF.map(function(n){return {n:n,u:/출장/.test(n)?'회':'개',p:0};});drawP();
+ ROWS=r[1].filter(function(d){return !d.fix;}).map(function(d){return {label:(d.eq||'')+' · '+(d.desc||'')+(d.loc?' ('+d.loc+')':''),pi:guess(d),qty:1,on:true,price:null};});
+ drawQ();if(!ROWS.length)$('q-sum').textContent='미조치 지적사항이 없습니다. \'품목 직접 추가\'로 견적을 쓸 수 있습니다.';});
+})();
+</script>
+<script src="../assets/ui.js" defer></script>
+</body>
+</html>

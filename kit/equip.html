@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>설비 QR 라벨·카메라 스캔·설비 이력 | 소화기·수신기·펌프 QR 점검 (무료·오프라인)</title>
+<meta name="description" content="소화기·수신기·펌프 등 설비마다 QR 라벨을 A4로 인쇄하고, 휴대폰 카메라로 찍으면 그 설비의 점검 확인·불량·반복 불량 이력이 열립니다. 인터넷 없이 동작, 무료, 가입 없음.">
+<link rel="canonical" href="https://pefp96-web.github.io/fire-safety-tools/kit/equip.html">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#C8322B">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="kit.css">
+<script src="../gc.js"></script>
+<script src="common.js"></script>
+</head>
+<body>
+<header class="top"><div class="in">
+<div><h1>설비 QR·설비 이력</h1><p>무료 · 회원가입 없음 · 이 기기에만 저장<span id="net" class="net"></span></p></div>
+<nav><a href="./">수첩 홈</a><a href="../">도구 모음</a></nav>
+</div></header>
+<main><style>#lsheet{display:none}@media print{#app,header.top,footer,.fb-link{display:none}#lsheet{display:block}}#cam{width:100%;max-width:480px;border-radius:8px;background:#000;display:none}</style>
+<div id="app">
+<section class="card" id="hist" style="display:none"></section>
+<section class="card">
+<h2>카메라로 QR 찍기</h2>
+<p class="hint">설비에 붙인 QR을 찍으면 그 설비 이력이 열립니다. 휴대폰 기본 카메라로 찍어도 이 화면이 열립니다(같은 브라우저에 자료가 있어야 함). 인터넷 없이 됩니다.</p>
+<div class="btns"><button id="scan">카메라 켜기</button><button class="gray" id="stop">끄기</button></div>
+<video id="cam" playsinline muted></video><canvas id="cv" hidden></canvas>
+<p class="hint" id="smsg"></p>
+</section>
+<section class="card">
+<h2>설비 등록</h2>
+<div class="g3">
+<div><label class="f" for="e-name">설비 이름</label><input id="e-name" list="eqk" placeholder="예: 소화기 3번"><datalist id="eqk"><option>소화기</option><option>수신기</option><option>소화펌프</option><option>옥내소화전</option><option>발신기</option><option>유도등</option><option>감지기</option><option>스프링클러 알람밸브</option><option>방화문</option><option>제연설비</option><option>가스계소화설비</option></datalist></div>
+<div><label class="f" for="e-loc">위치</label><input id="e-loc" placeholder="예: 지하1층 기계실"></div>
+<div><label class="f" for="e-memo">메모(제조년월 등)</label><input id="e-memo" data-voice></div>
+</div>
+<div class="btns"><button id="e-add">등록</button><button class="sub" id="e-many">여러 개 한 번에(같은 이름 번호 붙이기)</button></div>
+</section>
+<section class="card">
+<h2>설비 목록 <span class="hint" id="cnt"></span></h2>
+<div class="btns"><button id="l-print">QR 라벨 인쇄(A4, 한 장 24개)</button><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="l-all" checked style="width:auto">전체</label></div>
+<div id="list"></div>
+</section>
+</div>
+<div id="lsheet"></div>
+<footer>QR 만들기: qrcode-generator(MIT, Kazuhiko Arase), QR 읽기: 브라우저 내장 BarcodeDetector 또는 jsQR(Apache-2.0, Cosmo Wolfe). 두 라이브러리는 이 사이트에 같이 저장해 오프라인으로 동작합니다. · 제작 김재환</footer>
+</main>
+<script src="../assets/vendor/qrcode.js"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);},E=KIT.esc,EQ=[],D=[],B={};
+var BASE='https://pefp96-web.github.io/fire-safety-tools/kit/equip.html#id=';
+function save(){return KIT.set('equips',EQ);}
+function qrSvg(t,cell){var q=qrcode(0,'M');q.addData(t);q.make();return q.createSvgTag({cellSize:cell||3,margin:2,scalable:true});}
+function defsOf(e){return D.filter(function(d){return d.equip===e.id||(!d.equip&&d.eq&&e.name.indexOf(d.eq)===0&&d.loc&&d.loc===e.loc);});}
+function draw(){$('cnt').textContent='('+EQ.length+'개)';var rep=KIT.repeats(D);
+ $('list').innerHTML=EQ.length?'<table><tr><th><input type="checkbox" id="ck-all" style="width:auto" checked></th><th>설비</th><th>최근 확인</th><th>불량</th><th></th></tr>'+EQ.map(function(e){var ds=defsOf(e),open=ds.filter(function(d){return !d.fix;}).length,rp=ds.filter(function(d){return rep[d.id]>1;}).length,last=(e.checks||[]).slice(-1)[0];
+  return '<tr><td><input type="checkbox" class="ck" value="'+e.id+'" checked style="width:auto"></td><td><b>'+E(e.name)+'</b><div class="hint">'+E(e.loc)+(e.memo?' · '+E(e.memo):'')+'</div></td><td>'+(last?E(last.d):'-')+'</td><td>'+ds.length+'건'+(open?' <span class="pill red">미조치 '+open+'</span>':'')+(rp?' <span class="pill rep">반복</span>':'')+'</td><td><button class="sm sub" data-h="'+e.id+'">이력</button> <button class="sm gray" data-x="'+e.id+'">지우기</button></td></tr>';}).join('')+'</table>':'<p class="hint">등록한 설비가 없습니다.</p>';}
+function add(name,loc,memo){EQ.push({id:KIT.uid(),name:name,loc:loc,memo:memo||'',created:KIT.key(new Date()),checks:[]});}
+$('e-add').onclick=function(){var n=$('e-name').value.trim();if(!n){KIT.toast('설비 이름을 넣으세요');return;}add(n,$('e-loc').value.trim(),$('e-memo').value.trim());save().then(function(){$('e-name').value='';$('e-memo').value='';draw();KIT.toast('등록했습니다');});};
+$('e-many').onclick=function(){var n=$('e-name').value.trim()||'소화기',k=+prompt(n+' 몇 개를 만들까요? (이름 뒤에 1, 2, 3… 번호)', '10');if(!k||k>200)return;for(var i=1;i<=k;i++)add(n+' '+i,$('e-loc').value.trim(),'');save().then(function(){draw();KIT.toast(k+'개 등록했습니다');});};
+$('list').onclick=function(e){var h=e.target.getAttribute('data-h'),x=e.target.getAttribute('data-x');if(e.target.id==='ck-all'){[].forEach.call(document.querySelectorAll('.ck'),function(c){c.checked=e.target.checked;});}
+ if(h)show(h);if(x&&confirm('이 설비를 지울까요? (지적사항은 남습니다)')){EQ=EQ.filter(function(q){return q.id!==x;});save().then(draw);}};
+function show(id){var e=EQ.find(function(q){return q.id===id;}),s=$('hist');if(!e){s.style.display='block';s.innerHTML='<h2>설비를 찾을 수 없습니다</h2><p class="hint">이 QR의 설비는 이 기기에 등록돼 있지 않습니다. 등록한 기기에서 열거나, 백업 파일을 불러오세요.</p>';return;}
+ var rep=KIT.repeats(D),ds=defsOf(e).sort(function(a,b){return (b.found||'').localeCompare(a.found||'');});
+ var ev=(e.checks||[]).map(function(c){return {d:c.d,t:'확인함'+(c.note?' · '+c.note:''),c:'green'};}).concat(ds.map(function(d){return {d:d.found||'',t:(d.desc||'불량')+(d.fix?' → 조치 '+d.fix:' (미조치)')+(rep[d.id]>1?' · 반복 '+rep[d.id]+'회째':''),c:d.fix?'blue':'red'};})).sort(function(a,b){return (b.d||'').localeCompare(a.d||'');});
+ s.style.display='block';s.innerHTML='<h2>'+E(e.name)+' <span class="hint">'+E(e.loc)+'</span></h2><div style="display:flex;gap:14px;flex-wrap:wrap"><div style="width:110px">'+qrSvg(BASE+e.id,3)+'</div><div style="flex:1;min-width:220px"><p class="hint">등록 '+E(e.created)+(e.memo?' · '+E(e.memo):'')+' · 확인 '+(e.checks||[]).length+'회 · 불량 '+ds.length+'건</p>'+
+ '<div class="btns"><button id="h-ok">오늘 확인함(정상)</button><a class="btn sub" href="defects.html?eq='+encodeURIComponent(e.name.replace(/\s*\d+$/,''))+'&loc='+encodeURIComponent(e.loc)+'&equip='+e.id+'">이 설비 불량 적기</a></div></div></div>'+
+ '<h3>설비 이력</h3>'+(ev.length?'<ul>'+ev.map(function(v){return '<li><span class="pill '+v.c+'">'+E(v.d)+'</span> '+E(v.t)+'</li>';}).join('')+'</ul>':'<p class="hint">기록이 없습니다.</p>');
+ $('h-ok').onclick=function(){var note=prompt('메모(없으면 비워 두기)','')||'';var d=new Date();(e.checks=e.checks||[]).push({d:KIT.key(d)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),note:note});save().then(function(){show(id);draw();KIT.toast('확인 기록을 남겼습니다');});};
+ s.scrollIntoView();}
+$('l-print').onclick=function(){var ids=[].map.call(document.querySelectorAll('.ck:checked'),function(c){return c.value;});var L=EQ.filter(function(e){return ids.indexOf(e.id)>=0;});if(!L.length){KIT.toast('인쇄할 설비를 고르세요');return;}
+ $('lsheet').innerHTML='<div class="labels">'+L.map(function(e){return '<div class="label">'+qrSvg(BASE+e.id,3)+'<b>'+E(e.name)+'</b><small>'+E(e.loc)+'</small><small>'+E(B.name||'')+' · 찍으면 점검 이력</small></div>';}).join('')+'</div>';window.print();};
+// 스캔
+var stream=null,timer=null,det=null;
+function found(t){var m=/[#&]id=([a-z0-9]+)/i.exec(t);stopCam();if(m){$('smsg').textContent='읽음: '+t;history.replaceState(null,'','#id='+m[1]);show(m[1]);}else $('smsg').textContent='이 수첩 QR이 아닙니다: '+t;}
+function loadJsQR(){return new Promise(function(ok,no){if(window.jsQR)return ok();var s=document.createElement('script');s.src='../assets/vendor/jsQR.js';s.onload=ok;s.onerror=no;document.head.appendChild(s);});}
+function tick(){var v=$('cam');if(!stream||v.readyState<2){timer=setTimeout(tick,200);return;}
+ if(det){det.detect(v).then(function(r){if(r&&r.length)found(r[0].rawValue);else timer=setTimeout(tick,250);}).catch(function(){det=null;timer=setTimeout(tick,250);});return;}
+ var c=$('cv'),w=Math.min(640,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth);c.width=w;c.height=h;var g=c.getContext('2d');g.drawImage(v,0,0,w,h);var im=g.getImageData(0,0,w,h),q=window.jsQR&&jsQR(im.data,w,h,{inversionAttempts:'dontInvert'});if(q&&q.data)found(q.data);else timer=setTimeout(tick,250);}
+function stopCam(){clearTimeout(timer);if(stream){stream.getTracks().forEach(function(t){t.stop();});stream=null;}$('cam').style.display='none';}
+$('stop').onclick=function(){stopCam();$('smsg').textContent='';};
+$('scan').onclick=function(){if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('smsg').textContent='이 브라우저는 카메라를 쓸 수 없습니다. 휴대폰 기본 카메라로 QR을 찍어 주세요.';return;}
+ var p=('BarcodeDetector' in window)?BarcodeDetector.getSupportedFormats().then(function(f){if(f.indexOf('qr_code')>=0)det=new BarcodeDetector({formats:['qr_code']});}).catch(function(){}):Promise.resolve();
+ p.then(function(){return det?null:loadJsQR();}).then(function(){return navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});}).then(function(s){stream=s;var v=$('cam');v.srcObject=s;v.style.display='block';v.play();$('smsg').textContent='QR을 화면 가운데에 맞춰 주세요 ('+(det?'내장 인식':'jsQR')+')';tick();}).catch(function(err){$('smsg').textContent='카메라를 켜지 못했습니다: '+(err&&err.name==='NotAllowedError'?'카메라 권한을 허용해 주세요':(err&&err.message||err));});};
+window.__eqFound=found;
+Promise.all([KIT.get('equips'),KIT.all('defects'),KIT.building()]).then(function(r){EQ=r[0]||[];D=r[1];B=r[2];draw();var m=/[#&]id=([a-z0-9]+)/i.exec(location.hash);if(m)show(m[1]);});
+window.addEventListener('hashchange',function(){var m=/[#&]id=([a-z0-9]+)/i.exec(location.hash);if(m)show(m[1]);});
+})();
+</script>
+<script src="../assets/ui.js" defer></script>
+</body>
+</html>

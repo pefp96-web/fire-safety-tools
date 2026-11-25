@@ -71,7 +71,21 @@
   K.esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
 
   // ---------- 사진 줄이기 (기기 저장 용량 절약) ----------
-  K.shrink = function (file, max) {
+  // 사진 도장: 찍은 날짜·시각(파일 시각, 없으면 지금)과 건물명을 아래쪽에 찍음. 끄기: 수첩 홈 설정
+  K.stampOn = function () { try { return localStorage.getItem('fst-stamp') !== '0'; } catch (e) { return true; } };
+  K.stamp = function (c, ms, bname) {
+    var d = new Date(ms && ms < Date.now() + 60000 ? ms : Date.now());
+    var p = function (n) { return String(n).padStart(2, '0'); };
+    var txt = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + (bname ? ' · ' + bname : '');
+    var g = c.getContext('2d'), fs = Math.max(14, Math.round(c.width / 34)), pad = Math.round(fs * 0.45);
+    g.font = '700 ' + fs + 'px Pretendard, "Malgun Gothic", sans-serif';
+    var w = g.measureText(txt).width;
+    g.fillStyle = 'rgba(0,0,0,.62)'; g.fillRect(0, c.height - fs - pad * 2, Math.min(c.width, w + pad * 2), fs + pad * 2);
+    g.fillStyle = '#FFD84D'; g.textBaseline = 'bottom'; g.fillText(txt, pad, c.height - pad);
+    return txt;
+  };
+  document.addEventListener('DOMContentLoaded', function () { K.building().then(function (b) { K._bn = b.name || ''; }).catch(function () {}); });
+  K.shrink = function (file, max, opt) {
     max = max || 1280;
     return new Promise(function (ok, no) {
       var fr = new FileReader();
@@ -81,7 +95,8 @@
           var s = Math.min(1, max / Math.max(img.width, img.height));
           var c = document.createElement('canvas');
           c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          var g = c.getContext('2d'); g.drawImage(img, 0, 0, c.width, c.height);
+          if (K.stampOn() && !(opt && opt.noStamp)) K.stamp(c, file.lastModified, K._bn);
           ok(c.toDataURL('image/jpeg', 0.72));
         };
         img.onerror = no; img.src = fr.result;
@@ -99,8 +114,8 @@
 
   // ---------- 백업·복원 (회원가입 없이 기기 이동) ----------
   K.exportAll = function () {
-    return Promise.all([K.get('building'), K.get('calendar'), K.all('defects'), K.all('records'), K.all('inspections'), K.all('logs'), K.all('buildings'), K.all('households'), K.get('duty'), K.get('quotes')]).then(function (r) {
-      return { app: 'fst-kit', version: K.VERSION, exported: new Date().toISOString(), building: r[0] || {}, calendar: r[1] || {}, defects: r[2] || [], records: r[3] || [], inspections: r[4] || [], logs: r[5] || [], buildings: r[6] || [], households: r[7] || [], duty: r[8] || null, quotes: r[9] || null };
+    return Promise.all([K.get('building'), K.get('calendar'), K.all('defects'), K.all('records'), K.all('inspections'), K.all('logs'), K.all('buildings'), K.all('households'), K.get('duty'), K.get('quotes'), K.get('equips'), K.get('prices')]).then(function (r) {
+      return { app: 'fst-kit', version: K.VERSION, exported: new Date().toISOString(), building: r[0] || {}, calendar: r[1] || {}, defects: r[2] || [], records: r[3] || [], inspections: r[4] || [], logs: r[5] || [], buildings: r[6] || [], households: r[7] || [], duty: r[8] || null, quotes: r[9] || null, equips: r[10] || null, prices: r[11] || null };
     });
   };
   K.importAll = function (data) {
@@ -111,6 +126,8 @@
     ['inspections', 'logs', 'buildings', 'households'].forEach(function (n) { (data[n] || []).forEach(function (x) { jobs.push(K.put(n, x)); }); });
     if (data.duty) jobs.push(K.set('duty', data.duty));
     if (data.quotes) jobs.push(K.set('quotes', data.quotes));
+    if (data.equips) jobs.push(K.set('equips', data.equips));
+    if (data.prices) jobs.push(K.set('prices', data.prices));
     return Promise.all(jobs);
   };
 
@@ -137,4 +154,117 @@
     u(); window.addEventListener('online', u); window.addEventListener('offline', u);
   };
   document.addEventListener('DOMContentLoaded', K.netBadge);
+
+  // ---------- 2026-11-25 추가: 의견 창구, 길안내, 누락 검사, 반복 불량, 한눈에 보기 ----------
+  K.FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSclhgEM4yGzquJzb3NtVbfydJB8YqKhOaRvF_Sd7-Hc0nrhvw/viewform';
+  K.feedbackUrl = function (page) { return K.FORM + '?usp=pp_url&entry.945022373=' + encodeURIComponent(page || location.pathname.replace('/fire-safety-tools', '')); };
+
+  // 주소 → 지도 앱 (앱 키 없이 쓰는 공개 주소 형식)
+  K.navLinks = function (addr) {
+    if (!addr) return '';
+    var q = encodeURIComponent(addr);
+    return '<span class="navl">길안내: <a href="https://map.kakao.com/link/search/' + q + '" target="_blank" rel="noopener">카카오맵</a> · <a href="tmap://search?name=' + q + '">티맵</a> · <a href="https://map.naver.com/p/search/' + q + '" target="_blank" rel="noopener">네이버 지도</a></span>';
+  };
+
+  // 지적사항 기한 (defects.html 과 같은 계산)
+  K.defDue = function (x) {
+    var o = {}, rep = K.parse(x.report), fix = K.parse(x.fix), act = +x.act;
+    if (rep && act) { o.due = K.deadline(rep, act); o.delay = K.add(o.due, -3); }
+    if (fix && act) o.doneRep = K.deadline(fix, 10);
+    var t = K.today(); o.late = false;
+    if (!fix && o.due && o.due < t) o.late = true;
+    if (fix && act && !x.sent && o.doneRep < t) o.late = true;
+    o.next = !fix ? o.due : (act && !x.sent ? o.doneRep : null);
+    return o;
+  };
+
+  // 반복 불량: 같은 설비(QR 설비 또는 설비명+위치)에서 같은 불량이 전에 나온 횟수
+  function nz(s) { return String(s || '').replace(/\s+/g, '').toLowerCase(); }
+  K.defKey = function (x) { return (x.equip ? 'E' + x.equip : nz(x.eq) + '|' + nz(x.loc)) + '|' + nz(x.desc).slice(0, 16); };
+  K.repeats = function (list) {
+    var g = {}, out = {};
+    list.slice().sort(function (a, b) { return (a.found || '').localeCompare(b.found || ''); }).forEach(function (x) {
+      var k = K.defKey(x); g[k] = (g[k] || 0) + 1; out[x.id] = g[k];
+    });
+    return out; // 1 = 처음, 2 이상 = N번째 반복
+  };
+
+  // 출력 전 누락 검사. scope: 'all' | 'defects' | 'inspect' | 'record' | 'building'
+  K.audit = function (scope) {
+    scope = scope || 'all';
+    return Promise.all([K.building(), K.all('defects'), K.all('records'), K.all('inspections')]).then(function (r) {
+      var b = r[0], D = r[1], R = r[2], I = r[3], out = [];
+      function add(lv, where, msg, link) { out.push({ lv: lv, where: where, msg: msg, link: link }); }
+      var need = { name: '건물명', addr: '소재지', grade: '등급', approval: '사용승인일', manager: '소방안전관리자 이름' };
+      Object.keys(need).forEach(function (k) { if (!b[k]) add('err', '건물 정보', need[k] + ' 없음 (모든 서류 머리에 들어감)', 'index.html'); });
+      if (scope === 'all' || scope === 'defects') {
+        D.forEach(function (x) {
+          var nm = (x.eq || '설비 미기재') + ' · ' + (x.desc || '').slice(0, 20), o = K.defDue(x);
+          if (o.late) add('err', '지적사항', nm + ': 기한 지남(' + K.fmt(o.next || o.due) + ')', 'defects.html');
+          if (!x.pre) add('warn', '지적사항', nm + ': 조치 전 사진 없음', 'defects.html');
+          if (x.fix && !x.post) add('err', '지적사항', nm + ': 조치 완료인데 조치 후 사진 없음(이행완료 보고에 전·후 사진 필요)', 'defects.html');
+          if (!x.loc) add('warn', '지적사항', nm + ': 위치 없음', 'defects.html');
+          if (x.act && !x.report) add('warn', '지적사항', nm + ': 소방서 보고일 없음 → 이행 기한 계산 안 됨', 'defects.html');
+          if (x.fix && !x.fixdesc) add('warn', '지적사항', nm + ': 조치 내용 없음', 'defects.html');
+        });
+      }
+      if (scope === 'all' || scope === 'record') {
+        var t = K.today(), ym = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+        var have = {}; R.forEach(function (x) { if (x.date) have[x.date.slice(0, 7)] = 1; });
+        var pm = new Date(t.getFullYear(), t.getMonth() - 1, 1);
+        if (R.length && !have[ym(pm)]) add('err', '업무수행기록표', ym(pm) + ' 기록표 없음(월 1회 이상, 화재예방법 시행규칙 제10조)', 'record.html');
+        if (!have[ym(t)]) add('warn', '업무수행기록표', ym(t) + ' 이번 달 기록표 아직 없음', 'record.html');
+        R.forEach(function (x) { if (!x.who) add('warn', '업무수행기록표', (x.date || '날짜 없음') + ' 기록표: 작성자(서명) 없음', 'record.html'); });
+      }
+      if (scope === 'all' || scope === 'inspect') {
+        var cur = I.slice().sort(function (a, c) { return (c.s || '').localeCompare(a.s || ''); })[0];
+        if (cur) {
+          var res = cur.res || {}, xs = Object.keys(res).filter(function (k) { return res[k] === 'x'; });
+          var noMemo = xs.filter(function (k) { return !(cur.memo || {})[k]; }).length, noPh = xs.filter(function (k) { return !(cur.photo || {})[k]; }).length;
+          if (!Object.keys(res).length) add('err', '자체점검 점검표', (cur.s || '') + ' 점검: 체크한 항목이 하나도 없음', 'inspect.html');
+          if (noMemo) add('warn', '자체점검 점검표', '불량(×) ' + xs.length + '개 중 ' + noMemo + '개에 불량 내용 메모 없음', 'inspect.html');
+          if (noPh) add('warn', '자체점검 점검표', '불량(×) ' + xs.length + '개 중 ' + noPh + '개에 사진 없음', 'inspect.html');
+          if (!((cur.staff || [])[0] || {}).name) add('err', '자체점검 점검표', '점검인력(점검자) 이름 없음', 'inspect.html');
+          if (cur.e && K.parse(cur.e) && !cur.reported) { var rd = K.bizDeadline(K.parse(cur.e), 15); if (K.daysLeft(rd) < 0 && K.daysLeft(rd) > -60) add('warn', '자체점검 점검표', '점검 끝난 날 ' + cur.e + ' → 소방서 보고 기한 ' + K.fmt(rd) + ' 지남(보고했으면 무시)', 'inspect.html'); }
+        }
+      }
+      return out;
+    });
+  };
+
+  // 다음 점검 달 (별표 3: 종합점검 대상은 사용승인 달 종합·6개월 뒤 작동, 아니면 사용승인 달 작동)
+  K.nextInspect = function (b) {
+    var a = K.parse(b.approval); if (!a) return null;
+    var m = a.getMonth(), list = b.comp === 'y' ? [[m, '종합점검'], [(m + 6) % 12, '작동점검']] : [[m, '작동점검']];
+    var t = K.today(), best = null;
+    [t.getFullYear(), t.getFullYear() + 1].forEach(function (y) { list.forEach(function (p) { var end = K.lastDay(y, p[0]); if (end >= t && (!best || end < best.end)) best = { end: end, kind: p[1], month: p[0] + 1, year: y }; }); });
+    return best;
+  };
+
+  // 첫 화면 한눈에 보기 (el 에 그림, base 는 수첩 폴더 경로)
+  K.glance = function (el, base) {
+    base = base || '';
+    return Promise.all([K.building(), K.all('defects'), K.all('records'), K.audit('all')]).then(function (r) {
+      var b = r[0], D = r[1], R = r[2], A = r[3], t = K.today();
+      var open = D.filter(function (x) { return !x.fix; }), late = D.filter(function (x) { return K.defDue(x).late; });
+      var soon = D.map(function (x) { return { x: x, o: K.defDue(x) }; }).filter(function (p) { return p.o.next && K.daysLeft(p.o.next) >= 0 && K.daysLeft(p.o.next) <= 7; }).sort(function (p, q) { return p.o.next - q.o.next; });
+      var ym = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0');
+      var recNow = R.some(function (x) { return (x.date || '').slice(0, 7) === ym; });
+      var ni = K.nextInspect(b), rep = K.repeats(D), rpt = D.filter(function (x) { return rep[x.id] > 1 && !x.fix; }).length;
+      var errs = A.filter(function (a) { return a.lv === 'err'; }).length;
+      function tile(n, label, href, cls) { return '<a class="gl ' + (cls || '') + '" href="' + base + href + '"><b>' + n + '</b><span>' + label + '</span></a>'; }
+      var h = '<div class="gls">' +
+        tile(open.length, '미조치 지적사항', 'defects.html', open.length ? 'warn' : 'ok') +
+        tile(soon.length, '7일 안 기한', 'defects.html', soon.length ? 'warn' : 'ok') +
+        tile(late.length, '기한 지남', 'defects.html', late.length ? 'bad' : 'ok') +
+        tile(recNow ? '작성함' : '안 함', (t.getMonth() + 1) + '월 업무수행기록표', 'record.html', recNow ? 'ok' : 'warn') +
+        tile(ni ? 'D-' + K.daysLeft(ni.end) : '-', ni ? ni.year + '년 ' + ni.month + '월 ' + ni.kind + '(그 달 말까지)' : '다음 점검: 사용승인일 넣으면 계산', ni ? 'calendar.html' : 'index.html#b-approval', ni && K.daysLeft(ni.end) <= 31 ? 'warn' : 'ok') +
+        tile(errs, '출력 전 누락(빨간 항목)', 'check.html', errs ? 'bad' : 'ok') +
+        '</div>';
+      if (rpt) h += '<p class="hint">반복 불량(전에도 나온 불량) 미조치 ' + rpt + '건 → <a href="' + base + 'defects.html">지적사항에서 보기</a></p>';
+      if (soon.length) h += '<ul class="soon">' + soon.slice(0, 5).map(function (p) { return '<li>' + K.fmt(p.o.next) + ' (D-' + K.daysLeft(p.o.next) + ') · ' + K.esc(p.x.eq || '') + ' ' + K.esc((p.x.desc || '').slice(0, 30)) + (p.x.fix ? ' · 이행완료 보고' : ' · 이행 완료') + '</li>'; }).join('') + '</ul>';
+      if (b.addr) h += '<p class="hint">' + K.esc(b.name || '') + ' ' + K.navLinks(b.addr) + '</p>';
+      el.innerHTML = h;
+    });
+  };
 })();
