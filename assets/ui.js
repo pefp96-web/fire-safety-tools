@@ -4,6 +4,7 @@
   var ROOT = me ? me.replace(/assets\/ui\.js.*$/, '') : '/fire-safety-tools/';
   var CMDS = [
     ['대시보드(첫 화면)', '', '홈'],
+    ['검색 첫 화면(앱 시작 화면)', 'kit/search.html', '수첩'],
     ['현장 수첩 홈', 'kit/', '수첩'],
     ['건물 목록·등록', 'kit/buildings.html', '수첩'],
     ['자체점검 점검표·결과보고서', 'kit/inspect.html', '수첩'],
