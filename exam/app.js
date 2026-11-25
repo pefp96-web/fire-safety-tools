@@ -72,7 +72,7 @@ if (page === 'wiring') {
   ['#wn','#wm','#wf'].forEach(s => $(s).oninput = calc); calc();
   // 연습
   let cur = null, score = [0,0];
-  function newQ(){ const n = 1 + Math.floor(Math.random() * 20), zone = Math.random() < .4, fl = zone ? Math.max(11, n) : 1; cur = {n, mode: zone ? 'zone' : 'all', fl, r: wires(n, zone ? 'zone' : 'all', fl)};
+  function newQ(){ const zone = Math.random() < .4, n = zone ? 11 + Math.floor(Math.random() * 10) : 1 + Math.floor(Math.random() * 20), fl = zone ? n : 1; cur = {n, mode: zone ? 'zone' : 'all', fl, r: wires(n, zone ? 'zone' : 'all', fl)};
     $('#pq').innerHTML = `P형 수신기, 발신기세트 회로 <b>${n}개</b>가 한 간선에 모여 수신기로 간다. ${zone ? `건물은 지상 <b>${fl}층</b>(공동주택 아님), 층마다 회로가 있어 <b>구분 경보</b>.` : '<b>일제 경보</b> 방식.'} 이 간선의 가닥수는?`;
     $('#pa').value = ''; $('#pf').innerHTML = ''; }
   $('#pnew').onclick = newQ; $('#pchk').onclick = () => { const v = +$('#pa').value, good = v === cur.r.total; score[1]++; if (good) score[0]++;
