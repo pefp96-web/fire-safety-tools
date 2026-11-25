@@ -154,6 +154,8 @@
     u(); window.addEventListener('online', u); window.addEventListener('offline', u);
   };
   document.addEventListener('DOMContentLoaded', K.netBadge);
+  // 최근·자주 쓰는 기능(검색 첫 화면용): 이 기기 localStorage 에 화면 주소별 횟수·시각만 남김
+  try { var vk = location.pathname.replace(/^.*\/kit\//, '') + (location.search.indexOf('t=') > -1 ? location.search : ''); if (vk && vk !== 'search.html') { var vv = JSON.parse(localStorage.getItem('fst-visit') || '{}'); var vo = vv[vk] || { n: 0, t: 0 }; vo.n++; vo.t = Date.now(); vv[vk] = vo; localStorage.setItem('fst-visit', JSON.stringify(vv)); } } catch (e) {}
 
   // ---------- 2026-11-25 추가: 의견 창구, 길안내, 누락 검사, 반복 불량, 한눈에 보기 ----------
   K.FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSclhgEM4yGzquJzb3NtVbfydJB8YqKhOaRvF_Sd7-Hc0nrhvw/viewform';

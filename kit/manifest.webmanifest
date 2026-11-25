@@ -2,7 +2,7 @@
   "name": "소방안전관리자 현장 수첩",
   "short_name": "소방 수첩",
   "id": "./",
-  "start_url": "./",
+  "start_url": "search.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#F7F8FA",
