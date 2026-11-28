@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>세대점검 취합 시안 | 소방 업무 도구</title>
+<meta name="description" content="아파트 세대점검 취합·미점검 알림 화면 시안 3개(예시 데이터, 저장 기능 없음)">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="preload" href="../assets/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* 디자인 사양(숫자 먼저 정하고 그대로 구현)
+   본색 #C8322B 1개 + 회색 9단계(우리 사이트 ds.css와 같음), 글꼴 Pretendard
+   상태색: 완료 #17703F(흰 글자 6.4:1) / 부재 #FFB020(검은 글자 10:1) / 거부 #191F28(흰 글자 17:1) / 미점검 흰 바탕+굵은 테두리
+   누르는 곳 최소 48px, 현장 주요 버튼 56~96px, 버튼 사이 8px 이상
+   움직임: 누름 0.97배 80ms, 시트 240ms cubic-bezier(.2,0,0,1), 알림 160ms, 그 밖 없음 */
+@font-face{font-family:'Pretendard';src:url('../assets/PretendardVariable.woff2') format('woff2-variations'),url('../assets/PretendardVariable.woff2') format('woff2');font-weight:45 920;font-display:swap}
+:root{
+  --brand:#C8322B;--brand-hover:#A8261F;--brand-soft:#FCEDEC;--brand-text:#B02A24;
+  --g0:#FFFFFF;--g50:#F7F8FA;--g100:#F1F3F5;--g200:#E5E8EB;--g300:#D1D6DB;--g400:#B0B8C1;
+  --g500:#8B95A1;--g600:#5E6876;--g700:#4E5968;--g800:#333D4B;--g900:#191F28;
+  --ok:#17703F;--ok-soft:#E8F5EE;--absent:#FFB020;--absent-soft:#FFF4DB;--refuse:#191F28;--info:#1F5FA8;
+  --font:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+  --ease:cubic-bezier(.2,0,0,1);--r:8px;--r-lg:12px;--r-xl:16px;
+  --shadow:0 1px 2px rgba(25,31,40,.06),0 2px 8px rgba(25,31,40,.04);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;font-family:var(--font);font-size:16px;line-height:1.5;color:var(--g900);background:var(--g100);-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,select:focus-visible,label:focus-within{outline:3px solid var(--info);outline-offset:2px}
+.press{transition:transform 80ms var(--ease),background-color 160ms var(--ease),border-color 160ms var(--ease)}
+.press:active{transform:scale(.97)}
+svg.i{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.num{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* 시안 이동 막대 (앱 바깥, 시안 확인용) */
+.proto{position:sticky;top:0;z-index:40;background:var(--g900);color:#fff;display:flex;align-items:center;gap:4px;padding:0 8px;height:48px;overflow-x:auto;scrollbar-width:none}
+.proto::-webkit-scrollbar{display:none}
+@media (max-width:420px){.proto b{display:none}}
+.proto b{font-size:13px;font-weight:600;color:var(--g400);margin-right:6px;white-space:nowrap}
+.proto a{color:var(--g300);text-decoration:none;font-size:15px;font-weight:600;padding:0 12px;height:40px;display:flex;align-items:center;border-radius:8px;white-space:nowrap}
+.proto a[aria-current="page"]{background:#fff;color:var(--g900)}
+.view{display:none}
+.view.on{display:block}
+
+/* 공통 버튼 */
+.btn{min-height:48px;padding:0 18px;border-radius:var(--r-lg);border:1px solid var(--g300);background:#fff;font-size:16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn.dark{background:var(--g900);border-color:var(--g900);color:#fff}
+.btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.big{min-height:56px;font-size:18px;width:100%}
+.iconbtn{width:48px;height:48px;border-radius:12px;border:0;background:transparent;color:var(--g800);display:inline-flex;align-items:center;justify-content:center}
+.iconbtn:active{background:var(--g100)}
+
+/* ========== 1) 점검자 폰 ========== */
+.phone{max-width:430px;margin:0 auto;background:#fff;min-height:calc(100vh - 48px);position:relative}
+@media (min-width:700px){.phone{margin:24px auto;min-height:780px;border-radius:24px;box-shadow:0 0 0 1px var(--g200),0 12px 40px rgba(25,31,40,.10);overflow:clip}}
+.appbar{display:flex;align-items:center;gap:4px;padding:8px 8px 8px 16px;border-bottom:1px solid var(--g200);background:#fff}
+.site-btn{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;border:0;background:none;padding:4px 0;text-align:left;min-height:48px;justify-content:center}
+.site-btn .t{display:flex;align-items:center;gap:4px;font-size:19px;font-weight:800;letter-spacing:-.02em}
+.site-btn .t svg{width:20px;height:20px}
+.site-btn .s{font-size:14px;color:var(--g600);font-weight:500}
+.f-body{padding:16px 16px 8px}
+.dongtabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.dongtab{min-height:60px;border-radius:12px;border:1.5px solid var(--g200);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0}
+.dongtab .d{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.dongtab .p{font-size:13px;font-weight:700;color:var(--g600)}
+.dongtab[aria-selected="true"]{background:var(--g900);border-color:var(--g900);color:#fff}
+.dongtab[aria-selected="true"] .p{color:var(--g300)}
+.sum{margin-top:16px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.sum h2{margin:0;font-size:24px;font-weight:800;letter-spacing:-.03em}
+.sum h2 small{font-size:16px;color:var(--g600);font-weight:600;margin-left:4px}
+.sum .left{font-size:15px;font-weight:700;color:var(--brand-text)}
+.bar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--g200);margin-top:10px}
+.bar i{display:block;height:100%}
+.bar .b-ok{background:var(--ok)}.bar .b-ab{background:var(--absent)}.bar .b-rf{background:var(--refuse)}
+.filters{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.1fr;gap:6px;margin-top:14px}
+.chip{min-height:48px;border-radius:10px;border:1.5px solid var(--g200);background:#fff;display:flex;align-items:center;justify-content:center;gap:6px;font-size:15px;font-weight:700;padding:0 4px;white-space:nowrap}
+.chip .dot{width:12px;height:12px;border-radius:3px;flex:none}
+.chip .n{color:var(--g600);font-weight:700}
+.chip[aria-pressed="true"]{border-color:var(--g900);box-shadow:inset 0 0 0 1px var(--g900)}
+.dot.ok{background:var(--ok)}.dot.ab{background:var(--absent)}.dot.rf{background:var(--refuse)}.dot.no{background:#fff;border:2px solid var(--g400)}
+.grid-head{display:grid;grid-template-columns:36px repeat(4,1fr);gap:6px;margin:18px 0 6px;font-size:13px;color:var(--g600);font-weight:700;text-align:center}
+.grid{display:grid;grid-template-columns:36px repeat(4,1fr);gap:6px}
+.fl{display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--g600)}
+.cell{min-height:60px;border-radius:10px;border:2px solid var(--g300);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0}
+.cell .h{font-size:18px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.cell .l{font-size:12px;font-weight:700;color:var(--g600);line-height:1.2}
+.cell.ok{background:var(--ok);border-color:var(--ok);color:#fff}.cell.ok .l{color:#D6F0E1}
+.cell.ab{background:var(--absent);border-color:var(--absent);color:var(--g900)}.cell.ab .l{color:var(--g900)}
+.cell.rf{background:var(--refuse);border-color:var(--refuse);color:#fff}.cell.rf .l{color:var(--g300)}
+.cell.dim{opacity:.18}
+.cell.sel{outline:3px solid var(--info);outline-offset:2px}
+.cell.flash{animation:flash .5s var(--ease)}
+@keyframes flash{0%{transform:scale(.92)}100%{transform:scale(1)}}
+.dock{position:sticky;bottom:0;z-index:20;padding:16px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,#fff 78%,rgba(255,255,255,0))}
+
+
+/* 바닥 시트 */
+.scrim{position:fixed;inset:0;background:rgba(25,31,40,.45);z-index:50;opacity:0;pointer-events:none;transition:opacity 200ms var(--ease)}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;max-width:430px;margin:0 auto;background:#fff;border-radius:20px 20px 0 0;padding:8px 16px calc(16px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform 240ms var(--ease);max-height:92vh;overflow-y:auto}
+.sheet.on{transform:none}
+.handle{width:40px;height:5px;border-radius:9px;background:var(--g300);margin:4px auto 8px}
+.sh-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.sh-head .e{font-size:15px;font-weight:700;color:var(--g600);margin:4px 0 0}
+.sh-head h2{margin:0;font-size:32px;font-weight:800;letter-spacing:-.03em;line-height:1.2}
+.sh-head .last{font-size:14px;color:var(--g600);margin:2px 0 0}
+.st3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.stb{min-height:96px;border-radius:14px;border:2px solid var(--g300);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:19px;font-weight:800}
+.stb svg.i{width:30px;height:30px;stroke-width:2.4}
+.stb[data-s="ok"][aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.stb[data-s="ab"][aria-pressed="true"]{background:var(--absent);border-color:var(--absent)}
+.stb[data-s="rf"][aria-pressed="true"]{background:var(--refuse);border-color:var(--refuse);color:#fff}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.tool{min-height:64px;border-radius:14px;border:1.5px solid var(--g300);background:var(--g50);display:flex;align-items:center;justify-content:center;gap:8px;font-size:17px;font-weight:700}
+.tool.rec{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-text)}
+.tool .cnt{min-width:24px;height:24px;border-radius:12px;background:var(--g900);color:#fff;font-size:13px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.tool .cnt[hidden]{display:none}
+.att{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.att:empty{display:none}
+.thumb{width:64px;height:64px;border-radius:10px;background:var(--g200) center/cover;display:flex;align-items:flex-end;justify-content:flex-start;font-size:12px;font-weight:700;color:var(--g700);padding:4px}
+.memo{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:var(--g50);border:1px solid var(--g200);font-size:15px;width:100%}
+.memo small{color:var(--g600)}
+.sheet .btn.big{margin-top:16px}
+.list-sheet button.row{width:100%;min-height:64px;border:0;border-bottom:1px solid var(--g200);background:#fff;display:flex;align-items:center;justify-content:space-between;text-align:left;padding:8px 4px;gap:8px}
+.list-sheet .row b{font-size:17px}.list-sheet .row span{display:block;font-size:14px;color:var(--g600)}
+
+/* 알림 */
+.toast{position:fixed;left:50%;top:60px;z-index:60;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--g900);color:#fff;border-radius:12px;padding:0 6px 0 16px;min-height:52px;display:flex;align-items:center;gap:12px;font-size:16px;font-weight:600;transition:opacity 160ms var(--ease),transform 160ms var(--ease);width:max-content;max-width:calc(100vw - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{border:0;background:none;color:#FFD27A;font-weight:800;min-height:48px;padding:0 12px}
+
+/* ========== 2) 현황판 ========== */
+.board{max-width:1240px;margin:0 auto;padding:20px 16px 48px}
+.b-top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.b-top .eb{font-size:14px;font-weight:700;color:var(--g600);margin:0}
+.b-top h1{margin:2px 0 0;font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1.3}
+.b-acts{display:flex;gap:8px;flex-wrap:wrap}
+.b-acts .btn svg{width:20px;height:20px}
+.kpi{display:grid;grid-template-columns:1.6fr repeat(4,1fr);gap:12px;margin-top:20px}
+.card{background:#fff;border:1px solid var(--g200);border-radius:var(--r-xl);padding:20px}
+.k-main .lb{font-size:15px;font-weight:700;color:var(--g700)}
+.k-main .big{font-size:48px;font-weight:800;letter-spacing:-.04em;line-height:1.1;margin-top:6px}
+.k-main .big small{font-size:18px;color:var(--g600);font-weight:600;letter-spacing:0;margin-left:6px}
+.k-main .bar{height:12px;margin-top:14px}
+.k-sm .lb{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--g700)}
+.k-sm .v{font-size:34px;font-weight:800;letter-spacing:-.03em;margin-top:8px;line-height:1.1}
+.k-sm .v small{font-size:15px;font-weight:600;color:var(--g600);margin-left:2px}
+.k-sm.warn{border-color:#F1C7C4;background:#FFFAFA}
+.k-sm.warn .v{color:var(--brand-text)}
+.b-grid{display:grid;grid-template-columns:5fr 7fr;gap:12px;margin-top:12px;align-items:start}
+.card h2{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em}
+.card .hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.drow{display:grid;grid-template-columns:64px 1fr 56px;align-items:center;gap:12px;min-height:64px;border-top:1px solid var(--g100);padding:6px 0;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left}
+.drow:first-of-type{border-top:0}
+.drow .dn{font-size:17px;font-weight:800}
+.drow .pc{font-size:17px;font-weight:800;text-align:right}
+.drow .sub{font-size:13px;color:var(--g600);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
+.drow[aria-pressed="true"]{background:var(--g50)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{min-height:44px;padding:0 14px;border-radius:10px;border:1.5px solid var(--g200);background:#fff;font-size:15px;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--g900);border-color:var(--g900);color:#fff}
+table.ul{width:100%;border-collapse:collapse;font-size:15px}
+table.ul th{text-align:left;font-size:13px;color:var(--g600);font-weight:700;padding:10px 8px;border-bottom:1px solid var(--g200);position:sticky;top:0;background:#fff}
+table.ul td{padding:0 8px;height:52px;border-bottom:1px solid var(--g100)}
+table.ul td.h{font-weight:800}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.tag.no{background:var(--brand-soft);color:var(--brand-text)}
+.tag.ab{background:var(--absent-soft);color:#7A4B00}
+.tag.rf{background:var(--g100);color:var(--g900)}
+.tbl-wrap{max-height:520px;overflow:auto;margin:0 -8px}
+.mut{color:var(--g600)}
+.note{font-size:14px;color:var(--g600);margin:16px 0 0}
+@media (max-width:980px){.kpi{grid-template-columns:repeat(2,1fr)}.k-main{grid-column:1/-1}.b-grid{grid-template-columns:1fr}}
+@media (max-width:560px){.board{padding:16px 12px 40px}.b-top h1{font-size:22px}.b-acts{width:100%;display:grid;grid-template-columns:1fr 1fr}.b-acts .btn{padding:0 8px;font-size:15px}.k-main .big{font-size:40px}.kpi{grid-template-columns:repeat(4,1fr);gap:8px}.card.k-sm{padding:12px 8px}.k-sm .lb{font-size:13px;gap:5px;white-space:nowrap}.tbl-wrap{max-height:none;overflow:visible}.k-sm .v{font-size:24px}.k-sm .v small{display:none}.card{padding:16px}
+ table.ul thead{display:none}table.ul tr{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 10px;padding:10px 8px;border-bottom:1px solid var(--g100)}table.ul td{height:auto;padding:0;border:0}table.ul td.w{grid-column:2;font-size:14px;color:var(--g600)}table.ul td.t{grid-row:1/3;grid-column:3}table.ul td.h{font-size:17px}table.ul td.d{grid-row:1/3;font-size:15px;font-weight:700;color:var(--g700)}}
+
+/* 미리보기 창 */
+.modal{position:fixed;inset:0;z-index:70;display:none;background:rgba(25,31,40,.55);overflow:auto;padding:16px}
+.modal.on{display:block}
+.m-box{max-width:880px;margin:0 auto;background:var(--g100);border-radius:16px;overflow:hidden}
+.m-bar{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 16px;background:#fff;border-bottom:1px solid var(--g200);flex-wrap:wrap;position:sticky;top:-16px}
+.m-bar h2{margin:0;font-size:17px;font-weight:800;flex:1;min-width:140px}
+.m-bar select{min-height:44px;border-radius:10px;border:1.5px solid var(--g300);font:inherit;font-weight:700;padding:0 10px;background:#fff}
+.m-note{font-size:14px;color:var(--g700);padding:10px 16px;background:var(--absent-soft);margin:0}
+.paper{background:#fff;margin:16px auto;width:calc(100% - 32px);max-width:720px;aspect-ratio:210/297;padding:6% 7%;box-shadow:var(--shadow);color:#111;display:flex;flex-direction:column;font-size:clamp(11px,1.9vw,15px);line-height:1.65}
+.paper .org{font-size:.9em;color:#444;border-bottom:2px solid #111;padding-bottom:.6em;display:flex;justify-content:space-between}
+.paper h3{font-size:2em;margin:.9em 0 .3em;letter-spacing:-.03em;line-height:1.25}
+.paper .when{border:2px solid #111;padding:.8em 1em;margin:1em 0;font-size:1.15em}
+.paper .when b{font-size:1.2em}
+.paper table{width:100%;border-collapse:collapse;font-size:.95em}
+.paper td,.paper th{border:1px solid #999;padding:.3em .5em;text-align:center}
+.paper th{background:#F1F3F5}
+.paper .qr{display:flex;gap:1em;align-items:center;margin-top:auto;border-top:1px dashed #999;padding-top:1em}
+.paper .qr .box{width:5.5em;height:5.5em;border:2px solid #111;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+@media (max-width:560px){.modal{padding:8px}.m-bar{display:grid;grid-template-columns:1fr 1fr 48px;gap:8px;top:-8px}.m-bar h2{grid-column:1/3;grid-row:1}.m-bar [data-mclose]{grid-column:3;grid-row:1}.m-bar select{grid-row:2;grid-column:1}.m-bar .btn{grid-row:2;grid-column:2/4}.m-bar .btn.wide{grid-column:1/4}.paper{aspect-ratio:auto;width:calc(100% - 16px);margin:8px auto;padding:24px 18px;font-size:13px}.paper .qr{margin-top:1.5em}}
+.xl{background:#fff;margin:16px;border-radius:8px;overflow:auto}
+.xl table{border-collapse:collapse;width:100%;font-size:15px;min-width:560px}
+.xl th,.xl td{border:1px solid #D9DDE2;padding:8px 10px;text-align:right}
+.xl th{background:#EDF3EE;text-align:center;font-weight:700}
+.xl td:nth-child(2){text-align:center;font-weight:700}
+.xl tr.tot td{font-weight:800;background:#F7F8FA}
+.xl .cols td,.xl .cols th{background:#F1F3F5;color:var(--g600);font-size:12px;text-align:center;font-weight:600}
+
+/* ========== 3) 입주민 ========== */
+.res{max-width:480px;margin:0 auto;background:#fff;min-height:calc(100vh - 48px);padding:20px 20px 32px;font-size:18px}
+@media (min-width:700px){.res{margin:24px auto;min-height:780px;border-radius:24px;box-shadow:0 0 0 1px var(--g200),0 12px 40px rgba(25,31,40,.10)}}
+.steps{display:flex;gap:6px;margin-bottom:20px}
+.steps i{flex:1;height:6px;border-radius:9px;background:var(--g200)}
+.steps i.on{background:var(--g900)}
+.res .from{font-size:16px;font-weight:700;color:var(--g700);margin:0}
+.res h1{font-size:28px;line-height:1.35;letter-spacing:-.03em;margin:6px 0 0;font-weight:800}
+.res .lead{font-size:19px;line-height:1.6;color:var(--g800);margin:12px 0 0}
+.howto{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.howto figure{margin:0;border:1.5px solid var(--g200);border-radius:16px;padding:12px 8px 12px;text-align:center;background:var(--g50)}
+.howto svg{width:100%;height:auto;max-width:150px}
+.howto figcaption{font-size:17px;font-weight:800;margin-top:4px;line-height:1.35}
+.howto figcaption span{display:block;font-size:15px;font-weight:600;color:var(--g700)}
+.res .btn.big{min-height:72px;font-size:21px;border-radius:16px;margin-top:20px}
+.res .btn.big svg{width:28px;height:28px}
+.res .help{font-size:17px;color:var(--g700);margin:16px 0 0;text-align:center}
+.res .help a{color:var(--g900);font-weight:800}
+.res .demo{display:block;margin:8px auto 0;border:0;background:none;color:var(--g600);font-size:15px;text-decoration:underline;min-height:48px}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
+.shot{aspect-ratio:1;border-radius:12px;background:var(--g200) center/cover;position:relative}
+.shot span{position:absolute;left:6px;bottom:6px;background:rgba(25,31,40,.8);color:#fff;font-size:13px;font-weight:700;border-radius:6px;padding:1px 6px}
+.shot .demo-ill{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:10%;background:var(--g100);border-radius:12px}.shot .demo-ill svg{width:100%}
+.addmore{aspect-ratio:1;border-radius:12px;border:2px dashed var(--g400);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:16px;font-weight:700;color:var(--g700)}
+.done-ic{width:96px;height:96px;border-radius:50%;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;margin:40px auto 0}
+.done-ic svg{width:52px;height:52px;stroke-width:3}
+.center{text-align:center}
+
+/* 처음 화면 */
+.home{max-width:960px;margin:0 auto;padding:32px 16px 48px}
+.home .eb{font-size:15px;font-weight:700;color:var(--brand-text);margin:0}
+.home h1{font-size:clamp(26px,4vw,38px);letter-spacing:-.03em;line-height:1.3;margin:8px 0 8px}
+.home p.lead{font-size:17px;color:var(--g700);margin:0}
+.hcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+.hcard{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--g200);border-radius:16px;padding:20px;min-height:168px}
+.hcard .n{font-size:14px;font-weight:800;color:var(--g600)}
+.hcard b{font-size:20px;letter-spacing:-.02em}
+.hcard span{font-size:15px;color:var(--g700)}
+.hcard .go{margin-top:auto;font-weight:800;font-size:15px;color:var(--g900);display:flex;align-items:center;gap:4px}
+.hcard:hover{border-color:var(--g400)}
+@media (max-width:760px){.hcards{grid-template-columns:1fr}.hcard{min-height:0}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+ <symbol id="i-door" viewBox="0 0 24 24"><path d="M6 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17M3 21h18"/><path d="M14 12h.01"/></symbol>
+ <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.7 5.7l12.6 12.6"/></symbol>
+ <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></symbol>
+ <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+ <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+ <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+ <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+ <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4M9 13h6M9 17h6"/></symbol>
+ <symbol id="i-sheet" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M4 9h16M4 15h16M10 3v18"/></symbol>
+ <symbol id="i-board" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 16v-4M12 16V9M16 16v-6"/></symbol>
+ <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+</svg>
+
+<nav class="proto" aria-label="시안 이동">
+ <b>세대점검 시안</b>
+ <a href="#home" data-v="home">처음</a>
+ <a href="#field" data-v="field">1 점검자</a>
+ <a href="#board" data-v="board">2 현황판</a>
+ <a href="#resident" data-v="resident">3 입주민</a>
+</nav>
+
+<!-- 처음 -->
+<main id="v-home" class="view">
+ <div class="home">
+  <p class="eb">아파트 세대점검 취합 · 1단계 화면 시안</p>
+  <h1>세대마다 누르면, 사무실 현황판이 바로 채워집니다</h1>
+  <p class="lead">예시 데이터(수원 ○○아파트 101~105동, 동당 60세대)로 만든 시안입니다. 누르면 움직이지만 저장은 하지 않습니다.</p>
+  <div class="hcards">
+   <a class="hcard press" href="#field"><span class="n">1 · 휴대폰</span><b>점검자 화면</b><span>동을 고르고 호수를 누른 뒤 완료·부재·거부. 장갑 낀 손으로 누를 수 있는 크기.</span><span class="go">열기 <svg class="i"><use href="#i-right"/></svg></span></a>
+   <a class="hcard press" href="#board"><span class="n">2 · 휴대폰·PC</span><b>사무실·관리사무소 현황판</b><span>동별 진행률, 미점검 세대 목록, 재방문 안내문과 집계표 미리보기.</span><span class="go">열기 <svg class="i"><use href="#i-right"/></svg></span></a>
+   <a class="hcard press" href="#resident"><span class="n">3 · 휴대폰</span><b>부재 세대 입주민 링크</b><span>로그인 없이 감지기·스프링클러 헤드 사진을 찍어 보내면 끝.</span><span class="go">열기 <svg class="i"><use href="#i-right"/></svg></span></a>
+  </div>
+ </div>
+</main>
+
+<!-- 1) 점검자 폰 -->
+<main id="v-field" class="view">
+ <div class="phone">
+  <header class="appbar">
+   <button class="site-btn" id="siteBtn" aria-haspopup="dialog"><span class="t"><span id="siteName">수원 ○○아파트</span><svg class="i"><use href="#i-down"/></svg></span><span class="s">11월 28일(토) · 점검자 김○○</span></button>
+   <a class="iconbtn" href="#board" aria-label="현황판 보기"><svg class="i"><use href="#i-board"/></svg></a>
+  </header>
+  <div class="f-body">
+   <div class="dongtabs" role="tablist" id="dongTabs" aria-label="동 선택"></div>
+   <div class="sum"><h2 id="fTitle"></h2><span class="left num" id="fLeft"></span></div>
+   <div class="bar" id="fBar" aria-hidden="true"></div>
+   <div class="filters" id="fFilters" role="group" aria-label="보기 거르기"></div>
+   <div class="grid-head" aria-hidden="true"><span>층</span><span>1호</span><span>2호</span><span>3호</span><span>4호</span></div>
+   <div class="grid" id="fGrid"></div>
+  </div>
+  <div class="dock"><button class="btn dark big press" id="nextBtn">다음 미점검 세대 <svg class="i"><use href="#i-right"/></svg></button></div>
+ </div>
+</main>
+
+<!-- 2) 현황판 -->
+<main id="v-board" class="view">
+ <div class="board">
+  <div class="b-top">
+   <div><p class="eb">현황판 · 11월 28일(토) 14:20 기준</p><h1>수원 ○○아파트 세대점검</h1></div>
+   <div class="b-acts">
+    <button class="btn press" id="pdfBtn"><svg class="i"><use href="#i-doc"/></svg>재방문 안내문 PDF</button>
+    <button class="btn press" id="xlBtn"><svg class="i"><use href="#i-sheet"/></svg>결과 집계표 엑셀</button>
+   </div>
+  </div>
+  <div class="kpi" id="kpi"></div>
+  <div class="b-grid">
+   <section class="card" aria-labelledby="dh"><div class="hd"><h2 id="dh">동별 진행</h2><span class="mut" style="font-size:14px">누르면 목록이 그 동만</span></div><div id="dongRows"></div></section>
+   <section class="card" aria-labelledby="uh">
+    <div class="hd"><h2 id="uh">남은 세대 <span class="num mut" id="uCount"></span></h2>
+     <div class="seg" id="uSeg" role="group" aria-label="상태 거르기"></div></div>
+    <div class="tbl-wrap"><table class="ul"><thead><tr><th>동</th><th>호</th><th>상태</th><th>마지막 기록</th></tr></thead><tbody id="uBody"></tbody></table></div>
+    <a class="btn press" href="#resident" style="margin-top:12px;width:100%;text-decoration:none"><svg class="i"><use href="#i-link"/></svg>부재 세대 입주민 화면 보기</a>
+   </section>
+  </div>
+  <p class="note">예시 데이터입니다. 점검자 화면에서 누른 결과가 이 현황판에 바로 반영됩니다(새로고침하면 처음으로 돌아감).</p>
+ </div>
+</main>
+
+<!-- 3) 입주민 -->
+<main id="v-resident" class="view">
+ <div class="res" id="resRoot"></div>
+</main>
+
+<!-- 시트·창 -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="uSheet" role="dialog" aria-modal="true" aria-labelledby="shH">
+ <div class="handle"></div>
+ <div class="sh-head"><div><p class="e" id="shDong"></p><h2 id="shH"></h2><p class="last" id="shLast"></p></div><button class="iconbtn" data-close aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+ <div class="st3" id="st3">
+  <button class="stb press" data-s="ok" aria-pressed="false"><svg class="i"><use href="#i-check"/></svg>완료</button>
+  <button class="stb press" data-s="ab" aria-pressed="false"><svg class="i"><use href="#i-door"/></svg>부재</button>
+  <button class="stb press" data-s="rf" aria-pressed="false"><svg class="i"><use href="#i-ban"/></svg>거부</button>
+ </div>
+ <div class="tools">
+  <label class="tool press" for="photoIn"><svg class="i"><use href="#i-cam"/></svg>불량 사진 <span class="cnt num" id="pCnt" hidden></span></label>
+  <button class="tool press" id="micBtn"><svg class="i"><use href="#i-mic"/></svg><span id="micTxt">음성 메모</span></button>
+ </div>
+ <input type="file" id="photoIn" accept="image/*" capture="environment" class="sr">
+ <div class="att" id="att"></div>
+ <button class="btn dark big press" id="shNext">다음 세대로 <svg class="i"><use href="#i-right"/></svg></button>
+</div>
+<div class="sheet list-sheet" id="siteSheet" role="dialog" aria-modal="true" aria-label="단지 선택">
+ <div class="handle"></div>
+ <div class="sh-head"><div><h2 style="font-size:22px">단지 선택</h2></div><button class="iconbtn" data-close aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+ <div id="siteList"></div>
+</div>
+<div class="modal" id="pdfModal" role="dialog" aria-modal="true" aria-labelledby="pdfH">
+ <div class="m-box">
+  <div class="m-bar"><h2 id="pdfH">재방문 안내문 미리보기</h2>
+   <label class="sr" for="pdfDong">동</label><select id="pdfDong"></select>
+   <button class="btn dark press" data-fake="PDF 파일 만들기">PDF 받기</button>
+   <button class="iconbtn" data-mclose aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <p class="m-note">미리보기 화면입니다. 1단계 시안이라 파일은 만들지 않습니다.</p>
+  <div class="paper" id="paper"></div>
+ </div>
+</div>
+<div class="modal" id="xlModal" role="dialog" aria-modal="true" aria-labelledby="xlH">
+ <div class="m-box">
+  <div class="m-bar"><h2 id="xlH">결과 집계표 미리보기 (엑셀)</h2>
+   <button class="btn dark press wide" data-fake="엑셀 파일 만들기">엑셀 받기</button>
+   <button class="iconbtn" data-mclose aria-label="닫기"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <p class="m-note">미리보기 화면입니다. 1단계 시안이라 파일은 만들지 않습니다.</p>
+  <div class="xl" id="xl"></div>
+ </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="toastUndo" hidden>되돌리기</button></div>
+
+<script>
+/* ---------- 예시 데이터 ---------- */
+const DONGS=[101,102,103,104,105];
+const PLAN={101:.86,102:.7,103:.42,104:.15,105:0};
+const NAMES=['김○○','이○○','박○○'];
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const U={}; // 'dong-ho' -> {s,who,at,photos:[],memos:[]}
+const LBL={ok:'완료',ab:'부재',rf:'거부',no:'미점검'};
+for(const d of DONGS){for(let f=15;f>=1;f--){for(let u=1;u<=4;u++){
+  const ho=f*100+u,r=rnd(),p=PLAN[d];let s='no';
+  if(p>0){if(r<p)s='ok';else if(r<p+.09)s='ab';else if(r<p+.115)s='rf';}
+  const hh=9+Math.floor(rnd()*5),mm=Math.floor(rnd()*60);
+  U[d+'-'+ho]={s,who:s==='no'?'':NAMES[Math.floor(rnd()*3)],at:s==='no'?'':(rnd()<.5?'11/27 ':'11/28 ')+String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0'),photos:[],memos:[]};
+}}}
+const units=d=>Object.keys(U).filter(k=>k.startsWith(d+'-')).sort((a,b)=>+a.split('-')[1]-b.split('-')[1]);
+const count=d=>{const c={ok:0,ab:0,rf:0,no:0,all:0};(d?units(d):Object.keys(U)).forEach(k=>{c[U[k].s]++;c.all++});return c};
+const pct=c=>Math.round(c.ok/c.all*100);
+const $=s=>document.querySelector(s);
+const ic=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
+const barHTML=c=>`<i class="b-ok" style="width:${c.ok/c.all*100}%"></i><i class="b-ab" style="width:${c.ab/c.all*100}%"></i><i class="b-rf" style="width:${c.rf/c.all*100}%"></i>`;
+
+/* ---------- 알림 ---------- */
+let tT,undoFn=null;
+function toast(msg,undo){$('#toastTxt').textContent=msg;undoFn=undo||null;$('#toastUndo').hidden=!undo;$('#toast').classList.add('on');clearTimeout(tT);tT=setTimeout(()=>$('#toast').classList.remove('on'),3200)}
+$('#toastUndo').onclick=()=>{if(undoFn)undoFn();$('#toast').classList.remove('on')};
+document.querySelectorAll('[data-fake]').forEach(b=>b.onclick=()=>toast('시안이라 '+b.dataset.fake+'는 아직 안 돼요'));
+
+/* ---------- 시트 ---------- */
+let openSheet=null;
+function showSheet(el){openSheet=el;$('#scrim').classList.add('on');el.classList.add('on')}
+function hideSheet(){if(!openSheet)return;openSheet.classList.remove('on');$('#scrim').classList.remove('on');openSheet=null;document.querySelectorAll('.cell.sel').forEach(c=>c.classList.remove('sel'));stopRec()}
+$('#scrim').onclick=hideSheet;document.querySelectorAll('[data-close]').forEach(b=>b.onclick=hideSheet);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){hideSheet();document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'))}});
+
+/* ---------- 1) 점검자 ---------- */
+let curDong=103,filter='all',curKey=null;
+function renderField(){
+  $('#dongTabs').innerHTML=DONGS.map(d=>{const c=count(d);return `<button class="dongtab press" role="tab" aria-selected="${d===curDong}" data-d="${d}"><span class="d">${d}</span><span class="p num">${pct(c)}%</span></button>`}).join('');
+  const c=count(curDong);
+  $('#fTitle').innerHTML=`${curDong}동 <small class="num">완료 ${c.ok} / ${c.all}세대</small>`;
+  $('#fLeft').textContent=`남은 ${c.no}세대`;
+  $('#fBar').innerHTML=barHTML(c);
+  const F=[['no','미점검'],['ab','부재'],['rf','거부'],['ok','완료']];
+  $('#fFilters').innerHTML=F.map(([k,l])=>`<button class="chip press" aria-pressed="${filter===k}" data-f="${k}"><span class="dot ${k}"></span>${l}<span class="n num">${c[k]}</span></button>`).join('');
+  let h='';for(let f=15;f>=1;f--){h+=`<div class="fl num">${f}</div>`;for(let u=1;u<=4;u++){const ho=f*100+u,k=curDong+'-'+ho,x=U[k];
+    h+=`<button class="cell press ${x.s}${filter!=='all'&&filter!==x.s?' dim':''}${k===curKey&&openSheet?' sel':''}" data-k="${k}" aria-label="${ho}호 ${LBL[x.s]}"><span class="h num">${ho}</span><span class="l">${LBL[x.s]}</span></button>`}}
+  $('#fGrid').innerHTML=h;
+  const nb=$('#nextBtn');nb.disabled=c.no===0;nb.innerHTML=c.no?`다음 미점검 세대 ${ic('right')}`:'이 동은 미점검 세대가 없어요';
+}
+$('#dongTabs').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;curDong=+b.dataset.d;renderField()};
+$('#fFilters').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;filter=filter===b.dataset.f?'all':b.dataset.f;renderField()};
+$('#fGrid').onclick=e=>{const b=e.target.closest('[data-k]');if(b)openUnit(b.dataset.k)};
+function nextNo(fromKey){const ks=units(curDong);let i=fromKey?ks.indexOf(fromKey):-1;for(let n=1;n<=ks.length;n++){const k=ks[(i+n)%ks.length];if(U[k].s==='no')return k}return null}
+$('#nextBtn').onclick=()=>{const k=nextNo(null);if(k)openUnit(k)};
+function openUnit(k){curKey=k;renderSheet();showSheet($('#uSheet'));renderField();
+  const el=document.querySelector(`[data-k="${k}"]`);if(el)el.scrollIntoView({block:'center',behavior:'smooth'})}
+function renderSheet(){const [d,ho]=curKey.split('-'),x=U[curKey];
+  $('#shDong').textContent=`${d}동`;$('#shH').textContent=`${ho}호`;
+  $('#shLast').textContent=x.s==='no'?'아직 기록 없음':`${LBL[x.s]} · ${x.at} · ${x.who}`;
+  document.querySelectorAll('#st3 .stb').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===x.s));
+  $('#pCnt').hidden=!x.photos.length;$('#pCnt').textContent=x.photos.length;
+  $('#att').innerHTML=x.photos.map((p,i)=>`<div class="thumb" style="${p?`background-image:url(${p})`:''}">사진 ${i+1}</div>`).join('')+x.memos.map(m=>`<div class="memo">${ic('mic')}<span>${m.t} <small>· ${m.len}</small></span></div>`).join('');
+}
+$('#st3').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;const x=U[curKey],prev={s:x.s,at:x.at,who:x.who};
+  x.s=b.dataset.s;x.at='11/28 14:'+String(20+Math.floor(Math.random()*9)).padStart(2,'0');x.who='김○○';
+  renderSheet();renderField();const el=document.querySelector(`[data-k="${curKey}"]`);if(el){el.classList.add('flash','sel')}
+  const k=curKey;toast(`${k.split('-')[1]}호 ${LBL[x.s]}(으)로 기록`,()=>{Object.assign(U[k],prev);if(curKey===k)renderSheet();renderField()});
+};
+$('#shNext').onclick=()=>{const k=nextNo(curKey);if(k){curKey=k;renderSheet();renderField();const el=document.querySelector(`[data-k="${k}"]`);if(el)el.scrollIntoView({block:'center',behavior:'smooth'})}else{hideSheet();toast('이 동의 미점검 세대를 다 봤어요')}};
+$('#photoIn').onchange=e=>{const f=e.target.files[0];if(!f)return;U[curKey].photos.push(URL.createObjectURL(f));e.target.value='';renderSheet()};
+let rec=null,recT=0;
+function stopRec(){if(!rec)return;clearInterval(rec);rec=null;$('#micBtn').classList.remove('rec');$('#micTxt').textContent='음성 메모'}
+$('#micBtn').onclick=()=>{if(rec){const len=recT;stopRec();U[curKey].memos.push({t:'"거실 감지기 탈락, 교체 필요" (받아쓰기 예시)',len:`0:${String(len).padStart(2,'0')}`});renderSheet();return}
+  recT=0;$('#micBtn').classList.add('rec');$('#micTxt').textContent='녹음 중 0:00 · 누르면 끝';rec=setInterval(()=>{recT++;$('#micTxt').textContent=`녹음 중 0:${String(recT).padStart(2,'0')} · 누르면 끝`},1000)};
+const SITES=[['수원 ○○아파트','101~105동 · 300세대 · 오늘 점검'],['수원 △△아파트','201~208동 · 512세대 · 12월 2일'],['화성 □□아파트','1~6동 · 420세대 · 12월 5일']];
+$('#siteList').innerHTML=SITES.map((s,i)=>`<button class="row press" data-i="${i}"><div><b>${s[0]}</b><span>${s[1]}</span></div>${i===0?`<span style="color:var(--ok)">${ic('check')}</span>`:ic('right')}</button>`).join('');
+$('#siteList').onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;hideSheet();if(+b.dataset.i)toast('시안에는 ○○아파트 예시만 있어요')};
+$('#siteBtn').onclick=()=>showSheet($('#siteSheet'));
+
+/* ---------- 2) 현황판 ---------- */
+let bDong=0,bF='left';
+function renderBoard(){const c=count();
+  $('#kpi').innerHTML=`<div class="card k-main"><div class="lb">단지 전체 완료율</div><div class="big num">${pct(c)}%<small>${c.ok} / ${c.all}세대</small></div><div class="bar">${barHTML(c)}</div></div>`+
+   [['no','미점검','warn'],['ab','부재',''],['rf','거부',''],['ok','완료','']].map(([k,l,w])=>`<div class="card k-sm ${w}"><div class="lb"><span class="dot ${k}" style="width:12px;height:12px;border-radius:3px;display:inline-block"></span>${l}</div><div class="v num">${c[k]}<small>세대</small></div></div>`).join('');
+  $('#dongRows').innerHTML=DONGS.map(d=>{const x=count(d);return `<button class="drow press" aria-pressed="${bDong===d}" data-d="${d}"><span class="dn">${d}동</span><span><span class="bar" style="margin:0">${barHTML(x)}</span><span class="sub num"><span>완료 ${x.ok}</span><span>부재 ${x.ab}</span><span>거부 ${x.rf}</span><span style="color:var(--brand-text);font-weight:700">미점검 ${x.no}</span></span></span><span class="pc num">${pct(x)}%</span></button>`}).join('');
+  const segs=[['left','남은 전체'],['no','미점검'],['ab','부재'],['rf','거부']];
+  $('#uSeg').innerHTML=(bDong?`<button aria-pressed="true" data-d0>${bDong}동만 ✕</button>`:'')+segs.map(([k,l])=>`<button class="press" aria-pressed="${bF===k}" data-f="${k}">${l}</button>`).join('');
+  const rows=Object.keys(U).sort((a,b)=>{const [d1,h1]=a.split('-'),[d2,h2]=b.split('-');return d1-d2||h1-h2}).filter(k=>(!bDong||k.startsWith(bDong+'-'))&&(bF==='left'?U[k].s!=='ok':U[k].s===bF));
+  $('#uCount').textContent=rows.length+'세대';
+  $('#uBody').innerHTML=rows.slice(0,120).map(k=>{const [d,ho]=k.split('-'),x=U[k];return `<tr><td class="d">${d}동</td><td class="h num">${ho}호</td><td class="t"><span class="tag ${x.s}">${LBL[x.s]}</span></td><td class="w num">${x.s==='no'?'방문 기록 없음':x.at+' · '+x.who}</td></tr>`}).join('')||`<tr><td colspan="4" class="mut" style="height:64px">해당 세대가 없어요</td></tr>`;
+}
+$('#dongRows').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;bDong=bDong===+b.dataset.d?0:+b.dataset.d;renderBoard()};
+$('#uSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-d0'))bDong=0;else bF=b.dataset.f;renderBoard()};
+function renderPaper(){const v=$('#pdfDong').value,ds=v==='all'?DONGS:[+v];
+  const list=[];ds.forEach(d=>units(d).forEach(k=>{if(U[k].s==='ab'||U[k].s==='no')list.push(k)}));
+  const by={};list.forEach(k=>{const [d,ho]=k.split('-');(by[d]=by[d]||[]).push(ho)});
+  const rows=Object.keys(by).map(d=>`<tr><th style="width:4.5em">${d}동</th><td style="text-align:left">${by[d].length>14?by[d].slice(0,14).join(', ')+` 외 ${by[d].length-14}세대`:by[d].join(', ')}</td></tr>`).join('');
+  $('#paper').innerHTML=`<div class="org"><span>수원 ○○아파트 관리사무소</span><span>2026. 11. 28.</span></div>
+  <h3>소방시설 세대 점검<br>재방문 안내</h3>
+  <p>입주민 여러분께,<br>지난 11월 26일(목)~28일(토) 소방시설 세대 점검 때 댁에 계시지 않아 점검을 하지 못한 세대가 있습니다. 아래 날짜에 다시 찾아뵙겠습니다. 감지기와 스프링클러 헤드를 확인하며, 세대당 5분 정도 걸립니다.</p>
+  <div class="when">다시 찾아뵙는 날<br><b>12월 3일(목) 오전 10시 ~ 오후 5시</b></div>
+  <table><tbody>${rows||'<tr><td>대상 세대 없음</td></tr>'}</tbody></table>
+  <div class="qr"><div class="box">QR</div><div><b>집에 안 계셔도 됩니다.</b><br>휴대폰으로 QR을 찍고 천장의 감지기·스프링클러 헤드 사진을 보내 주시면 점검 기록에 반영합니다(1분).<br>문의: 관리사무소 031-000-0000 (예시)</div></div>`;
+}
+$('#pdfDong').innerHTML='<option value="all">전체 동</option>'+DONGS.map(d=>`<option value="${d}">${d}동</option>`).join('');
+$('#pdfDong').onchange=renderPaper;
+$('#pdfBtn').onclick=()=>{renderPaper();$('#pdfModal').classList.add('on')};
+$('#xlBtn').onclick=()=>{const t=count();
+  $('#xl').innerHTML=`<table><tr class="cols"><th></th><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td><td>G</td></tr><tr><th>1</th><th>동</th><th>세대 수</th><th>완료</th><th>부재</th><th>거부</th><th>미점검</th><th>완료율</th></tr>`+
+   DONGS.map((d,i)=>{const c=count(d);return `<tr><th class="cols" style="background:#F1F3F5;color:#5E6876;font-size:12px">${i+2}</th><td>${d}동</td><td class="num">${c.all}</td><td class="num">${c.ok}</td><td class="num">${c.ab}</td><td class="num">${c.rf}</td><td class="num">${c.no}</td><td class="num">${pct(c)}%</td></tr>`}).join('')+
+   `<tr class="tot"><th style="background:#F1F3F5;color:#5E6876;font-size:12px">7</th><td>합계</td><td class="num">${t.all}</td><td class="num">${t.ok}</td><td class="num">${t.ab}</td><td class="num">${t.rf}</td><td class="num">${t.no}</td><td class="num">${pct(t)}%</td></tr></table>`;
+  $('#xlModal').classList.add('on')};
+document.querySelectorAll('[data-mclose]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('on'));
+document.querySelectorAll('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('on')});
+
+/* ---------- 3) 입주민 ---------- */
+const ILL_DET=`<svg viewBox="0 0 160 120" aria-hidden="true"><path d="M8 26h144" stroke="#191F28" stroke-width="3"/><path d="M14 26l8-10M34 26l8-10M54 26l8-10M74 26l8-10M94 26l8-10M114 26l8-10M134 26l8-10" stroke="#8B95A1" stroke-width="2"/><rect x="56" y="26" width="48" height="7" rx="2" fill="#fff" stroke="#191F28" stroke-width="3"/><path d="M50 33h60q0 20-30 20t-30-20z" fill="#fff" stroke="#191F28" stroke-width="3"/><circle cx="80" cy="42" r="3.5" fill="#C8322B"/><path d="M80 66v30" stroke="#C8322B" stroke-width="3" stroke-dasharray="5 5"/><path d="M72 88l8 10 8-10" fill="none" stroke="#C8322B" stroke-width="3"/><rect x="62" y="100" width="36" height="16" rx="3" fill="#fff" stroke="#191F28" stroke-width="2.5"/><circle cx="80" cy="108" r="4" fill="none" stroke="#191F28" stroke-width="2"/></svg>`;
+const ILL_SP=`<svg viewBox="0 0 160 120" aria-hidden="true"><path d="M8 26h144" stroke="#191F28" stroke-width="3"/><path d="M14 26l8-10M34 26l8-10M54 26l8-10M74 26l8-10M94 26l8-10M114 26l8-10M134 26l8-10" stroke="#8B95A1" stroke-width="2"/><path d="M66 26h28v6H66z" fill="#fff" stroke="#191F28" stroke-width="3"/><path d="M74 32h12v8H74z" fill="#fff" stroke="#191F28" stroke-width="3"/><path d="M76 40l-4 14M84 40l4 14" stroke="#191F28" stroke-width="3"/><path d="M62 56h36" stroke="#191F28" stroke-width="4" stroke-linecap="round"/><path d="M64 56l-4 5M72 56l-2 5M88 56l2 5M96 56l4 5" stroke="#191F28" stroke-width="2"/><path d="M80 66v30" stroke="#C8322B" stroke-width="3" stroke-dasharray="5 5"/><path d="M72 88l8 10 8-10" fill="none" stroke="#C8322B" stroke-width="3"/><rect x="62" y="100" width="36" height="16" rx="3" fill="#fff" stroke="#191F28" stroke-width="2.5"/><circle cx="80" cy="108" r="4" fill="none" stroke="#191F28" stroke-width="2"/></svg>`;
+let rStep=1,rShots=[];
+const DEMO=['#D1D6DB','#E5E8EB','#B0B8C1'];
+function renderRes(){const r=$('#resRoot');
+  const steps=`<div class="steps" aria-label="3단계 중 ${rStep}단계">${[1,2,3].map(i=>`<i class="${i<=rStep?'on':''}"></i>`).join('')}</div>`;
+  if(rStep===1){r.innerHTML=steps+`<p class="from">수원 ○○아파트 관리사무소</p><h1>103동 1204호<br>소방 점검 사진을 보내 주세요</h1>
+   <p class="lead">천장에 있는 아래 두 가지를 찍어 주시면 점검이 끝납니다. 집에 오시지 않아도 됩니다.</p>
+   <div class="howto"><figure>${ILL_DET}<figcaption>감지기<span>천장의 둥근 기계</span></figcaption></figure><figure>${ILL_SP}<figcaption>스프링클러 헤드<span>천장의 작은 꼭지</span></figcaption></figure></div>
+   <label class="btn brand big press" for="resIn">${ic('cam')}사진 찍기</label>
+   <input type="file" id="resIn" accept="image/*" capture="environment" multiple class="sr">
+   <p class="help">어려우시면 <a href="#resident">031-000-0000</a>(예시)로 전화 주세요.</p>
+   <button class="demo" id="resDemo">예시 사진으로 다음 화면 보기</button>`;
+   $('#resIn').onchange=e=>{rShots=[...e.target.files].map(f=>URL.createObjectURL(f));if(rShots.length){rStep=2;renderRes()}};
+   $('#resDemo').onclick=()=>{rShots=['','',''];rStep=2;renderRes()};
+  }else if(rStep===2){r.innerHTML=steps+`<p class="from">103동 1204호</p><h1>사진 ${rShots.length}장이<br>잘 찍혔어요</h1>
+   <p class="lead">감지기와 스프링클러 헤드가 보이면 됩니다. 더 찍을 것이 없으면 보내기를 눌러 주세요.</p>
+   <div class="shots">${rShots.map((s,i)=>`<div class="shot" style="${s?`background-image:url(${s})`:''}">${s?'':`<span class="demo-ill">${i%2?ILL_SP:ILL_DET}</span>`}<span>${i+1}</span></div>`).join('')}<label class="addmore press" for="resIn2">${ic('cam')}더 찍기</label></div>
+   <input type="file" id="resIn2" accept="image/*" capture="environment" multiple class="sr">
+   <button class="btn brand big press" id="resSend">보내기</button>
+   <button class="demo" id="resBack">처음부터 다시 찍기</button>`;
+   $('#resIn2').onchange=e=>{rShots=rShots.concat([...e.target.files].map(f=>URL.createObjectURL(f)));renderRes()};
+   $('#resSend').onclick=()=>{rStep=3;renderRes();const k='103-1204';if(U[k]&&U[k].s!=='ok'){U[k].s='ok';U[k].at='11/28 14:31';U[k].who='입주민 사진'}};
+   $('#resBack').onclick=()=>{rStep=1;rShots=[];renderRes()};
+  }else{r.innerHTML=steps+`<div class="done-ic">${ic('check')}</div><h1 class="center" style="margin-top:20px">보내 주셔서<br>고맙습니다</h1>
+   <p class="lead center">사진 ${rShots.length}장을 받았습니다.<br>점검 업체가 확인한 뒤<br>점검 기록에 넣습니다.<br>이 화면은 닫으셔도 됩니다.</p>
+   <button class="demo" id="resAgain">시안 처음으로</button>`;
+   $('#resAgain').onclick=()=>{rStep=1;rShots=[];renderRes()};
+  }
+}
+
+/* ---------- 화면 이동 ---------- */
+function route(){const v=(location.hash||'#home').slice(1);const name=['home','field','board','resident'].includes(v)?v:'home';
+  hideSheet();document.querySelectorAll('.modal.on').forEach(m=>m.classList.remove('on'));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+name));
+  document.querySelectorAll('.proto a').forEach(a=>{if(a.dataset.v===name)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+  if(name==='field')renderField();if(name==='board')renderBoard();if(name==='resident')renderRes();
+  window.scrollTo(0,0)}
+addEventListener('hashchange',route);route();
+</script>
+</body>
+</html>
